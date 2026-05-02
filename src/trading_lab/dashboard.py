@@ -16,9 +16,11 @@ from trading_lab.models import (
     Hypothesis,
 )
 from trading_lab.training import (
+    build_commercial_readiness,
     build_experiment_ledger,
     build_mistake_taxonomy,
     build_training_plan,
+    build_workflow_outcomes,
     research_maturity_score,
 )
 
@@ -104,6 +106,8 @@ def render_dashboard_html(
             ),
             "</section>",
             _run_comparator(artifacts),
+            _outcome_flow(artifacts),
+            _commercial_readiness(artifacts),
             _experiment_ledger(artifacts),
             '<section class="two-column">',
             '<section class="panel">',
@@ -320,6 +324,45 @@ def _experiment_ledger(artifacts: list[ResearchRunArtifact]) -> str:
     )
 
 
+def _outcome_flow(artifacts: list[ResearchRunArtifact]) -> str:
+    rows = [
+        "<tr>"
+        f"<td>{escape(item['label'])}</td>"
+        f"<td>{escape(item['outcome'])}</td>"
+        f"<td>{escape(item['why'])}</td>"
+        "</tr>"
+        for item in build_workflow_outcomes(artifacts)
+    ]
+    return (
+        '<section class="panel outcome-panel">'
+        "<h2>Outcome Flow</h2>"
+        '<p class="hint">The dashboard starts with what the research process can use now.</p>'
+        '<div class="table-wrap"><table>'
+        "<thead><tr><th>Flow Step</th><th>Usable Outcome</th><th>Reason</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody>"
+        "</table></div>"
+        "</section>"
+    )
+
+
+def _commercial_readiness(artifacts: list[ResearchRunArtifact]) -> str:
+    readiness = build_commercial_readiness(artifacts)
+    return (
+        '<section class="panel">'
+        "<h2>Commercial Readiness</h2>"
+        + _definition_list(
+            [
+                ("Audience", readiness["audience"]),
+                ("Paid data asset", readiness["paid_data_asset"]),
+                ("Current packaging", readiness["current_packaging"]),
+                ("Next packaging step", readiness["next_packaging_step"]),
+                ("Trust boundary", readiness["trust_boundary"]),
+            ]
+        )
+        + "</section>"
+    )
+
+
 def _return_delta(metrics: dict[str, Any]) -> Any:
     strategy_return = metrics.get("strategy_cumulative_return")
     baseline_return = metrics.get("baseline_cumulative_return")
@@ -424,15 +467,17 @@ def _taxonomy_list(items: list[dict[str, str]]) -> str:
 
 
 def _training_plan_table(plan: list[dict[str, object]]) -> str:
+    preview = plan[:10]
     rows = [
         "<tr>"
         f"<td>{item['round']}</td>"
         f"<td>{escape(str(item['phase']))}</td>"
         f"<td>{escape(str(item['focus']))}</td>"
         "</tr>"
-        for item in plan
+        for item in preview
     ]
     return (
+        '<p class="hint">100 offline review rounds; showing the first 10 as the current training preview.</p>'
         '<div class="table-wrap training-scroll"><table>'
         "<thead><tr><th>Round</th><th>Phase</th><th>Focus</th></tr></thead>"
         f"<tbody>{''.join(rows)}</tbody>"

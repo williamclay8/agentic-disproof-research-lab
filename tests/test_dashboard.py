@@ -41,7 +41,10 @@ def test_render_dashboard_html_builds_offline_falsification_cockpit():
     assert "Research Training Maturity" in html
     assert "Mistake Taxonomy" in html
     assert "Experiment Ledger" in html
+    assert "Outcome Flow" in html
+    assert "Commercial Readiness" in html
     assert "100-Round Training Roadmap" in html
+    assert "100 offline review rounds" in html
     assert "accepted" not in html.lower()
     assert "http://" not in html
     assert "https://" not in html

@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from trading_lab.models import GateResult
 from trading_lab.training import (
+    build_commercial_readiness,
     build_experiment_ledger,
     build_mistake_taxonomy,
     build_training_plan,
+    build_workflow_outcomes,
     research_maturity_score,
 )
 from trading_lab.artifacts import ResearchRunArtifact
@@ -108,6 +110,32 @@ def test_experiment_ledger_summarizes_recurring_mistakes_across_runs():
     assert "Comparator weakness" in row["recurring_mistake_types"]
     assert "Fold fragility" in row["recurring_mistake_types"]
     assert row["next_curriculum_round"] > 0
+
+
+def test_workflow_outcomes_turn_evidence_into_usable_flow():
+    outcomes = build_workflow_outcomes(
+        [_artifact("run-1", [_gate("baseline comparison", "warn", "warning")])]
+    )
+
+    labels = {item["label"] for item in outcomes}
+    assert "Inspect first" in labels
+    assert "Current learning objective" in labels
+    assert "Next evidence product" in labels
+    text = " ".join(item["outcome"] for item in outcomes).lower()
+    assert "recommend" not in text
+    assert "trade" not in text
+
+
+def test_commercial_readiness_frames_paid_value_as_evidence_not_returns():
+    readiness = build_commercial_readiness(
+        [_artifact("run-1", [_gate("baseline comparison", "warn", "warning")])]
+    )
+
+    assert readiness["audience"] == "systematic research teams"
+    assert readiness["paid_data_asset"] == "auditable falsification records"
+    text = " ".join(str(value) for value in readiness.values()).lower()
+    assert "returns" not in text
+    assert "recommendation" not in text
 
 
 def _gate(name: str, status: str, severity: str) -> GateResult:

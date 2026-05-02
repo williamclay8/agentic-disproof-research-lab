@@ -99,6 +99,58 @@ def build_experiment_ledger(
     return rows
 
 
+def build_workflow_outcomes(
+    artifacts: list[ResearchRunArtifact],
+) -> list[dict[str, str]]:
+    ledger = build_experiment_ledger(artifacts)
+    if not ledger:
+        return [
+            {
+                "label": "Inspect first",
+                "outcome": "No run ledger is recorded yet.",
+                "why": "A paid research lab starts with auditable records.",
+            }
+        ]
+
+    primary = ledger[0]
+    mistakes = str(primary["recurring_mistake_types"])
+    return [
+        {
+            "label": "Inspect first",
+            "outcome": mistakes,
+            "why": "Recurring non-pass evidence is the fastest path to better research behavior.",
+        },
+        {
+            "label": "Current learning objective",
+            "outcome": f"Curriculum round {primary['next_curriculum_round']}",
+            "why": "Training advances from the most persistent evidence gap.",
+        },
+        {
+            "label": "Next evidence product",
+            "outcome": "A multi-run falsification ledger with repeated mistake counts.",
+            "why": "People pay for trusted evidence records, not raw charts.",
+        },
+    ]
+
+
+def build_commercial_readiness(
+    artifacts: list[ResearchRunArtifact],
+) -> dict[str, str]:
+    ledger = build_experiment_ledger(artifacts)
+    run_count = sum(int(row["runs"]) for row in ledger) if ledger else 0
+    recurring = ", ".join(
+        str(row["recurring_mistake_types"]) for row in ledger
+    ) if ledger else "None recorded"
+
+    return {
+        "audience": "systematic research teams",
+        "paid_data_asset": "auditable falsification records",
+        "current_packaging": f"{run_count} offline run records with recurring gaps: {recurring}",
+        "next_packaging_step": "Bundle comparable hypothesis ledgers by theme, gate coverage, and repeated evidence gaps.",
+        "trust_boundary": "Offline research evidence only; no allocation, order, or live-data surface.",
+    }
+
+
 def _maturity_label(score: int) -> str:
     if score >= 80:
         return "substantial evidence coverage"
