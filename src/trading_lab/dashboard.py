@@ -62,6 +62,8 @@ def render_dashboard_html(
             f'<div class="verdict verdict-{escape(verdict.replace(" ", "-"))}">',
             "<span>Falsification result</span>",
             f"<strong>{escape(verdict)}</strong>",
+            f"<small>{counts['fail']} fail · {counts['warn']} warn · {counts['pass']} pass</small>",
+            f"<p>{escape(_verdict_explainer(verdict, counts))}</p>",
             "</div>",
             "</section>",
             '<section class="claim panel">',
@@ -71,8 +73,20 @@ def render_dashboard_html(
                     ("Thesis", hypothesis.thesis),
                     ("Null hypothesis", hypothesis.null_hypothesis),
                     ("Comparator baseline", "buy-and-hold baseline on the offline sample"),
-                    ("Pre-registered success condition", hypothesis.acceptance_thresholds),
+                    *_threshold_rows(hypothesis.acceptance_thresholds),
+                    ("Registered before run", "yes"),
                     ("Posthoc edit policy", hypothesis.posthoc_edit_policy),
+                ]
+            ),
+            "</section>",
+            '<section class="panel reader-guide">',
+            "<h2>Reader Guide</h2>",
+            _list(
+                [
+                    "Start with Outcome Flow to see the usable takeaway.",
+                    "Check the evidence cards to see which research controls were recorded.",
+                    "Use Mistake Taxonomy to translate warnings into learning objectives.",
+                    "Use Falsification Gates only when you need the raw evidence record.",
                 ]
             ),
             "</section>",
@@ -87,20 +101,56 @@ def render_dashboard_html(
             ),
             "</section>",
             '<section class="grid metrics">',
-            _evidence_card("Registry locked", "present", "Pre-registered fields recorded"),
-            _evidence_card("Runner reproducible", _gate_status(gate_results, "reproducibility"), "Fingerprint comparison"),
-            _evidence_card("Walk-forward", _gate_status(gate_results, "walk-forward robustness"), "Fold evidence"),
-            _evidence_card("Parameter sensitivity", _gate_status(gate_results, "parameter sensitivity"), "Grid evidence"),
-            _evidence_card("Cost grid", _gate_status(gate_results, "cost grid robustness"), "Cost stress evidence"),
+            _evidence_card(
+                "Registry locked",
+                "present",
+                "Pre-registered fields recorded",
+                "The claim was written before evidence review.",
+                "It helps separate planned tests from after-the-fact storytelling.",
+                "Inspect the Evidence Docket.",
+            ),
+            _evidence_card(
+                "Runner reproducible",
+                _gate_status(gate_results, "reproducibility"),
+                "Fingerprint comparison",
+                "The same inputs produced the same run fingerprint.",
+                "Repeatability makes the artifact auditable.",
+                "Inspect the Reproducibility panel.",
+            ),
+            _evidence_card(
+                "Walk-forward",
+                _gate_status(gate_results, "walk-forward robustness"),
+                "Fold evidence",
+                "The claim was checked across chronological folds.",
+                "Fold weakness shows whether results depend on one small period.",
+                "Open the walk-forward gate evidence.",
+            ),
+            _evidence_card(
+                "Parameter sensitivity",
+                _gate_status(gate_results, "parameter sensitivity"),
+                "Grid evidence",
+                "Nearby parameter cells were recorded for comparison.",
+                "Stable neighborhoods are more informative than one selected setting.",
+                "Inspect the parameter sensitivity gate.",
+            ),
+            _evidence_card(
+                "Cost grid",
+                _gate_status(gate_results, "cost grid robustness"),
+                "Cost stress evidence",
+                "The run records how friction assumptions changed the result.",
+                "Cost fragility is often where paper edges disappear.",
+                "Inspect the cost grid robustness gate.",
+            ),
             "</section>",
             '<section class="panel">',
             "<h2>Evidence Docket</h2>",
+            "<p class=\"hint\">This docket shows what was registered before results were interpreted.</p>",
             _definition_list(
                 [
                     ("Pre-registered metrics", ", ".join(hypothesis.pre_registered_metrics)),
                     ("Falsification tests", ", ".join(hypothesis.falsification_tests)),
                     ("Data requirements", ", ".join(hypothesis.data_requirements)),
-                    ("Dataset hash match", spec.dataset_hash == manifest.content_hash),
+                    ("Dataset hash match", "match" if spec.dataset_hash == manifest.content_hash else "mismatch"),
                     ("Spec hypothesis ID", spec.hypothesis_id),
                 ]
             ),
@@ -131,6 +181,16 @@ def render_dashboard_html(
             _disproof_summary(gate_results),
             "</section>",
             '<section class="panel">',
+            "<h2>Current Loop Position</h2>",
+            _list(
+                [
+                    "Warning evidence surfaced before performance metrics.",
+                    "The current review focus is the recurring mistake pattern.",
+                    "Raw gate evidence remains available for audit.",
+                ]
+            ),
+            "</section>",
+            '<section class="panel">',
             "<h2>Falsification Gates</h2>",
             _gate_table(gate_results),
             "</section>",
@@ -141,6 +201,7 @@ def render_dashboard_html(
             "</section>",
             '<section class="panel">',
             "<h2>Reproducibility</h2>",
+            "<p class=\"hint\">Matching fingerprints indicate the same offline inputs and spec reproduced the same output.</p>",
             _definition_list(
                 [
                     ("Dataset hash", manifest.content_hash),
@@ -216,6 +277,23 @@ def _status_counts(gate_results: list[GateResult]) -> dict[str, int]:
     return counts
 
 
+def _verdict_explainer(verdict: str, counts: dict[str, int]) -> str:
+    if verdict == "rejected":
+        return "Critical failure evidence is recorded for this claim."
+    if verdict == "inconclusive":
+        return "The claim was not rejected, but warning gates remain."
+    return "No failure or warning gate is recorded; this is not a trading conclusion."
+
+
+def _threshold_rows(thresholds: dict[str, Any]) -> list[tuple[str, Any]]:
+    if not thresholds:
+        return [("Pre-registered success condition", "None recorded")]
+    return [
+        (f"Threshold: {name}", value)
+        for name, value in sorted(thresholds.items())
+    ]
+
+
 def _metric_card(label: str, value: Any, caption: str) -> str:
     return (
         '<article class="metric-card">'
@@ -226,12 +304,24 @@ def _metric_card(label: str, value: Any, caption: str) -> str:
     )
 
 
-def _evidence_card(label: str, status: str, caption: str) -> str:
+def _evidence_card(
+    label: str,
+    status: str,
+    caption: str,
+    meaning: str,
+    why_it_matters: str,
+    inspect_next: str,
+) -> str:
     return (
         f'<article class="metric-card evidence-card evidence-{escape(status)}">'
         f"<span>{escape(label)}</span>"
         f"<strong>{escape(status)}</strong>"
         f"<small>{escape(caption)}</small>"
+        '<dl class="card-explain">'
+        f"<dt>What it means</dt><dd>{escape(meaning)}</dd>"
+        f"<dt>Why it matters</dt><dd>{escape(why_it_matters)}</dd>"
+        f"<dt>Inspect next</dt><dd>{escape(inspect_next)}</dd>"
+        "</dl>"
         "</article>"
     )
 
@@ -393,10 +483,27 @@ def _disproof_summary(gate_results: list[GateResult]) -> str:
             f"<strong>{escape(gate.gate_name)}</strong>: "
             f"{escape(gate.status)} against threshold "
             f"<code>{escape(gate.threshold)}</code>"
+            f"{_evidence_sentence(gate)}"
         )
         for gate in pressure
     ]
     return _list(items, already_escaped=True)
+
+
+def _evidence_sentence(gate: GateResult) -> str:
+    evidence = gate.evidence
+    if {
+        "strategy_cumulative_return",
+        "baseline_cumulative_return",
+    }.issubset(evidence):
+        return (
+            " — "
+            f"strategy {_format_percent(evidence['strategy_cumulative_return'])} "
+            f"vs baseline {_format_percent(evidence['baseline_cumulative_return'])}"
+        )
+    if "passing_folds" in evidence and "folds" in evidence:
+        return f" — {evidence['passing_folds']} / {evidence['folds']} folds passed"
+    return ""
 
 
 def _gate_table(gate_results: list[GateResult]) -> str:
@@ -434,8 +541,8 @@ def _status_sort_key(status: str) -> int:
 def _metrics_table(metrics: dict[str, Any]) -> str:
     rows = [
         "<tr>"
-        f"<td>{escape(name)}</td>"
-        f"<td>{escape(str(metrics[name]))}</td>"
+        f"<td>{escape(_metric_label(name))}</td>"
+        f"<td>{escape(_format_metric(name, metrics[name]))}</td>"
         "</tr>"
         for name in sorted(metrics)
     ]
@@ -445,6 +552,43 @@ def _metrics_table(metrics: dict[str, Any]) -> str:
         f"<tbody>{''.join(rows)}</tbody>"
         "</table></div>"
     )
+
+
+def _metric_label(name: str) -> str:
+    labels = {
+        "average_exposure": "Average exposure",
+        "bars": "Offline bars",
+        "baseline_cumulative_return": "Baseline cumulative return",
+        "max_drawdown": "Max drawdown",
+        "strategy_cumulative_return": "Strategy cumulative return",
+        "symbols": "Symbols",
+        "total_cost": "Total cost",
+        "turnover": "Turnover",
+    }
+    return labels.get(name, name.replace("_", " ").title())
+
+
+def _format_metric(name: str, value: Any) -> str:
+    if name in {
+        "strategy_cumulative_return",
+        "baseline_cumulative_return",
+        "max_drawdown",
+        "total_cost",
+        "turnover",
+        "average_exposure",
+    } and isinstance(value, (int, float)):
+        return _format_percent(value)
+    if name == "bars":
+        return f"{value} offline bars"
+    if isinstance(value, list):
+        return ", ".join(str(item) for item in value)
+    return str(value)
+
+
+def _format_percent(value: Any) -> str:
+    if not isinstance(value, (int, float)):
+        return str(value)
+    return f"{value * 100:.2f}%"
 
 
 def _taxonomy_list(items: list[dict[str, str]]) -> str:

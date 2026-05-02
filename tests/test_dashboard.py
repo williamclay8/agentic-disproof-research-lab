@@ -45,6 +45,19 @@ def test_render_dashboard_html_builds_offline_falsification_cockpit():
     assert "Commercial Readiness" in html
     assert "100-Round Training Roadmap" in html
     assert "100 offline review rounds" in html
+    assert "What it means" in html
+    assert "Why it matters" in html
+    assert "Inspect next" in html
+    assert "The claim was written before evidence review." in html
+    assert "Open the walk-forward gate evidence." in html
+    assert "Reader Guide" in html
+    assert "Start with Outcome Flow" in html
+    assert "0 fail" in html
+    assert "warning gates remain" in html
+    assert "strategy 1.00% vs baseline 2.00%" in html
+    assert "Current Loop Position" in html
+    assert "Matching fingerprints indicate" in html
+    assert "Registered before run" in html
     assert "accepted" not in html.lower()
     assert "http://" not in html
     assert "https://" not in html
