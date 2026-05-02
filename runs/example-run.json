@@ -1,0 +1,388 @@
+{
+  "disproof_score": 4,
+  "gate_results": [
+    {
+      "evidence": {
+        "missing_columns": [],
+        "observed_columns": [
+          "date",
+          "symbol",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume"
+        ],
+        "required_columns": [
+          "date",
+          "symbol",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume"
+        ]
+      },
+      "gate_name": "schema columns",
+      "remediation_hint": "No evidence gap recorded.",
+      "severity": "info",
+      "status": "pass",
+      "threshold": "all required OHLCV columns are present"
+    },
+    {
+      "evidence": {
+        "rows_checked": 12
+      },
+      "gate_name": "chronology",
+      "remediation_hint": "No evidence gap recorded.",
+      "severity": "info",
+      "status": "pass",
+      "threshold": "rows are sorted and unique by date and symbol"
+    },
+    {
+      "evidence": {
+        "checked_columns": [
+          "date",
+          "symbol",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume"
+        ]
+      },
+      "gate_name": "lookahead columns",
+      "remediation_hint": "No evidence gap recorded.",
+      "severity": "info",
+      "status": "pass",
+      "threshold": "no lowercase column name contains future, target, or forward"
+    },
+    {
+      "evidence": {
+        "slippage_bps": 5,
+        "total_cost": 0.003,
+        "transaction_cost_bps": 10
+      },
+      "gate_name": "cost realism",
+      "remediation_hint": "No evidence gap recorded.",
+      "severity": "info",
+      "status": "pass",
+      "threshold": "transaction_cost_bps + slippage_bps > 0 and total_cost present"
+    },
+    {
+      "evidence": {
+        "baseline_cumulative_return": 0.0419350221840562,
+        "strategy_cumulative_return": 0.03883048242570175
+      },
+      "gate_name": "baseline comparison",
+      "remediation_hint": "Comparator evidence weakened the claim.",
+      "severity": "warning",
+      "status": "warn",
+      "threshold": "strategy_cumulative_return > baseline_cumulative_return"
+    },
+    {
+      "evidence": {
+        "deterioration": 0.006195183440356411,
+        "original_strategy_cumulative_return": 0.03883048242570175,
+        "stressed_strategy_cumulative_return": 0.03263529898534534
+      },
+      "gate_name": "cost sensitivity",
+      "remediation_hint": "No evidence gap recorded.",
+      "severity": "info",
+      "status": "pass",
+      "threshold": "stressed strategy_cumulative_return > 0 and deterioration <= 50%"
+    },
+    {
+      "evidence": {
+        "first_fingerprint": "24803bcd372677658d5df1678d8d449753157932c9ec4c8a425a767276dfe0ac",
+        "second_fingerprint": "24803bcd372677658d5df1678d8d449753157932c9ec4c8a425a767276dfe0ac"
+      },
+      "gate_name": "reproducibility",
+      "remediation_hint": "No evidence gap recorded.",
+      "severity": "info",
+      "status": "pass",
+      "threshold": "backtest fingerprints match"
+    },
+    {
+      "evidence": {
+        "fold_metrics": [
+          {
+            "baseline_cumulative_return": 0.012237011592958424,
+            "fold": 1,
+            "strategy_cumulative_return": 0.009220959746672364,
+            "test_end": "2024-01-05",
+            "test_start": "2024-01-05",
+            "train_end": "2024-01-04",
+            "train_start": "2024-01-02"
+          },
+          {
+            "baseline_cumulative_return": 0.014634146341463428,
+            "fold": 2,
+            "strategy_cumulative_return": 0.0116145158183103,
+            "test_end": "2024-01-08",
+            "test_start": "2024-01-08",
+            "train_end": "2024-01-05",
+            "train_start": "2024-01-03"
+          },
+          {
+            "baseline_cumulative_return": 0.01449275362318847,
+            "fold": 3,
+            "strategy_cumulative_return": 0.011473334169453508,
+            "test_end": "2024-01-09",
+            "test_start": "2024-01-09",
+            "train_end": "2024-01-08",
+            "train_start": "2024-01-04"
+          }
+        ],
+        "folds": 3,
+        "median_baseline_cumulative_return": 0.01449275362318847,
+        "median_strategy_cumulative_return": 0.011473334169453508,
+        "pass_ratio": 0.0,
+        "passing_folds": 0,
+        "worst_fold_strategy_cumulative_return": 0.009220959746672364
+      },
+      "gate_name": "walk-forward robustness",
+      "remediation_hint": "Record more fold evidence or mark the claim as fold-fragile.",
+      "severity": "warning",
+      "status": "warn",
+      "threshold": "majority of folds beat the comparator on the same offline bars"
+    },
+    {
+      "evidence": {
+        "cells": [
+          {
+            "long_window": 3,
+            "short_window": 1,
+            "strategy_cumulative_return": 0.03883048242570175
+          },
+          {
+            "long_window": 4,
+            "short_window": 1,
+            "strategy_cumulative_return": 0.026275595757706105
+          },
+          {
+            "long_window": 5,
+            "short_window": 1,
+            "strategy_cumulative_return": 0.011473334169453508
+          },
+          {
+            "long_window": 3,
+            "short_window": 2,
+            "strategy_cumulative_return": 0.03883048242570175
+          },
+          {
+            "long_window": 4,
+            "short_window": 2,
+            "strategy_cumulative_return": 0.026275595757706105
+          },
+          {
+            "long_window": 5,
+            "short_window": 2,
+            "strategy_cumulative_return": 0.011473334169453508
+          },
+          {
+            "long_window": 4,
+            "short_window": 3,
+            "strategy_cumulative_return": 0.026275595757706105
+          },
+          {
+            "long_window": 5,
+            "short_window": 3,
+            "strategy_cumulative_return": 0.011473334169453508
+          }
+        ],
+        "median_strategy_cumulative_return": 0.026275595757706105,
+        "positive_cells": 8,
+        "positive_ratio": 1.0,
+        "selected_is_isolated_peak": false,
+        "selected_strategy_cumulative_return": 0.03883048242570175
+      },
+      "gate_name": "parameter sensitivity",
+      "remediation_hint": "No evidence gap recorded.",
+      "severity": "info",
+      "status": "pass",
+      "threshold": "nearby parameter cells show broad non-negative evidence"
+    },
+    {
+      "evidence": {
+        "cells": [
+          {
+            "execution_delay_bars": 1,
+            "slippage_bps": 0,
+            "strategy_cumulative_return": 0.0419350221840562,
+            "transaction_cost_bps": 0
+          },
+          {
+            "execution_delay_bars": 1,
+            "slippage_bps": 5,
+            "strategy_cumulative_return": 0.03883048242570175,
+            "transaction_cost_bps": 10
+          },
+          {
+            "execution_delay_bars": 1,
+            "slippage_bps": 15,
+            "strategy_cumulative_return": 0.03263529898534534,
+            "transaction_cost_bps": 30
+          },
+          {
+            "execution_delay_bars": 2,
+            "slippage_bps": 15,
+            "strategy_cumulative_return": 0.020162504841163775,
+            "transaction_cost_bps": 30
+          }
+        ],
+        "highest_cost_strategy_cumulative_return": 0.020162504841163775,
+        "survival_ratio": 1.0,
+        "surviving_cells": 4,
+        "worst_strategy_cumulative_return": 0.020162504841163775
+      },
+      "gate_name": "cost grid robustness",
+      "remediation_hint": "No evidence gap recorded.",
+      "severity": "info",
+      "status": "pass",
+      "threshold": "returns remain positive across at least half of cost grid cells"
+    }
+  ],
+  "hypothesis": {
+    "acceptance_thresholds": {
+      "baseline_comparison": "strategy_cumulative_return > baseline",
+      "cost_grid": "returns remain positive across at least half of cost grid cells",
+      "parameter_sensitivity": "nearby parameter cells show broad non-negative evidence",
+      "walk_forward": "majority of folds beat the comparator on the same offline bars"
+    },
+    "asset_universe": [
+      "AAA",
+      "BBB"
+    ],
+    "data_requirements": [
+      "local CSV only",
+      "date, symbol, OHLCV columns",
+      "rows sorted by date then symbol"
+    ],
+    "expected_failure_modes": [
+      "lookahead leakage",
+      "cost sensitivity",
+      "failure to beat the offline comparator",
+      "non-reproducible run outputs",
+      "walk-forward fold fragility",
+      "parameter-grid fragility"
+    ],
+    "falsification_tests": [
+      "lookahead columns",
+      "baseline comparison",
+      "walk_forward",
+      "parameter_sensitivity",
+      "cost_grid",
+      "reproducibility"
+    ],
+    "id": "toy-moving-average-crossover",
+    "null_hypothesis": "The toy moving-average crossover has no edge after costs, slippage, and one-bar execution delay.",
+    "posthoc_edit_policy": "Do not change the hypothesis or thresholds after observing results.",
+    "pre_registered_metrics": [
+      "strategy_cumulative_return",
+      "baseline_cumulative_return",
+      "max_drawdown",
+      "turnover",
+      "total_cost"
+    ],
+    "signal_definition": "Moving-average crossover on toy OHLCV bars.",
+    "thesis": "A toy moving-average crossover may beat an offline comparator on the bundled sample.",
+    "time_horizon": "daily bars over a tiny educational sample"
+  },
+  "limitations": [
+    "Offline local CSV only; no live data, broker APIs, or order routes were used.",
+    "Toy research configuration; robustness gates record evidence gaps."
+  ],
+  "manifest": {
+    "columns": [
+      "date",
+      "symbol",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "content_hash": "52635e40771bdd93cb3df91e76808bcdf5cbb67446bebb28c136611068e3ea06",
+    "end_date": "2024-01-09",
+    "source": "examples/toy_prices.csv",
+    "start_date": "2024-01-02",
+    "symbols": [
+      "AAA",
+      "BBB"
+    ],
+    "warnings": []
+  },
+  "next_tests": [
+    "Record additional offline walk-forward folds.",
+    "Record wider parameter and cost grids.",
+    "Record stronger comparator families before interpreting the claim."
+  ],
+  "result": {
+    "fingerprint": "24803bcd372677658d5df1678d8d449753157932c9ec4c8a425a767276dfe0ac",
+    "metrics": {
+      "average_exposure": 0.75,
+      "bars": 8,
+      "baseline_cumulative_return": 0.0419350221840562,
+      "max_drawdown": 0.0,
+      "strategy_cumulative_return": 0.03883048242570175,
+      "symbols": [
+        "AAA",
+        "BBB"
+      ],
+      "total_cost": 0.003,
+      "turnover": 0.375
+    },
+    "positions": [
+      0.0,
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "returns": [
+      0.0,
+      0.005799270072992803,
+      0.004830917874396157,
+      0.009615384615384581,
+      0.0,
+      0.003401960784313708,
+      0.009756097560975618,
+      0.004830917874396157
+    ],
+    "trades": [
+      {
+        "cost": 0.0015,
+        "date": "2024-01-05",
+        "from_position": 0.0,
+        "position_change": 1.0,
+        "symbol": "AAA",
+        "to_position": 1.0
+      },
+      {
+        "cost": 0.0015,
+        "date": "2024-01-05",
+        "from_position": 0.0,
+        "position_change": 1.0,
+        "symbol": "BBB",
+        "to_position": 1.0
+      }
+    ],
+    "warnings": []
+  },
+  "run_id": "toy-moving-average-crossover-52635e40",
+  "schema_version": 1,
+  "spec": {
+    "dataset_hash": "52635e40771bdd93cb3df91e76808bcdf5cbb67446bebb28c136611068e3ea06",
+    "execution_delay_bars": 1,
+    "hypothesis_id": "toy-moving-average-crossover",
+    "long_window": 3,
+    "short_window": 2,
+    "slippage_bps": 5,
+    "transaction_cost_bps": 10
+  },
+  "verdict": "inconclusive"
+}

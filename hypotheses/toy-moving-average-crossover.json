@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "toy-moving-average-crossover",
+  "status": "active",
+  "registered_at": "2026-05-02T00:00:00Z",
+  "thesis": "A toy moving-average crossover may beat an offline comparator on the bundled sample.",
+  "null_hypothesis": "The toy moving-average crossover has no edge after costs, slippage, and one-bar execution delay.",
+  "asset_universe": ["AAA", "BBB"],
+  "time_horizon": "daily bars over a tiny educational sample",
+  "signal_definition": "Moving-average crossover on toy OHLCV bars.",
+  "expected_failure_modes": [
+    "lookahead leakage",
+    "cost sensitivity",
+    "failure to beat the offline comparator",
+    "non-reproducible run outputs",
+    "walk-forward fold fragility",
+    "parameter-grid fragility"
+  ],
+  "falsification_tests": [
+    "lookahead columns",
+    "baseline comparison",
+    "walk_forward",
+    "parameter_sensitivity",
+    "cost_grid",
+    "reproducibility"
+  ],
+  "pre_registered_metrics": [
+    "strategy_cumulative_return",
+    "baseline_cumulative_return",
+    "max_drawdown",
+    "turnover",
+    "total_cost"
+  ],
+  "acceptance_thresholds": {
+    "baseline_comparison": "strategy_cumulative_return > baseline",
+    "walk_forward": "majority of folds beat the comparator on the same offline bars",
+    "parameter_sensitivity": "nearby parameter cells show broad non-negative evidence",
+    "cost_grid": "returns remain positive across at least half of cost grid cells"
+  },
+  "data_requirements": [
+    "local CSV only",
+    "date, symbol, OHLCV columns",
+    "rows sorted by date then symbol"
+  ],
+  "posthoc_edit_policy": "Do not change the hypothesis or thresholds after observing results."
+}
