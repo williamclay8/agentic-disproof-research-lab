@@ -15,6 +15,12 @@ from trading_lab.models import (
     GateResult,
     Hypothesis,
 )
+from trading_lab.training import (
+    build_experiment_ledger,
+    build_mistake_taxonomy,
+    build_training_plan,
+    research_maturity_score,
+)
 
 
 def render_dashboard_html(
@@ -30,6 +36,8 @@ def render_dashboard_html(
     verdict = choose_verdict(gate_results)
     counts = _status_counts(gate_results)
     artifacts = run_artifacts or []
+    maturity = research_maturity_score(gate_results)
+    taxonomy = build_mistake_taxonomy(gate_results)
 
     return "\n".join(
         [
@@ -96,6 +104,24 @@ def render_dashboard_html(
             ),
             "</section>",
             _run_comparator(artifacts),
+            _experiment_ledger(artifacts),
+            '<section class="two-column">',
+            '<section class="panel">',
+            "<h2>Research Training Maturity</h2>",
+            _definition_list(
+                [
+                    ("Score", f"{maturity['score']} / 100"),
+                    ("Label", maturity["label"]),
+                    ("Evidence recorded", ", ".join(maturity["components"])),
+                    ("Evidence missing", ", ".join(maturity["missing"])),
+                ]
+            ),
+            "</section>",
+            '<section class="panel">',
+            "<h2>Mistake Taxonomy</h2>",
+            _taxonomy_list(taxonomy),
+            "</section>",
+            "</section>",
             '<section class="panel">',
             "<h2>Top Evidence Against Claim</h2>",
             _disproof_summary(gate_results),
@@ -159,6 +185,10 @@ def render_dashboard_html(
             "<h2>Open Evidence Gaps</h2>",
             _list(next_tests),
             "</section>",
+            "</section>",
+            '<section class="panel">',
+            "<h2>100-Round Training Roadmap</h2>",
+            _training_plan_table(build_training_plan()),
             "</section>",
             '<section class="panel">',
             "<h2>Agentic Disproof Loop</h2>",
@@ -254,6 +284,42 @@ def _run_comparator(artifacts: list[ResearchRunArtifact]) -> str:
     )
 
 
+def _experiment_ledger(artifacts: list[ResearchRunArtifact]) -> str:
+    ledger = build_experiment_ledger(artifacts)
+    if not ledger:
+        return (
+            '<section class="panel">'
+            "<h2>Experiment Ledger</h2>"
+            "<p>No multi-run artifact ledger is recorded yet.</p>"
+            "</section>"
+        )
+
+    rows = [
+        "<tr>"
+        f"<td>{escape(str(row['hypothesis_id']))}</td>"
+        f"<td>{row['runs']}</td>"
+        f"<td>{escape(str(row['latest_verdict']))}</td>"
+        f"<td>{row['worst_disproof_score']}</td>"
+        f"<td>{escape(str(row['recurring_mistake_types']))}</td>"
+        f"<td>{escape(str(row['open_evidence_gaps']))}</td>"
+        f"<td>{row['next_curriculum_round']}</td>"
+        "</tr>"
+        for row in ledger
+    ]
+    return (
+        '<section class="panel">'
+        "<h2>Experiment Ledger</h2>"
+        '<p class="hint">Multi-run memory for recurring evidence gaps and curriculum state.</p>'
+        '<div class="table-wrap"><table>'
+        "<thead><tr><th>Hypothesis</th><th>Runs</th><th>Latest verdict</th>"
+        "<th>Worst disproof score</th><th>Recurring mistake types</th>"
+        "<th>Open evidence gaps</th><th>Next curriculum round</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody>"
+        "</table></div>"
+        "</section>"
+    )
+
+
 def _return_delta(metrics: dict[str, Any]) -> Any:
     strategy_return = metrics.get("strategy_cumulative_return")
     baseline_return = metrics.get("baseline_cumulative_return")
@@ -333,6 +399,42 @@ def _metrics_table(metrics: dict[str, Any]) -> str:
     return (
         '<div class="table-wrap"><table>'
         "<thead><tr><th>Metric</th><th>Value</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody>"
+        "</table></div>"
+    )
+
+
+def _taxonomy_list(items: list[dict[str, str]]) -> str:
+    if not items:
+        return "<p>No non-pass evidence items recorded.</p>"
+    rows = [
+        "<tr>"
+        f"<td>{escape(item['name'])}</td>"
+        f"<td>{escape(item['gate_name'])}</td>"
+        f"<td>{escape(item['learning_focus'])}</td>"
+        "</tr>"
+        for item in items
+    ]
+    return (
+        '<div class="table-wrap"><table>'
+        "<thead><tr><th>Mistake Type</th><th>Gate</th><th>Learning Focus</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody>"
+        "</table></div>"
+    )
+
+
+def _training_plan_table(plan: list[dict[str, object]]) -> str:
+    rows = [
+        "<tr>"
+        f"<td>{item['round']}</td>"
+        f"<td>{escape(str(item['phase']))}</td>"
+        f"<td>{escape(str(item['focus']))}</td>"
+        "</tr>"
+        for item in plan
+    ]
+    return (
+        '<div class="table-wrap training-scroll"><table>'
+        "<thead><tr><th>Round</th><th>Phase</th><th>Focus</th></tr></thead>"
         f"<tbody>{''.join(rows)}</tbody>"
         "</table></div>"
     )

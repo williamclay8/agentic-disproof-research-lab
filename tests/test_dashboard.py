@@ -38,6 +38,10 @@ def test_render_dashboard_html_builds_offline_falsification_cockpit():
     assert "Agentic Disproof Loop" in html
     assert "Treat missing evidence as a critical failure" in html
     assert "Evidence Docket" in html
+    assert "Research Training Maturity" in html
+    assert "Mistake Taxonomy" in html
+    assert "Experiment Ledger" in html
+    assert "100-Round Training Roadmap" in html
     assert "accepted" not in html.lower()
     assert "http://" not in html
     assert "https://" not in html
