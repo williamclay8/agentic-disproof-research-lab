@@ -32,6 +32,35 @@ def research_maturity_score(gate_results: list[GateResult]) -> dict[str, object]
     }
 
 
+def build_evidence_coverage_matrix(
+    gate_results: list[GateResult],
+) -> list[dict[str, str]]:
+    recorded = {gate.gate_name: gate for gate in gate_results}
+    rows: list[dict[str, str]] = []
+    for gate_name in CORE_EVIDENCE_GATES:
+        gate = recorded.get(gate_name)
+        if gate is None:
+            rows.append(
+                {
+                    "gate_name": gate_name,
+                    "coverage": "missing",
+                    "status": "missing",
+                    "meaning": "No evidence was recorded for this control.",
+                }
+            )
+            continue
+
+        rows.append(
+            {
+                "gate_name": gate_name,
+                "coverage": "recorded",
+                "status": gate.status,
+                "meaning": _coverage_meaning(gate),
+            }
+        )
+    return rows
+
+
 def build_mistake_taxonomy(gate_results: list[GateResult]) -> list[dict[str, str]]:
     taxonomy: list[dict[str, str]] = []
     for gate in gate_results:
@@ -157,6 +186,14 @@ def _maturity_label(score: int) -> str:
     if score >= 50:
         return "partial evidence coverage"
     return "thin evidence coverage"
+
+
+def _coverage_meaning(gate: GateResult) -> str:
+    if gate.status == "pass":
+        return "This control recorded passing evidence."
+    if gate.status == "warn":
+        return "This control recorded warning evidence that needs harder review."
+    return "This control recorded failure evidence against the claim."
 
 
 def _taxonomy_item(gate_name: str) -> dict[str, str]:

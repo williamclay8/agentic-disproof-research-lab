@@ -52,6 +52,14 @@ def test_render_dashboard_html_builds_offline_falsification_cockpit():
     assert "Open the walk-forward gate evidence." in html
     assert "Reader Guide" in html
     assert "Start with Outcome Flow" in html
+    assert "Power Boundary" in html
+    assert "epistemic power" in html
+    assert "Offline Terminal Catalog" in html
+    assert "Research Action Queue" in html
+    assert "Retest warning evidence" in html
+    assert "Evidence Coverage Matrix" in html
+    assert "What this evidence says" in html
+    assert "Strategy returned 1.00% vs baseline 2.00%." in html
     assert "0 fail" in html
     assert "warning gates remain" in html
     assert "strategy 1.00% vs baseline 2.00%" in html
@@ -59,6 +67,8 @@ def test_render_dashboard_html_builds_offline_falsification_cockpit():
     assert "Matching fingerprints indicate" in html
     assert "Registered before run" in html
     assert "accepted" not in html.lower()
+    for forbidden in ["buy msft", "sell msft", "place order", "submit order", "api_key"]:
+        assert forbidden not in html.lower()
     assert "http://" not in html
     assert "https://" not in html
     assert "cdn" not in html.lower()
@@ -98,6 +108,8 @@ def test_render_dashboard_html_compares_multiple_run_artifacts():
     assert html.index("run-harsher") < html.index("run-weaker")
     assert "Disproof score" in html
     assert "Sorted by disproof score" in html
+    assert "Disproof pressure" in html
+    assert "Next research move" in html
 
 
 def test_render_dashboard_html_escapes_dynamic_content():

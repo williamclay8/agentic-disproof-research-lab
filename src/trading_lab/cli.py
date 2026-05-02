@@ -17,6 +17,7 @@ from trading_lab.gates import choose_verdict
 from trading_lab.registry import load_hypothesis
 from trading_lab.reports import render_markdown_report
 from trading_lab.runner import DisproofConfig, run_disproof
+from trading_lab.terminal import parse_terminal_input
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -35,6 +36,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
     if args.command == "dashboard":
         return _dashboard(args.output, args.runs)
+    if args.command == "terminal":
+        return _terminal(args.input)
 
     parser.error("missing command")
     return 2
@@ -91,6 +94,12 @@ def _build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="Structured run artifact to include in the comparator.",
     )
+
+    terminal = subparsers.add_parser(
+        "terminal",
+        help="Parse an offline terminal command or ticker-like research focus.",
+    )
+    terminal.add_argument("input", nargs="+")
 
     return parser
 
@@ -192,6 +201,12 @@ def _run_registered(
         print(f"Report: {output_path}")
 
     return 0
+
+
+def _terminal(parts: list[str]) -> int:
+    parsed = parse_terminal_input(" ".join(parts))
+    print(parsed.message)
+    return 0 if parsed.kind != "unknown" else 2
 
 
 def _artifact_from_example_run(run) -> ResearchRunArtifact:

@@ -172,3 +172,27 @@ def test_run_command_uses_hypothesis_registry_and_writes_artifacts(tmp_path):
     assert "walk-forward robustness" in payload
     assert "parameter sensitivity" in payload
     assert "cost grid robustness" in payload
+
+
+def test_terminal_command_parses_offline_symbol_focus(tmp_path):
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(PROJECT_ROOT / "src")
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "trading_lab.cli",
+            "terminal",
+            "MSFT",
+        ],
+        cwd=tmp_path,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert "offline research focus" in completed.stdout
+    assert "No live market data" in completed.stdout

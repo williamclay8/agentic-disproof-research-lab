@@ -4,24 +4,33 @@
 
 inconclusive
 
+## Power Boundary
+
+- This report can falsify pre-registered claims, compare local evidence, and expose fragility.
+- This report cannot trade, advise, fetch live data, connect brokers, or watch markets.
+- This offline research lab helps focus symbols, register hypotheses, run local falsification, and review evidence.
+- No live market data is requested or implied; use local CSVs and generated artifacts only.
+- No broker or execution actions are available from this terminal layer.
+- Type '?' for catalog help, use command aliases, or enter an uppercase ticker-like token such as MSFT.
+
 ## Hypothesis
 
 - ID: toy-moving-average-crossover
-- Thesis: A toy moving-average crossover may beat an offline comparator on the bundled sample.
+- Thesis: A toy moving-average crossover may outperform a buy-and-hold baseline on the bundled offline sample.
 - Null hypothesis: The toy moving-average crossover has no edge after costs, slippage, and one-bar execution delay.
 - Asset universe: AAA, BBB
 - Time horizon: daily bars over a tiny educational sample
-- Signal definition: Moving-average crossover on toy OHLCV bars.
-- Expected failure modes: lookahead leakage, cost sensitivity, failure to beat the offline comparator, non-reproducible run outputs, walk-forward fold fragility, parameter-grid fragility
-- Falsification tests: lookahead columns, baseline comparison, walk_forward, parameter_sensitivity, cost_grid, reproducibility
+- Signal definition: Long when the 2-bar moving average is above the 3-bar moving average; flat otherwise.
+- Expected failure modes: lookahead leakage, cost sensitivity, failure to beat buy-and-hold baseline, non-reproducible run outputs
+- Falsification tests: lookahead column scan, explicit cost realism check, baseline comparison, higher-cost stress run, deterministic rerun fingerprint check
 - Pre-registered metrics: strategy_cumulative_return, baseline_cumulative_return, max_drawdown, turnover, total_cost
-- Thresholds: {'baseline_comparison': 'strategy_cumulative_return > baseline', 'walk_forward': 'majority of folds beat the comparator on the same offline bars', 'parameter_sensitivity': 'nearby parameter cells show broad non-negative evidence', 'cost_grid': 'returns remain positive across at least half of cost grid cells'}
+- Thresholds: {'baseline_comparison': 'strategy_cumulative_return > baseline', 'cost_sensitivity': 'stressed return remains positive', 'reproducibility': 'rerun fingerprints match'}
 - Data requirements: local CSV only, date, symbol, OHLCV columns, rows sorted by date then symbol
 - Posthoc edit policy: Do not change the hypothesis or thresholds after observing results.
 
 ## Dataset
 
-- Source: examples/toy_prices.csv
+- Source: /Users/clay/Documents/New project 4/examples/toy_prices.csv
 - Symbols: AAA, BBB
 - Date range: 2024-01-02 to 2024-01-09
 - Columns: date, symbol, open, high, low, close, volume
@@ -125,6 +134,24 @@ inconclusive
 - Evidence: {'cells': [{'transaction_cost_bps': 0, 'slippage_bps': 0, 'execution_delay_bars': 1, 'strategy_cumulative_return': 0.0419350221840562}, {'transaction_cost_bps': 10, 'slippage_bps': 5, 'execution_delay_bars': 1, 'strategy_cumulative_return': 0.03883048242570175}, {'transaction_cost_bps': 30, 'slippage_bps': 15, 'execution_delay_bars': 1, 'strategy_cumulative_return': 0.03263529898534534}, {'transaction_cost_bps': 30, 'slippage_bps': 15, 'execution_delay_bars': 2, 'strategy_cumulative_return': 0.020162504841163775}], 'surviving_cells': 4, 'survival_ratio': 1.0, 'worst_strategy_cumulative_return': 0.020162504841163775, 'highest_cost_strategy_cumulative_return': 0.020162504841163775}
 - Remediation: No evidence gap recorded.
 
+## Evidence Coverage
+
+- schema columns: recorded / pass - This control recorded passing evidence.
+- chronology: recorded / pass - This control recorded passing evidence.
+- lookahead columns: recorded / pass - This control recorded passing evidence.
+- baseline comparison: recorded / warn - This control recorded warning evidence that needs harder review.
+- cost realism: recorded / pass - This control recorded passing evidence.
+- cost sensitivity: recorded / pass - This control recorded passing evidence.
+- reproducibility: recorded / pass - This control recorded passing evidence.
+- walk-forward robustness: recorded / warn - This control recorded warning evidence that needs harder review.
+- parameter sensitivity: recorded / pass - This control recorded passing evidence.
+- cost grid robustness: recorded / pass - This control recorded passing evidence.
+
+## Research Action Queue
+
+- Retest warning evidence against a stricter comparator or robustness control.
+- Run next offline test: Record additional offline walk-forward folds.
+- Run next offline test: Record wider parameter and cost grids.
 ## Limitations
 
 - Offline local CSV only; no live data, broker APIs, or order routes were used.
@@ -138,4 +165,4 @@ inconclusive
 
 ## Safety Note
 
-This is not investment advice and no live trading was performed.
+This is not investment advice. No live trading, live data, broker connection, credentials, order routing, or execution action was performed.

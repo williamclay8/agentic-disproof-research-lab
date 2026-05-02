@@ -10,6 +10,8 @@ from trading_lab.models import (
     GateResult,
     Hypothesis,
 )
+from trading_lab.training import build_evidence_coverage_matrix
+from trading_lab.terminal import power_guidance
 
 
 def render_markdown_report(
@@ -28,6 +30,12 @@ def render_markdown_report(
         "## Verdict",
         "",
         verdict,
+        "",
+        "## Power Boundary",
+        "",
+        "- This report can falsify pre-registered claims, compare local evidence, and expose fragility.",
+        "- This report cannot trade, advise, fetch live data, connect brokers, or watch markets.",
+        *_bullet_lines(list(power_guidance())),
         "",
         "## Hypothesis",
         "",
@@ -90,6 +98,15 @@ def render_markdown_report(
             ]
         )
 
+    lines.extend(["## Evidence Coverage", ""])
+    for row in build_evidence_coverage_matrix(gate_results):
+        lines.append(
+            f"- {row['gate_name']}: {row['coverage']} / {row['status']} - {row['meaning']}"
+        )
+
+    lines.extend(["", "## Research Action Queue", ""])
+    lines.extend(_bullet_lines(_research_actions(gate_results, next_tests)))
+
     lines.extend(["## Limitations", ""])
     lines.extend(_bullet_lines(limitations))
     lines.extend(["", "## Next Tests", ""])
@@ -99,7 +116,10 @@ def render_markdown_report(
             "",
             "## Safety Note",
             "",
-            "This is not investment advice and no live trading was performed.",
+            (
+                "This is not investment advice. No live trading, live data, broker "
+                "connection, credentials, order routing, or execution action was performed."
+            ),
             "",
         ]
     )
@@ -115,3 +135,22 @@ def _bullet_lines(values: list[str]) -> list[str]:
     if not values:
         return ["- None listed"]
     return [f"- {value}" for value in values]
+
+
+def _research_actions(gate_results: list[GateResult], next_tests: list[str]) -> list[str]:
+    actions: list[str] = []
+    if any(gate.status == "fail" for gate in gate_results):
+        actions.append("Reject or quarantine the claim until failure evidence is resolved.")
+    if any(gate.status == "warn" for gate in gate_results):
+        actions.append("Retest warning evidence against a stricter comparator or robustness control.")
+    missing = [
+        row["gate_name"]
+        for row in build_evidence_coverage_matrix(gate_results)
+        if row["coverage"] == "missing"
+    ]
+    if missing:
+        actions.append(f"Record missing evidence controls: {', '.join(missing[:3])}.")
+    actions.extend(f"Run next offline test: {test}" for test in next_tests[:2])
+    if not actions:
+        actions.append("Archive the run as reviewed, then design a harder falsification pass.")
+    return actions

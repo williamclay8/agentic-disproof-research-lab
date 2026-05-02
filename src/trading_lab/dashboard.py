@@ -16,6 +16,7 @@ from trading_lab.models import (
     Hypothesis,
 )
 from trading_lab.training import (
+    build_evidence_coverage_matrix,
     build_commercial_readiness,
     build_experiment_ledger,
     build_mistake_taxonomy,
@@ -23,6 +24,7 @@ from trading_lab.training import (
     build_workflow_outcomes,
     research_maturity_score,
 )
+from trading_lab.terminal import catalog_by_intent, power_guidance
 
 
 def render_dashboard_html(
@@ -90,6 +92,11 @@ def render_dashboard_html(
                 ]
             ),
             "</section>",
+            '<section class="two-column">',
+            _power_boundary_panel(),
+            _terminal_catalog_panel(),
+            "</section>",
+            _research_action_queue(gate_results, next_tests),
             '<section class="safety">',
             (
                 "offline research artifact only, not investment advice. This page "
@@ -175,6 +182,11 @@ def render_dashboard_html(
             "<h2>Mistake Taxonomy</h2>",
             _taxonomy_list(taxonomy),
             "</section>",
+            "</section>",
+            '<section class="panel">',
+            "<h2>Evidence Coverage Matrix</h2>",
+            '<p class="hint">A terminal-style status surface for the controls that make this artifact trustworthy.</p>',
+            _coverage_matrix_table(gate_results),
             "</section>",
             '<section class="panel">',
             "<h2>Top Evidence Against Claim</h2>",
@@ -333,6 +345,97 @@ def _gate_status(gate_results: list[GateResult], gate_name: str) -> str:
     return "not run"
 
 
+def _power_boundary_panel() -> str:
+    can_items = [
+        "Falsify pre-registered research claims.",
+        "Compare local evidence artifacts across runs.",
+        "Expose leakage, cost fragility, and weak baselines.",
+        "Guide the next offline review move.",
+    ]
+    cannot_items = [
+        "Trade, advise, fetch live data, connect brokers, or watch markets.",
+        "Turn a non-rejected claim into an allocation or recommendation.",
+        "Hide raw evidence behind a polished summary.",
+    ]
+    return (
+        '<section class="panel power-boundary">'
+        "<h2>Power Boundary</h2>"
+        '<p class="hint">This terminal gives you epistemic power, not execution power.</p>'
+        "<h3>Can</h3>"
+        + _list(can_items)
+        + "<h3>Cannot</h3>"
+        + _list(cannot_items)
+        + "</section>"
+    )
+
+
+def _terminal_catalog_panel() -> str:
+    groups = []
+    for intent, components in catalog_by_intent().items():
+        labels = ", ".join(component.title for component in components)
+        groups.append(f"{intent}: {labels}")
+    return (
+        '<section class="panel terminal-catalog">'
+        "<h2>Offline Terminal Catalog</h2>"
+        + _list(list(power_guidance()))
+        + '<div class="catalog-groups">'
+        + _list(groups)
+        + "</div>"
+        + "</section>"
+    )
+
+
+def _research_action_queue(
+    gate_results: list[GateResult],
+    next_tests: list[str],
+) -> str:
+    return (
+        '<section class="panel action-queue">'
+        "<h2>Research Action Queue</h2>"
+        '<p class="hint">Research-only next moves generated from recorded evidence.</p>'
+        + _list(_research_actions(gate_results, next_tests))
+        + "</section>"
+    )
+
+
+def _research_actions(gate_results: list[GateResult], next_tests: list[str]) -> list[str]:
+    actions: list[str] = []
+    if any(gate.status == "fail" for gate in gate_results):
+        actions.append("Reject or quarantine the claim until failure evidence is resolved.")
+    if any(gate.status == "warn" for gate in gate_results):
+        actions.append("Retest warning evidence against a stricter comparator or robustness control.")
+    missing = [
+        row["gate_name"]
+        for row in build_evidence_coverage_matrix(gate_results)
+        if row["coverage"] == "missing"
+    ]
+    if missing:
+        actions.append(f"Record missing evidence controls: {', '.join(missing[:3])}.")
+    actions.extend(f"Run next offline test: {test}" for test in next_tests[:2])
+    if not actions:
+        actions.append("Archive the run as reviewed, then design a harder falsification pass.")
+    return actions
+
+
+def _coverage_matrix_table(gate_results: list[GateResult]) -> str:
+    rows = []
+    for item in build_evidence_coverage_matrix(gate_results):
+        rows.append(
+            "<tr>"
+            f"<td>{escape(item['gate_name'])}</td>"
+            f"<td>{escape(item['coverage'])}</td>"
+            f"<td>{escape(item['status'])}</td>"
+            f"<td>{escape(item['meaning'])}</td>"
+            "</tr>"
+        )
+    return (
+        '<div class="table-wrap"><table>'
+        "<thead><tr><th>Control</th><th>Coverage</th><th>Status</th><th>Meaning</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody>"
+        "</table></div>"
+    )
+
+
 def _run_comparator(artifacts: list[ResearchRunArtifact]) -> str:
     if not artifacts:
         return ""
@@ -344,6 +447,7 @@ def _run_comparator(artifacts: list[ResearchRunArtifact]) -> str:
         strategy_return = metrics.get("strategy_cumulative_return", "missing")
         baseline_return = metrics.get("baseline_cumulative_return", "missing")
         delta = _return_delta(metrics)
+        pressure = _score_label(artifact.disproof_score)
         rows.append(
             "<tr>"
             f"<td>{escape(artifact.run_id)}</td>"
@@ -357,7 +461,8 @@ def _run_comparator(artifacts: list[ResearchRunArtifact]) -> str:
             f"<td>{escape(str(strategy_return))}</td>"
             f"<td>{escape(str(baseline_return))}</td>"
             f"<td>{escape(str(delta))}</td>"
-            f"<td>{escape(_score_label(artifact.disproof_score))}</td>"
+            f"<td>{escape(pressure)}</td>"
+            f"<td>{escape(_next_research_move(artifact.gate_results, artifact.next_tests))}</td>"
             "</tr>"
         )
 
@@ -371,7 +476,7 @@ def _run_comparator(artifacts: list[ResearchRunArtifact]) -> str:
         "<th>Dataset hash</th><th>Fingerprint</th><th>Cost bps</th>"
         "<th>Slippage bps</th><th>Delay bars</th>"
         "<th>Strategy return</th><th>Baseline return</th><th>Delta</th>"
-        "<th>Evidence strength</th></tr></thead>"
+        "<th>Disproof pressure</th><th>Next research move</th></tr></thead>"
         f"<tbody>{''.join(rows)}</tbody>"
         "</table></div>"
         "</section>"
@@ -518,6 +623,7 @@ def _gate_table(gate_results: list[GateResult]) -> str:
             f"<td>{escape(gate.gate_name)}</td>"
             f"<td>{escape(gate.severity)}</td>"
             f"<td><code>{escape(gate.threshold)}</code></td>"
+            f"<td>{escape(_gate_evidence_summary(gate))}</td>"
             f"<td><pre>{escape(evidence)}</pre></td>"
             f"<td>{escape(gate.remediation_hint)}</td>"
             "</tr>"
@@ -527,11 +633,36 @@ def _gate_table(gate_results: list[GateResult]) -> str:
         '<div class="table-wrap"><table>'
         "<thead><tr>"
         "<th>Status</th><th>Gate</th><th>Severity</th><th>Threshold</th>"
-        "<th>Evidence</th><th>Evidence gap</th>"
+        "<th>What this evidence says</th><th>Raw evidence</th><th>Evidence gap</th>"
         "</tr></thead>"
         f"<tbody>{''.join(rows)}</tbody>"
         "</table></div>"
     )
+
+
+def _gate_evidence_summary(gate: GateResult) -> str:
+    evidence = gate.evidence
+    if {
+        "strategy_cumulative_return",
+        "baseline_cumulative_return",
+    }.issubset(evidence):
+        return (
+            f"Strategy returned {_format_percent(evidence['strategy_cumulative_return'])} "
+            f"vs baseline {_format_percent(evidence['baseline_cumulative_return'])}."
+        )
+    if "passing_folds" in evidence and "folds" in evidence:
+        return f"{evidence['passing_folds']} / {evidence['folds']} folds passed."
+    if "flagged_columns" in evidence:
+        return f"Potential forward-looking fields recorded: {evidence['flagged_columns']}."
+    if gate.status == "pass":
+        return "Recorded evidence satisfied this control."
+    if gate.status == "warn":
+        return "Recorded evidence raised a warning for further review."
+    return "Recorded evidence failed this control."
+
+
+def _next_research_move(gate_results: list[GateResult], next_tests: list[str]) -> str:
+    return _research_actions(gate_results, next_tests)[0]
 
 
 def _status_sort_key(status: str) -> int:

@@ -3,6 +3,7 @@ from __future__ import annotations
 from trading_lab.models import GateResult
 from trading_lab.training import (
     build_commercial_readiness,
+    build_evidence_coverage_matrix,
     build_experiment_ledger,
     build_mistake_taxonomy,
     build_training_plan,
@@ -41,6 +42,24 @@ def test_mistake_taxonomy_maps_warning_gates_to_learning_items():
     assert "Comparator weakness" in names
     assert "Fold fragility" in names
     assert all("trade" not in item["learning_focus"].lower() for item in taxonomy)
+
+
+def test_evidence_coverage_matrix_shows_recorded_and_missing_controls():
+    matrix = build_evidence_coverage_matrix(
+        [
+            _gate("schema columns", "pass", "info"),
+            _gate("baseline comparison", "warn", "warning"),
+        ]
+    )
+
+    by_name = {row["gate_name"]: row for row in matrix}
+    assert by_name["schema columns"]["coverage"] == "recorded"
+    assert by_name["schema columns"]["status"] == "pass"
+    assert by_name["baseline comparison"]["meaning"] == (
+        "This control recorded warning evidence that needs harder review."
+    )
+    assert by_name["chronology"]["coverage"] == "missing"
+    assert by_name["chronology"]["status"] == "missing"
 
 
 def test_training_plan_has_100_rounds_without_advice_language():

@@ -81,6 +81,9 @@ def test_render_markdown_report_includes_required_sections_and_computed_verdict(
     assert "## Verdict" in markdown
     assert "inconclusive" in markdown
     assert "## Hypothesis" in markdown
+    assert "## Power Boundary" in markdown
+    assert "This report can falsify" in markdown
+    assert "This report cannot trade" in markdown
     assert "A moving-average signal may outperform buy and hold." in markdown
     assert "## Dataset" in markdown
     assert "examples/toy_prices.csv" in markdown
@@ -89,13 +92,18 @@ def test_render_markdown_report_includes_required_sections_and_computed_verdict(
     assert "strategy_cumulative_return" in markdown
     assert "## Falsification Gates" in markdown
     assert "baseline comparison" in markdown
+    assert "## Evidence Coverage" in markdown
+    assert "schema columns: missing / missing" in markdown
+    assert "## Research Action Queue" in markdown
+    assert "Retest warning evidence" in markdown
     assert "## Limitations" in markdown
     assert "Toy sample only." in markdown
     assert "## Next Tests" in markdown
     assert "Run a walk-forward split." in markdown
     assert "## Safety Note" in markdown
     assert "not investment advice" in markdown
-    assert "no live trading was performed" in markdown
+    assert "No live trading" in markdown
+    assert "broker connection" in markdown
 
 
 def test_render_markdown_report_never_describes_hypothesis_as_accepted():

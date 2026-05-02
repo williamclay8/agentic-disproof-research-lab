@@ -20,6 +20,7 @@ python3 -m trading_lab.cli run \
 python3 -m trading_lab.cli dashboard \
   --run runs/example-run.json \
   --output reports/dashboard.html
+python3 -m trading_lab.cli terminal MSFT
 ```
 
 Open `reports/dashboard.html` in a browser to inspect the local falsification
@@ -34,6 +35,18 @@ views over that evidence, not separate sources of truth.
 - Describe local dataset manifests.
 - Configure offline backtest specifications.
 - Store backtest results, falsification gate outcomes, and research reports.
+- Use an offline terminal catalog to focus symbols, discover research actions,
+  and explain power boundaries without adding live data or execution.
+- Share local research snapshots through an in-memory topic hub for future
+  dashboard/workflow components.
 
 The bundled example is intentionally skeptical: it can produce an
 `inconclusive` verdict when a toy idea fails to beat its baseline after costs.
+
+## Power Boundary
+
+The terminal layer is for epistemic power: finding what a claim cannot survive.
+It can focus a ticker-like symbol, route local commands, compare evidence
+artifacts, and surface missing controls. It cannot trade, advise, fetch live
+market data, connect brokers, watch markets, handle credentials, or submit
+orders.
