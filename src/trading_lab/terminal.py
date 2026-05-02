@@ -40,7 +40,7 @@ class ParsedInput:
 
 
 def component_catalog() -> tuple[Component, ...]:
-    """Return the built-in catalog for local-only research terminal actions."""
+    """Return the built-in catalog for research terminal actions."""
     return (
         Component(
             id="symbol-focus",
@@ -51,7 +51,7 @@ def component_catalog() -> tuple[Component, ...]:
                 "for notes, local artifacts, and hypothesis framing."
             ),
             aliases=("SYMBOL",),
-            safety="offline research focus only",
+            safety="research focus only; no market data is fetched",
         ),
         Component(
             id="hypothesis-register",
@@ -85,6 +85,39 @@ def component_catalog() -> tuple[Component, ...]:
             ),
             aliases=("dash", "dashboard", "review"),
             safety="static local report; not investment advice",
+        ),
+        Component(
+            id="market-snapshot",
+            title="Collect market snapshot",
+            intent="Observation",
+            summary=(
+                "Collect explicit research-only market observations from a fixture "
+                "or approved provider into auditable local snapshots."
+            ),
+            aliases=("market-snapshot", "snapshot", "watch"),
+            safety="research data only; no broker or execution actions",
+        ),
+        Component(
+            id="data-source-inspect",
+            title="Inspect data sources",
+            intent="Observation",
+            summary=(
+                "List or inspect available market-data sources, freshness labels, "
+                "and provenance boundaries."
+            ),
+            aliases=("data-source", "providers", "provenance"),
+            safety="metadata only; credentials are never collected",
+        ),
+        Component(
+            id="safety-status",
+            title="Safety status",
+            intent="Safety",
+            summary=(
+                "Show research-mode boundaries, blocked command families, and "
+                "network/realtime kill-switch status."
+            ),
+            aliases=("safety-status", "safety-off"),
+            safety="fails closed for advice, broker, and order commands",
         ),
     )
 
@@ -131,13 +164,40 @@ def registered_commands() -> dict[str, TerminalCommand]:
                 "research reports, not trading recommendations."
             ),
         ),
+        "market-snapshot": TerminalCommand(
+            id="market-snapshot",
+            aliases=("market-snapshot", "snapshot", "watch"),
+            component_id="market-snapshot",
+            guidance=(
+                "Collect a research-only market observation snapshot with provenance "
+                "and freshness labels. No broker or execution actions are available."
+            ),
+        ),
+        "data-source-inspect": TerminalCommand(
+            id="data-source-inspect",
+            aliases=("data-source", "providers", "provenance", "data-freshness"),
+            component_id="data-source-inspect",
+            guidance=(
+                "Inspect source metadata, freshness, and delay labels. Credentials, "
+                "accounts, and broker connections are outside this terminal."
+            ),
+        ),
+        "safety-status": TerminalCommand(
+            id="safety-status",
+            aliases=("safety-status", "safety-off"),
+            component_id="safety-status",
+            guidance=(
+                "Show or activate research-mode safety boundaries. This disables "
+                "observation collection for the current session when requested."
+            ),
+        ),
     }
 
 
 def power_guidance() -> tuple[str, ...]:
     return (
-        "This offline research lab helps focus symbols, register hypotheses, run local falsification, and review evidence.",
-        "No live market data is requested or implied; use local CSVs and generated artifacts only.",
+        "This research lab helps focus symbols, register hypotheses, collect explicit observations, run local falsification, and review evidence.",
+        "Market observations must be explicitly collected and labeled with source, freshness, and provenance.",
         "No broker or execution actions are available from this terminal layer.",
         "Type '?' for catalog help, use command aliases, or enter an uppercase ticker-like token such as MSFT.",
     )
@@ -189,6 +249,20 @@ def parse_terminal_input(raw_input: str) -> ParsedInput:
             message=f"{command.id}: {command.guidance}",
         )
 
+    if _is_forbidden_command(tokens):
+        return ParsedInput(
+            kind="blocked",
+            command_id=None,
+            alias=first,
+            args=tokens[1:],
+            symbol=None,
+            message=(
+                "Blocked or unknown command. Trading Lab does not support advice, "
+                "broker access, order routing, account actions, or execution. Try '?' "
+                "for research-only commands."
+            ),
+        )
+
     if len(tokens) == 1 and _SYMBOL_RE.match(first):
         return ParsedInput(
             kind="symbol",
@@ -236,3 +310,36 @@ def _unknown(prefix: str) -> ParsedInput:
         symbol=None,
         message=f"{prefix} Type '?' for help. No broker or execution actions are available.",
     )
+
+
+def _is_forbidden_command(tokens: tuple[str, ...]) -> bool:
+    lowered = " ".join(tokens).lower().replace("_", "-")
+    forbidden_terms = (
+        "buy",
+        "sell",
+        "hold",
+        "short",
+        "cover",
+        "order",
+        "submit-order",
+        "cancel-order",
+        "replace-order",
+        "broker",
+        "broker-login",
+        "account",
+        "portfolio-sync",
+        "paper-trade",
+        "simulate-fill",
+        "position-size",
+        "allocation",
+        "rebalance",
+        "entry",
+        "exit",
+        "stop-loss",
+        "take-profit",
+        "execute",
+        "copy trade",
+        "api-key",
+        "credentials",
+    )
+    return any(term in lowered for term in forbidden_terms)

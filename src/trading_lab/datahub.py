@@ -1,4 +1,4 @@
-"""Offline topic data hub for local trading research workflows."""
+"""Topic data hub for local trading research workflows."""
 
 from __future__ import annotations
 
@@ -43,9 +43,9 @@ class _SubscriptionEntry:
 
 
 class DataHub:
-    """Small in-memory topic hub for offline research components.
+    """Small in-memory topic hub for research components.
 
-    Topics keep their latest live event. Subscribers can register for exact
+    Topics keep their latest current event. Subscribers can register for exact
     topics or suffix wildcard patterns such as ``market:*``.
     """
 
@@ -68,7 +68,7 @@ class DataHub:
         producer: str | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> DataEvent:
-        """Publish a payload and notify matching live subscribers."""
+        """Publish a payload and notify matching subscribers."""
 
         self._validate_topic(topic)
         if ttl is not None and ttl < 0:
@@ -100,7 +100,7 @@ class DataHub:
         return event
 
     def peek(self, topic: str) -> DataEvent | None:
-        """Return the latest live event for a topic, if present."""
+        """Return the latest current event for a topic, if present."""
 
         self._validate_topic(topic)
         self._purge_expired()
@@ -143,10 +143,21 @@ class DataHub:
         return removed
 
     def topics(self) -> list[str]:
-        """Return live topic names in deterministic order."""
+        """Return current topic names in deterministic order."""
 
         self._purge_expired()
         return sorted(self._topics)
+
+    def snapshot(self, pattern: str = "*") -> list[DataEvent]:
+        """Return current events matching a topic pattern in deterministic order."""
+
+        self._validate_pattern(pattern)
+        self._purge_expired()
+        return [
+            self._topics[topic]
+            for topic in sorted(self._topics)
+            if self._matches(pattern, topic)
+        ]
 
     def subscriptions(self) -> list[Subscription]:
         """Return active subscription descriptors."""
@@ -154,7 +165,7 @@ class DataHub:
         return [entry.subscription for entry in self._subscriptions.values()]
 
     def stats(self) -> dict[str, int]:
-        """Return lightweight operational counters and current live counts."""
+        """Return lightweight operational counters and current topic counts."""
 
         self._purge_expired()
         return {

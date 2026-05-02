@@ -282,6 +282,72 @@ def render_dashboard_html(
     )
 
 
+def render_snapshot_dashboard_html(snapshot: dict[str, Any]) -> str:
+    events = snapshot.get("events")
+    if events is None:
+        events = [snapshot]
+    snapshot_hash = snapshot.get("snapshot_hash") or snapshot.get("hash") or "unhashed"
+    rows = []
+    for event in events:
+        metadata = event.get("metadata", {}) if isinstance(event, dict) else {}
+        payload = event.get("payload", {}) if isinstance(event, dict) else {}
+        rows.append(
+            "<tr>"
+            f"<td>{escape(str(event.get('topic', 'unknown')))}</td>"
+            f"<td>{escape(str(event.get('producer', metadata.get('source', 'unknown'))))}</td>"
+            f"<td>{escape(str(metadata.get('delay_class', metadata.get('freshness', 'unlabeled'))))}</td>"
+            f"<td>{escape(str(metadata.get('source_timestamp', metadata.get('timestamp', 'unknown'))))}</td>"
+            f"<td>{escape(str(metadata.get('received_at', 'unknown')))}</td>"
+            f"<td>{escape(str(metadata.get('license_note', 'research data only')))}</td>"
+            f"<td><pre>{escape(json.dumps(payload, sort_keys=True, default=str))}</pre></td>"
+            "</tr>"
+        )
+
+    return "\n".join(
+        [
+            "<!doctype html>",
+            '<html lang="en">',
+            "<head>",
+            '<meta charset="utf-8">',
+            '<meta name="viewport" content="width=device-width, initial-scale=1">',
+            "<title>Market Observation Snapshot</title>",
+            f"<style>{_CSS}</style>",
+            "</head>",
+            "<body>",
+            '<main class="shell">',
+            '<section class="topbar">',
+            "<div>",
+            '<p class="eyebrow">Research data only</p>',
+            "<h1>Market Observation Snapshot</h1>",
+            '<p class="subtitle">Timestamped market observations with provenance and freshness labels. This is not investment advice.</p>',
+            "</div>",
+            '<div class="verdict verdict-inconclusive">',
+            "<span>Snapshot hash</span>",
+            f"<strong>{escape(str(snapshot_hash)[:16])}</strong>",
+            "<small>audit pointer</small>",
+            "</div>",
+            "</section>",
+            '<section class="safety">',
+            (
+                "research data only. This view may display market observations, "
+                "but it does not provide investment advice, trade recommendations, "
+                "broker connectivity, order routing, or execution."
+            ),
+            "</section>",
+            '<section class="panel">',
+            "<h2>Observation Provenance</h2>",
+            '<div class="table-wrap"><table>',
+            "<thead><tr><th>Topic</th><th>Source</th><th>Freshness</th><th>Source timestamp</th><th>Received</th><th>License note</th><th>Payload</th></tr></thead>",
+            f"<tbody>{''.join(rows)}</tbody>",
+            "</table></div>",
+            "</section>",
+            "</main>",
+            "</body>",
+            "</html>",
+        ]
+    )
+
+
 def _status_counts(gate_results: list[GateResult]) -> dict[str, int]:
     counts = {"fail": 0, "warn": 0, "pass": 0}
     for gate in gate_results:

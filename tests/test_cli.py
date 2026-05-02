@@ -196,3 +196,128 @@ def test_terminal_command_parses_offline_symbol_focus(tmp_path):
     assert completed.returncode == 0, completed.stderr
     assert "offline research focus" in completed.stdout
     assert "No live market data" in completed.stdout
+
+
+def test_collect_live_fixture_writes_snapshot_without_network_language(tmp_path):
+    snapshot_path = tmp_path / "live" / "latest.json"
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(PROJECT_ROOT / "src")
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "trading_lab.cli",
+            "collect-live",
+            "--provider",
+            "fixture",
+            "--symbols",
+            "MSFT",
+            "AAPL",
+            "--max-events",
+            "2",
+            "--snapshot",
+            str(snapshot_path),
+        ],
+        cwd=tmp_path,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert "Collected 2 research data events" in completed.stdout
+    assert "No broker" in completed.stdout
+    assert snapshot_path.exists()
+    payload = snapshot_path.read_text(encoding="utf-8")
+    assert "market:quote:" in payload
+    assert "simulated" in payload
+    assert "submit_order" not in payload
+
+
+def test_snapshot_dashboard_command_renders_market_observations(tmp_path):
+    snapshot_path = tmp_path / "live" / "latest.json"
+    dashboard_path = tmp_path / "live" / "snapshot.html"
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(PROJECT_ROOT / "src")
+
+    collect = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "trading_lab.cli",
+            "collect-live",
+            "--provider",
+            "fixture",
+            "--symbols",
+            "MSFT",
+            "--max-events",
+            "1",
+            "--snapshot",
+            str(snapshot_path),
+        ],
+        cwd=tmp_path,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert collect.returncode == 0, collect.stderr
+
+    rendered = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "trading_lab.cli",
+            "snapshot-dashboard",
+            "--snapshot",
+            str(snapshot_path),
+            "--output",
+            str(dashboard_path),
+        ],
+        cwd=tmp_path,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert rendered.returncode == 0, rendered.stderr
+    assert "Snapshot dashboard:" in rendered.stdout
+    html = dashboard_path.read_text(encoding="utf-8")
+    assert "Market Observation Snapshot" in html
+    assert "research data only" in html
+
+
+def test_collect_live_respects_realtime_kill_switch(tmp_path):
+    snapshot_path = tmp_path / "live" / "latest.json"
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(PROJECT_ROOT / "src")
+    env["TRADING_LAB_DISABLE_REALTIME"] = "1"
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "trading_lab.cli",
+            "collect-live",
+            "--provider",
+            "fixture",
+            "--symbols",
+            "MSFT",
+            "--max-events",
+            "1",
+            "--snapshot",
+            str(snapshot_path),
+        ],
+        cwd=tmp_path,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 2
+    assert "disabled by safety switch" in completed.stderr
+    assert not snapshot_path.exists()

@@ -1,0 +1,3 @@
+{"kind":"quote","symbol":"aapl","timestamp":"2026-01-02T14:30:00Z","bid":"101.25","ask":"101.35","last":"101.30","bid_size":500,"ask_size":700,"venue":"fixture"}
+{"kind":"quote","symbol":"MSFT","timestamp":"2026-01-02T14:30:01Z","bid":203.4,"ask":203.55,"last":203.5,"bid_size":"350","ask_size":"450","venue":"fixture"}
+{"kind":"quote","symbol":"AAPL","timestamp":"2026-01-02T14:30:02Z","bid":101.4,"ask":101.5,"last":101.45,"bid_size":600,"ask_size":650,"venue":"fixture"}

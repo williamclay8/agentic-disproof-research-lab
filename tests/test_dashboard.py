@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from trading_lab.dashboard import render_dashboard_html
+from trading_lab.dashboard import render_dashboard_html, render_snapshot_dashboard_html
 from trading_lab.artifacts import ResearchRunArtifact
 from trading_lab.models import (
     BacktestResult,
@@ -138,6 +138,40 @@ def test_render_dashboard_html_escapes_dynamic_content():
     assert "<script>alert(1)</script>" not in html
     assert "<b>bold</b>" not in html
     assert "<img src=x onerror=alert(1)>" not in html
+
+
+def test_render_snapshot_dashboard_html_shows_provenance_and_freshness():
+    snapshot = {
+        "schema_version": 1,
+        "snapshot_hash": "snap-hash",
+        "events": [
+            {
+                "topic": "market:quote:MSFT",
+                "payload": {"symbol": "MSFT", "last": 401.5},
+                "producer": "fixture",
+                "metadata": {
+                    "delay_class": "simulated",
+                    "source_timestamp": "2026-05-02T15:30:00Z",
+                    "received_at": "2026-05-02T15:30:01Z",
+                    "license_note": "fixture data for tests",
+                },
+            }
+        ],
+    }
+
+    html = render_snapshot_dashboard_html(snapshot)
+
+    assert "Market Observation Snapshot" in html
+    assert "snap-hash" in html
+    assert "market:quote:MSFT" in html
+    assert "simulated" in html
+    assert "fixture data for tests" in html
+    assert "research data only" in html
+    assert "not investment advice" in html
+    assert "http://" not in html
+    assert "https://" not in html
+    for forbidden in ["place order", "submit order", "broker-login", "api_key"]:
+        assert forbidden not in html.lower()
 
 
 def _hypothesis() -> Hypothesis:

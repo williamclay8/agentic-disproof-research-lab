@@ -85,3 +85,21 @@ def test_stats_and_topics_report_live_state() -> None:
         "delivered": 0,
         "expired": 1,
     }
+
+
+def test_snapshot_returns_matching_current_topic_events_with_metadata() -> None:
+    hub = DataHub(clock=ManualClock())
+
+    hub.publish(
+        "market:quote:MSFT",
+        {"last": 401.5},
+        producer="fixture",
+        metadata={"delay_class": "simulated", "source": "fixture"},
+    )
+    hub.publish("provider:status:fixture", {"state": "ok"}, producer="fixture")
+
+    snapshot = hub.snapshot("market:*")
+
+    assert [event.topic for event in snapshot] == ["market:quote:MSFT"]
+    assert snapshot[0].metadata == {"delay_class": "simulated", "source": "fixture"}
+    assert snapshot[0].producer == "fixture"

@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Market Observation Snapshot</title>
+<style>:root {
+  color-scheme: light;
+  --bg: #f6f7f4;
+  --ink: #18201d;
+  --muted: #59645f;
+  --line: #d8ddd6;
+  --panel: #ffffff;
+  --pass: #285f6b;
+  --warn: #94620d;
+  --fail: #a33a35;
+  --note: #e9f0ed;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  line-height: 1.45;
+}
+
+.shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 44px;
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 8px;
+  font-size: clamp(2rem, 5vw, 4rem);
+  letter-spacing: 0;
+}
+
+h2 {
+  margin-bottom: 14px;
+  font-size: 1rem;
+}
+
+.subtitle {
+  max-width: 760px;
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.verdict {
+  min-width: 230px;
+  border-left: 4px solid var(--muted);
+  padding: 14px 16px;
+  background: var(--panel);
+}
+
+.verdict span,
+.metric-card span,
+.metric-card small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.verdict strong,
+.metric-card strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.25rem;
+}
+
+.verdict-rejected {
+  border-color: var(--fail);
+}
+
+.verdict-inconclusive {
+  border-color: var(--warn);
+}
+
+.verdict-passed-preliminary-gates {
+  border-color: var(--pass);
+}
+
+.safety,
+.panel,
+.metric-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.safety {
+  margin: 18px 0;
+  padding: 12px 14px;
+  background: var(--note);
+  color: #33423b;
+  font-size: 0.92rem;
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+}
+
+.metrics {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.metric-card {
+  min-height: 116px;
+  padding: 16px;
+}
+
+.metric-card strong {
+  margin: 12px 0 8px;
+  font-size: 2rem;
+}
+
+.two-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.panel,
+.two-column {
+  margin-top: 14px;
+}
+
+.panel {
+  padding: 18px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  padding: 10px 8px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 0.88rem;
+}
+
+th {
+  color: var(--muted);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+}
+
+code,
+pre {
+  margin: 0;
+  color: #25302c;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: pre-wrap;
+}
+
+.pill {
+  display: inline-flex;
+  min-width: 52px;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 3px 8px;
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.pill-pass {
+  background: var(--pass);
+}
+
+.pill-warn {
+  background: var(--warn);
+}
+
+.pill-fail {
+  background: var(--fail);
+}
+
+dl {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.35fr) minmax(0, 1fr);
+  gap: 10px 14px;
+  margin: 0;
+}
+
+dt {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+dd {
+  margin: 0;
+}
+
+ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+li + li {
+  margin-top: 7px;
+}
+
+@media (max-width: 820px) {
+  .topbar,
+  .two-column {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .verdict {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .shell {
+    width: min(100% - 20px, 1180px);
+    padding-top: 18px;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  dl {
+    grid-template-columns: 1fr;
+  }
+}</style>
+</head>
+<body>
+<main class="shell">
+<section class="topbar">
+<div>
+<p class="eyebrow">Research data only</p>
+<h1>Market Observation Snapshot</h1>
+<p class="subtitle">Timestamped market observations with provenance and freshness labels. This is not investment advice.</p>
+</div>
+<div class="verdict verdict-inconclusive">
+<span>Snapshot hash</span>
+<strong>5389114feda43887</strong>
+<small>audit pointer</small>
+</div>
+</section>
+<section class="safety">
+research data only. This view may display market observations, but it does not provide investment advice, trade recommendations, broker connectivity, order routing, or execution.
+</section>
+<section class="panel">
+<h2>Observation Provenance</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Topic</th><th>Source</th><th>Freshness</th><th>Source timestamp</th><th>Received</th><th>License note</th><th>Payload</th></tr></thead>
+<tbody><tr><td>market:quote:MSFT</td><td>fixture</td><td>simulated</td><td>2026-01-02T14:30:01Z</td><td>unknown</td><td>research data only</td><td><pre>{&quot;ask&quot;: 203.55, &quot;ask_size&quot;: 450.0, &quot;bid&quot;: 203.4, &quot;bid_size&quot;: 350.0, &quot;last&quot;: 203.5, &quot;observed_at&quot;: &quot;2026-01-02T14:30:01+00:00&quot;, &quot;symbol&quot;: &quot;MSFT&quot;, &quot;venue&quot;: &quot;fixture&quot;}</pre></td></tr></tbody>
+</table></div>
+</section>
+</main>
+</body>
+</html>

@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
+import os
 from pathlib import Path
+import sys
 from typing import Sequence
 
 from trading_lab.artifacts import (
@@ -11,12 +14,16 @@ from trading_lab.artifacts import (
     read_run_artifact,
     write_run_artifact,
 )
-from trading_lab.dashboard import render_dashboard_html
+from trading_lab.dashboard import render_dashboard_html, render_snapshot_dashboard_html
+from trading_lab.datahub import DataHub
 from trading_lab.example import build_example_run
 from trading_lab.gates import choose_verdict
+from trading_lab.live_runtime import collect_live_data
+from trading_lab.providers import FixtureProvider, KrakenTickerProvider, NullProvider
 from trading_lab.registry import load_hypothesis
 from trading_lab.reports import render_markdown_report
 from trading_lab.runner import DisproofConfig, run_disproof
+from trading_lab.snapshots import SnapshotStore, read_latest
 from trading_lab.terminal import parse_terminal_input
 
 
@@ -38,6 +45,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _dashboard(args.output, args.runs)
     if args.command == "terminal":
         return _terminal(args.input)
+    if args.command == "collect-live":
+        return _collect_live(
+            provider_name=args.provider,
+            symbols=args.symbols,
+            max_events=args.max_events,
+            snapshot_path=args.snapshot,
+        )
+    if args.command == "snapshot-dashboard":
+        return _snapshot_dashboard(args.snapshot, args.output)
 
     parser.error("missing command")
     return 2
@@ -100,6 +116,26 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Parse an offline terminal command or ticker-like research focus.",
     )
     terminal.add_argument("input", nargs="+")
+
+    collect_live = subparsers.add_parser(
+        "collect-live",
+        help="Collect bounded research-only market observations into a local snapshot.",
+    )
+    collect_live.add_argument(
+        "--provider",
+        choices=("fixture", "kraken-public-rest", "null"),
+        default="fixture",
+    )
+    collect_live.add_argument("--symbols", nargs="+", required=True)
+    collect_live.add_argument("--max-events", type=int, default=10)
+    collect_live.add_argument("--snapshot", required=True, type=Path)
+
+    snapshot_dashboard = subparsers.add_parser(
+        "snapshot-dashboard",
+        help="Render a static dashboard from a local market observation snapshot.",
+    )
+    snapshot_dashboard.add_argument("--snapshot", required=True, type=Path)
+    snapshot_dashboard.add_argument("--output", required=True, type=Path)
 
     return parser
 
@@ -207,6 +243,79 @@ def _terminal(parts: list[str]) -> int:
     parsed = parse_terminal_input(" ".join(parts))
     print(parsed.message)
     return 0 if parsed.kind != "unknown" else 2
+
+
+def _collect_live(
+    *,
+    provider_name: str,
+    symbols: list[str],
+    max_events: int,
+    snapshot_path: Path,
+) -> int:
+    if _live_collection_disabled():
+        print(
+            "collect-live disabled by safety switch. "
+            "Unset TRADING_LAB_DISABLE_NETWORK/TRADING_LAB_DISABLE_REALTIME to collect observations.",
+            file=sys.stderr,
+        )
+        return 2
+
+    provider = _build_live_provider(provider_name, symbols)
+    hub = DataHub()
+    store = SnapshotStore(snapshot_path.parent, latest_name=snapshot_path.name)
+    result = asyncio.run(
+        collect_live_data(
+            provider,
+            hub,
+            max_events=max_events,
+            snapshot_store=store,
+        )
+    )
+    print(
+        f"Collected {result.events_collected} research data events from {result.provider}. "
+        "No broker or execution actions are available."
+    )
+    print(f"Snapshot: {snapshot_path}")
+    return 0
+
+
+def _live_collection_disabled() -> bool:
+    return os.environ.get("TRADING_LAB_DISABLE_NETWORK") == "1" or os.environ.get(
+        "TRADING_LAB_DISABLE_REALTIME"
+    ) == "1"
+
+
+def _snapshot_dashboard(snapshot_path: Path, output_path: Path) -> int:
+    snapshot = read_latest(snapshot_path)
+    if snapshot is None:
+        raise ValueError(f"snapshot not found: {snapshot_path}")
+    html = render_snapshot_dashboard_html(snapshot)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(html, encoding="utf-8")
+    print(f"Snapshot dashboard: {output_path}")
+    return 0
+
+
+def _build_live_provider(provider_name: str, symbols: list[str]):
+    if provider_name == "null":
+        return NullProvider()
+    if provider_name == "kraken-public-rest":
+        return KrakenTickerProvider(symbols=symbols)
+
+    fixture_path = Path(__file__).resolve().parents[2] / "examples" / "live_fixture_quotes.jsonl"
+    return _SymbolFilterProvider(FixtureProvider(fixture_path), symbols)
+
+
+class _SymbolFilterProvider:
+    def __init__(self, provider, symbols: list[str]) -> None:
+        self.provider = provider
+        self.symbols = {symbol.upper() for symbol in symbols}
+        self.name = provider.name
+
+    def stream(self):
+        for envelope in self.provider.stream():
+            if str(envelope.symbol).upper() in self.symbols:
+                yield envelope
 
 
 def _artifact_from_example_run(run) -> ResearchRunArtifact:
