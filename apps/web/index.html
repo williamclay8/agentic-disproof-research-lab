@@ -7,26 +7,28 @@
     <style>
       :root {
         color-scheme: dark;
-        --bg: #0c0d0b;
-        --surface: #161815;
-        --surface-raised: #1f231e;
-        --surface-soft: #24291f;
-        --text: #f2f0e8;
-        --muted: #b8b5a9;
-        --faint: #858276;
-        --line: rgba(242, 240, 232, 0.13);
-        --line-strong: rgba(242, 240, 232, 0.22);
-        --ok: #8bcf8d;
-        --warn: #f2c566;
-        --bad: #ff8f7d;
-        --cyan: #78d4d1;
-        --blue: #8eb6ff;
-        --ink: #0f1115;
-        --shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+        --bg: #07090d;
+        --surface: #0d1117;
+        --surface-raised: #111821;
+        --surface-soft: #151d27;
+        --text: #f3f7fb;
+        --muted: #aeb9c5;
+        --faint: #6f7b89;
+        --line: rgba(218, 232, 250, 0.12);
+        --line-strong: rgba(218, 232, 250, 0.22);
+        --ok: #7edb92;
+        --warn: #f4c96f;
+        --bad: #ff7d73;
+        --cyan: #61d8ea;
+        --blue: #91b9ff;
+        --ink: #090c12;
+        --shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+        --radius: 8px;
       }
 
       * {
         box-sizing: border-box;
+        min-width: 0;
       }
 
       html {
@@ -38,7 +40,9 @@
         margin: 0;
         min-height: 100vh;
         background:
-          linear-gradient(180deg, rgba(120, 212, 209, 0.07), transparent 240px),
+          linear-gradient(180deg, rgba(97, 216, 234, 0.075), transparent 320px),
+          repeating-linear-gradient(90deg, rgba(218, 232, 250, 0.018) 0 1px, transparent 1px 124px),
+          repeating-linear-gradient(180deg, rgba(218, 232, 250, 0.014) 0 1px, transparent 1px 124px),
           var(--bg);
         color: var(--text);
         font-family:
@@ -52,7 +56,7 @@
         align-items: center;
         background: transparent;
         border: 1px solid var(--line);
-        border-radius: 8px;
+        border-radius: var(--radius);
         color: var(--text);
         cursor: pointer;
         display: inline-flex;
@@ -114,16 +118,22 @@
       main {
         margin: 0 auto;
         max-width: 1520px;
-        padding: 18px;
+        overflow-x: clip;
+        padding: 14px 18px 30px;
         width: 100%;
       }
 
       .topbar {
         align-items: center;
+        backdrop-filter: blur(14px);
+        background: rgba(7, 9, 13, 0.78);
         display: grid;
         gap: 14px;
         grid-template-columns: minmax(0, 1fr) auto;
-        padding: 6px 0 16px;
+        padding: 8px 0 14px;
+        position: sticky;
+        top: 0;
+        z-index: 20;
       }
 
       .brand {
@@ -150,6 +160,10 @@
         min-width: 0;
       }
 
+      a.pill {
+        text-decoration: none;
+      }
+
       .pill,
       .metric,
       .status-dot {
@@ -165,6 +179,8 @@
         min-height: 30px;
         overflow-wrap: anywhere;
         padding: 6px 9px;
+        text-align: center;
+        white-space: normal;
       }
 
       .status-dot::before,
@@ -227,13 +243,187 @@
         padding: 18px;
       }
 
+      .command-surface {
+        background:
+          linear-gradient(135deg, rgba(97, 216, 234, 0.09), transparent 38%),
+          linear-gradient(180deg, rgba(145, 185, 255, 0.04), rgba(255, 125, 115, 0.035)),
+          var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        display: grid;
+        margin-top: 2px;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .command-top,
+      .command-grid {
+        display: grid;
+        min-width: 0;
+      }
+
+      .command-top {
+        border-bottom: 1px solid var(--line);
+        grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+      }
+
+      .command-grid {
+        grid-template-columns: minmax(0, 1.08fr) minmax(270px, 0.76fr) minmax(290px, 0.82fr);
+      }
+
+      .verdict-cell,
+      .stage-cell,
+      .path-cell,
+      .queue-cell,
+      .blocker-cell {
+        align-content: start;
+        display: grid;
+        gap: 14px;
+        min-width: 0;
+        padding: 16px 18px;
+      }
+
+      .verdict-cell,
+      .path-cell,
+      .queue-cell {
+        border-right: 1px solid var(--line);
+      }
+
+      .stage-cell {
+        background: rgba(255, 255, 255, 0.018);
+      }
+
+      .verdict-summary {
+        color: var(--muted);
+        max-width: 78ch;
+        overflow-wrap: anywhere;
+      }
+
+      .brief-grid {
+        display: grid;
+        gap: 0;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .brief-item {
+        border-top: 1px solid var(--line);
+        display: grid;
+        gap: 6px;
+        min-width: 0;
+        padding: 12px 14px 0 0;
+      }
+
+      .brief-item + .brief-item {
+        border-left: 1px solid var(--line);
+        padding-left: 14px;
+      }
+
+      .stage-progress {
+        display: grid;
+        gap: 6px;
+      }
+
+      .stage-node {
+        align-items: center;
+        color: var(--muted);
+        display: grid;
+        font-size: 13px;
+        gap: 8px;
+        grid-template-columns: 12px minmax(0, 1fr);
+        min-height: 24px;
+      }
+
+      .stage-node::before {
+        background: var(--surface-soft);
+        border: 1px solid var(--line-strong);
+        border-radius: 999px;
+        content: "";
+        height: 10px;
+        width: 10px;
+      }
+
+      .stage-node.current {
+        color: var(--warn);
+        font-weight: 700;
+      }
+
+      .stage-node.current::before {
+        background: var(--warn);
+        border-color: rgba(244, 201, 111, 0.72);
+        box-shadow: 0 0 0 4px rgba(244, 201, 111, 0.1);
+      }
+
+      .stage-node.locked {
+        color: var(--faint);
+      }
+
+      .path-cell .spine {
+        gap: 12px;
+      }
+
+      .queue-cell .queue-list,
+      .blocker-cell .compact-list {
+        align-content: start;
+      }
+
+      .compact-list strong,
+      .queue-item strong {
+        color: var(--text);
+      }
+
+      .compact-list span,
+      .compact-list p {
+        min-width: 0;
+      }
+
+      .source-note {
+        color: var(--faint);
+        font-size: 12px;
+      }
+
+      .source-note strong {
+        color: var(--muted);
+      }
+
+      .stage-caption {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .stage-cell .queue-item {
+        gap: 4px;
+        padding-top: 8px;
+      }
+
+      .stage-cell .queue-item p {
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .view-panel {
+        animation: viewIn 180ms cubic-bezier(0.2, 0, 0, 1);
+      }
+
+      @keyframes viewIn {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
       .answer-stack,
       .surface,
       .rail,
       .basis {
         background: rgba(22, 24, 21, 0.92);
         border: 1px solid var(--line);
-        border-radius: 8px;
+        border-radius: var(--radius);
       }
 
       .answer-stack {
@@ -252,7 +442,7 @@
 
       .decision-label {
         color: var(--bad);
-        font-size: 32px;
+        font-size: 34px;
         font-weight: 760;
         letter-spacing: 0;
         line-height: 1.08;
@@ -292,7 +482,7 @@
       .action-panel {
         background: var(--ink);
         border: 1px solid rgba(242, 197, 102, 0.28);
-        border-radius: 8px;
+        border-radius: var(--radius);
         display: grid;
         gap: 10px;
         min-width: 0;
@@ -331,9 +521,9 @@
 
       .shell {
         display: grid;
-        gap: 14px;
+        gap: 12px;
         grid-template-columns: 220px minmax(0, 1fr) 340px;
-        margin-top: 14px;
+        margin-top: 12px;
       }
 
       .rail,
@@ -363,8 +553,8 @@
       }
 
       .nav-button.active {
-        background: rgba(120, 212, 209, 0.12);
-        border-color: rgba(120, 212, 209, 0.42);
+        background: rgba(97, 216, 234, 0.12);
+        border-color: rgba(97, 216, 234, 0.42);
         color: var(--text);
       }
 
@@ -387,6 +577,9 @@
         display: grid;
         gap: 8px;
         padding-top: 10px;
+        transition-property: background-color, border-color, transform;
+        transition-duration: 160ms;
+        transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
       }
 
       .queue-item:first-child,
@@ -419,6 +612,14 @@
         font-size: 13px;
         margin: 0;
         text-wrap: pretty;
+      }
+
+      .queue-item:hover,
+      .data-row:hover,
+      .finding-row:hover,
+      .gate-row:hover,
+      .provenance-row:hover {
+        background: rgba(218, 232, 250, 0.025);
       }
 
       .workbench {
@@ -468,7 +669,7 @@
 
       .metric-tile {
         background: rgba(255, 255, 255, 0.03);
-        border-radius: 8px;
+        border-radius: var(--radius);
         display: grid;
         gap: 4px;
         min-width: 0;
@@ -566,7 +767,7 @@
 
       pre {
         background: #0a0b09;
-        border-radius: 8px;
+        border-radius: var(--radius);
         color: var(--muted);
         font-size: 12px;
         line-height: 1.55;
@@ -588,8 +789,17 @@
 
       @media (max-width: 1180px) {
         .hero,
-        .shell {
+        .shell,
+        .command-top,
+        .command-grid {
           grid-template-columns: 1fr;
+        }
+
+        .verdict-cell,
+        .path-cell,
+        .queue-cell {
+          border-bottom: 1px solid var(--line);
+          border-right: 0;
         }
 
         .rail,
@@ -616,8 +826,14 @@
         .meaning-grid,
         .gate-row,
         .finding-row,
-        .provenance-row {
+        .provenance-row,
+        .brief-grid {
           grid-template-columns: 1fr;
+        }
+
+        .brief-item + .brief-item {
+          border-left: 0;
+          padding-left: 0;
         }
 
         .nav-stack {
@@ -638,6 +854,27 @@
           grid-template-columns: 1fr;
         }
 
+        .topbar {
+          position: static;
+        }
+
+        .system-pills {
+          display: grid;
+          grid-template-columns: 1fr;
+          width: 100%;
+        }
+
+        .system-pills .pill {
+          justify-content: center;
+          width: 100%;
+        }
+
+        .brand p,
+        .body-copy,
+        .verdict-summary {
+          max-width: min(300px, calc(100vw - 64px));
+        }
+
         .decision-label {
           font-size: 24px;
           word-break: normal;
@@ -656,11 +893,26 @@
         }
 
         .hero,
+        .command-surface,
+        .verdict-cell,
+        .stage-cell,
+        .path-cell,
+        .queue-cell,
+        .blocker-cell,
         .answer-stack,
         .surface,
         .rail,
         .basis {
           padding: 12px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
         }
       }
     </style>
@@ -672,56 +924,89 @@
           <p class="eyebrow">Agentic Trading Lab</p>
           <h1>Decision Cockpit</h1>
           <p>
-            A local falsification workspace for research claims, evidence gates,
-            market observations, and agent review. Research only; no advice,
-            broker APIs, account routes, or execution.
+            Local falsification for research claims, evidence gates, bounded
+            observations, and agent review. Research only.
           </p>
         </div>
         <div class="system-pills" aria-label="System status">
-          <span class="pill ok">API-backed</span>
+          <span id="api-pill" class="pill ok">API-backed</span>
           <span class="pill warn">Research only</span>
           <span id="freshness-pill" class="pill">Quote unknown</span>
+          <span id="data-mode-pill" class="pill">Data mode unknown</span>
+          <a class="pill cyan" href="http://127.0.0.1:5199">Live local view</a>
         </div>
       </header>
 
-      <section class="hero" aria-labelledby="decision-title">
-        <div class="answer-stack">
-          <div class="verdict-line">
+      <section class="command-surface" aria-labelledby="decision-title">
+        <div class="command-top">
+          <div class="verdict-cell">
+            <div class="verdict-line">
+              <div>
+                <p class="eyebrow">What matters now</p>
+                <h2 id="decision-title" class="decision-label">Loading verdict...</h2>
+              </div>
+              <div class="metrics" id="verdict-metrics" aria-live="polite"></div>
+            </div>
+            <p id="meaning-text" class="verdict-summary">Checking the latest evidence packet.</p>
+            <div class="brief-grid" aria-label="Decision brief">
+              <div class="brief-item">
+                <span class="eyebrow">Why</span>
+                <p id="why-text" class="body-copy">Waiting for evidence gates.</p>
+              </div>
+              <div class="brief-item">
+                <span class="eyebrow">Human posture</span>
+                <p id="posture-text" class="body-copy">Hold in research mode until gates clear.</p>
+              </div>
+              <div class="brief-item">
+                <span class="eyebrow">Since last review</span>
+                <p id="changed-text" class="body-copy">No comparable prior packet loaded yet.</p>
+              </div>
+            </div>
+          </div>
+
+          <aside class="stage-cell" aria-labelledby="stage-title">
             <div>
-              <p class="eyebrow">Current answer</p>
-              <h2 id="decision-title" class="decision-label">Loading verdict...</h2>
+              <p class="eyebrow">Readiness ladder</p>
+              <h2 id="stage-title">Blocked-at reason</h2>
+              <p id="promotion-text" class="stage-caption">No promotion state loaded yet.</p>
             </div>
-            <div class="metrics" id="verdict-metrics" aria-live="polite"></div>
-          </div>
-          <div class="meaning-grid" aria-label="What this means">
-            <div class="meaning-block">
-              <span>What this means</span>
-              <p id="meaning-text" class="body-copy">Checking the latest evidence packet.</p>
+            <div id="stage-rail" class="stage-progress"></div>
+            <div>
+              <p class="eyebrow">Would change our mind</p>
+              <div id="mind-changers" class="queue-list"></div>
             </div>
-            <div class="meaning-block">
-              <span>Human posture</span>
-              <p id="posture-text" class="body-copy">Hold in research mode until gates clear.</p>
-            </div>
-            <div class="meaning-block">
-              <span>Promotion state</span>
-              <p id="promotion-text" class="body-copy">No promotion state loaded yet.</p>
-            </div>
-          </div>
+            <p id="source-note" class="source-note">Waiting for data source.</p>
+          </aside>
         </div>
 
-        <aside class="hero-side" aria-labelledby="next-move-title">
-          <div class="action-panel">
-            <p class="eyebrow">Operator focus</p>
-            <h2 id="next-move-title" class="action-title">Next best research move</h2>
+        <div class="command-grid">
+          <section class="path-cell" aria-labelledby="path-title">
+            <div>
+              <p class="eyebrow">Evidence path</p>
+              <h2 id="path-title">Weakest proof chain</h2>
+            </div>
+            <div id="command-spine" class="spine"></div>
+          </section>
+
+          <section class="queue-cell" aria-labelledby="next-move-title">
+            <div>
+              <p class="eyebrow">Inspect next</p>
+              <h2 id="next-move-title">Priority queue</h2>
+            </div>
             <p id="next-move" class="body-copy">Loading priority queue...</p>
-          </div>
-          <div class="action-panel">
-            <p class="eyebrow">Trust blockers</p>
+            <div id="inspect-next-list" class="queue-list"></div>
+          </section>
+
+          <section class="blocker-cell" aria-labelledby="blocker-title">
+            <div>
+              <p class="eyebrow">Why this is still research-only</p>
+              <h2 id="blocker-title">Promotion blockers</h2>
+            </div>
             <ul id="blocker-list" class="compact-list">
               <li><span>Loading blockers...</span></li>
             </ul>
-          </div>
-        </aside>
+          </section>
+        </div>
       </section>
 
       <section class="shell">
@@ -729,11 +1014,11 @@
           <div>
             <p class="eyebrow">Views</p>
             <div class="nav-stack">
-              <button class="nav-button active" type="button" data-view-target="overview">Overview</button>
-              <button class="nav-button" type="button" data-view-target="agents">Agents</button>
-              <button class="nav-button" type="button" data-view-target="evidence">Evidence</button>
-              <button class="nav-button" type="button" data-view-target="provenance">Provenance</button>
-              <button class="nav-button" type="button" data-view-target="raw">Raw</button>
+              <button class="nav-button active" type="button" data-view-target="overview" aria-pressed="true">Now</button>
+              <button class="nav-button" type="button" data-view-target="agents" aria-pressed="false">Reviewers</button>
+              <button class="nav-button" type="button" data-view-target="evidence" aria-pressed="false">Weakest Evidence</button>
+              <button class="nav-button" type="button" data-view-target="provenance" aria-pressed="false">Sources</button>
+              <button class="nav-button" type="button" data-view-target="raw" aria-pressed="false">Artifacts</button>
             </div>
           </div>
           <div>
@@ -915,14 +1200,191 @@
         return text(terminal.readiness_verdict?.label);
       };
       const moveLabel = (label) =>
-        text(label)
-          .replace("Refresh observation", "Refresh bounded observation")
-          .replace("Check execution reality", "Review market-friction context");
+        text(label).toLowerCase().includes("execution")
+          ? "Review market-friction context"
+          : text(label).replace("Refresh observation", "Refresh bounded observation");
+
+      function staticTerminal() {
+        return {
+          mode: "research_only",
+          headline: "BTC/USD: observe only; evidence verdict is inconclusive; quote is stale.",
+          readiness_verdict: {
+            label: "Not live-signal ready",
+            confidence_label: "low: unresolved blockers",
+            blocker_count: 5,
+          },
+          market: {
+            symbol: "BTC/USD",
+            venue: "coinbase",
+            bid: 68235.12,
+            ask: 68235.2,
+            last: 68235.18,
+            mid: 68235.16,
+            spread_abs: 0.08,
+            spread_bps: 0.01,
+            last_location: "inside_spread",
+            freshness: { label: "stale", age_seconds: null },
+            source: "local preview fixture",
+            source_timestamp: "2026-05-02T14:18:11Z",
+            license_note: "research data only",
+          },
+          snapshot_event: {
+            source_ref: "runs/live/latest.json",
+            provider: { name: "local fixture", dataset: "bounded market observation" },
+            raw_hash: "static-preview-raw",
+            normalized_hash: "static-preview-normalized",
+            record_hash: "static-preview-record",
+          },
+          evidence: {
+            run_id: "toy-moving-average-crossover",
+            verdict: "inconclusive",
+            disproof_score: 4,
+            gate_counts: { pass: 8, warn: 2, fail: 0 },
+            source: "runs/example-run.json",
+            top_gates: [
+              {
+                name: "baseline comparison",
+                status: "warn",
+                severity: "warning",
+                detail: "Comparator evidence weakened the claim.",
+                threshold: "strategy_cumulative_return > baseline_cumulative_return",
+              },
+              {
+                name: "walk-forward robustness",
+                status: "warn",
+                severity: "warning",
+                detail: "Record more fold evidence or mark the claim as fold-fragile.",
+                threshold: "majority of folds beat the comparator on the same offline bars",
+              },
+            ],
+          },
+          setup_visibility: {
+            setup_label: "claim under test",
+            visibility_stage: "research_candidate",
+            symbol: "BTC/USD",
+            artifact_ref: "runs/example-run.json",
+            snapshot_ref: "runs/live/latest.json",
+          },
+          evidence_passport: {
+            run_fingerprint: "static-preview-fingerprint",
+            open_warning_gates: ["baseline comparison", "walk-forward robustness"],
+            open_failure_gates: [],
+          },
+          ranked_attention_items: [
+            {
+              label: "Refresh bounded observation",
+              why: "A stale observation keeps the cockpit in static research context.",
+            },
+            {
+              label: "Review market-friction context",
+              why: "Observed spread belongs in the evidence packet, not in advice copy.",
+            },
+            {
+              label: "Resolve baseline comparison",
+              why: "Comparator evidence weakened the claim.",
+            },
+            {
+              label: "Resolve walk-forward robustness",
+              why: "More fold evidence is needed before the claim deserves attention.",
+            },
+          ],
+          blockers: [
+            "No paper ledger or live-shadow drift monitor exists.",
+            "No human approval packet exists.",
+            "Advice and execution routes are disabled.",
+            "Latest quote is not fresh.",
+            "Evidence run still has unresolved warnings or failures.",
+          ],
+          confidence_readiness: {
+            current_stage: { id: "observe_only", label: "Observe-only" },
+            allowed_output: "Show source-labeled market facts and evidence blockers.",
+            validation: { promotion_ready: false },
+            missing_checks: [
+              {
+                id: "fresh_observation",
+                label: "Fresh market observation",
+                why: "Live setup views should degrade when the latest quote is aging or stale.",
+              },
+              {
+                id: "no_warning_gates",
+                label: "No warning evidence gates",
+                why: "Warnings like weak comparator performance keep the claim in research mode.",
+              },
+              {
+                id: "baseline_beaten",
+                label: "Comparator beaten",
+                why: "A setup family must beat a boring baseline before it deserves attention.",
+              },
+              {
+                id: "human_review",
+                label: "Human review",
+                why: "A human approval packet must exist before anything leaves research-only mode.",
+              },
+            ],
+            stages: [
+              { id: "observe_only", label: "Observe-only", output: "Show source-labeled market facts and evidence blockers." },
+              { id: "research_candidate", label: "Research candidate", output: "Show claim under test, next falsification task, and non-actionable context." },
+              { id: "validated_setup_note", label: "Validated setup note", output: "Show scenario, horizon, invalidation, expiry, and evidence refs without execution." },
+              { id: "shadow_confidence", label: "Shadow confidence", output: "Show calibrated confidence bands and live-vs-expected drift state." },
+            ],
+          },
+          agentic_review: {
+            promotion_decision: {
+              decision: "research-only hold",
+              reason: "Warning evidence remains open and promotion evidence is incomplete.",
+            },
+            roles: [
+              { name: "Leak Auditor", responsibility: "lineage" },
+              { name: "Baseline Challenger", responsibility: "comparators" },
+              { name: "Regime Skeptic", responsibility: "folds" },
+            ],
+            findings: [
+              {
+                role: "Baseline Challenger",
+                gate_name: "baseline comparison",
+                status: "warn",
+                finding: "Recorded evidence raised a warning that needs harder offline review.",
+                remediation_hint: "Comparator evidence weakened the claim.",
+              },
+              {
+                role: "Regime Skeptic",
+                gate_name: "walk-forward robustness",
+                status: "warn",
+                finding: "Recorded evidence raised a warning that needs harder offline review.",
+                remediation_hint: "Record more fold evidence or mark the claim as fold-fragile.",
+              },
+            ],
+          },
+          evidence_rigor: {
+            summary: {
+              score: 60,
+              status: "needs_evidence",
+              allowed_fields: ["close", "date", "high", "low", "open", "symbol", "volume"],
+              missing_baselines: ["equal-weight", "naive-mean-reversion", "naive-momentum", "random-control"],
+              evidence_gaps: ["missing_baseline:equal-weight", "missing_baseline:naive-mean-reversion", "missing_baseline:naive-momentum", "missing_baseline:random-control"],
+            },
+          },
+          noise_filters: [
+            "Hide any setup without source timestamp, provider, and artifact ref.",
+            "Collapse passed gates; show warnings and failures first.",
+            "Show the next falsification task before any upside story.",
+          ],
+        };
+      }
 
       async function loadTerminal() {
-        const response = await fetch(`${API_BASE}/terminal/overview`, { cache: "no-store" });
-        if (!response.ok) throw new Error(`/terminal/overview returned ${response.status}`);
-        return response.json();
+        try {
+          const response = await fetch(`${API_BASE}/terminal/overview`, { cache: "no-store" });
+          if (!response.ok) throw new Error(`/terminal/overview returned ${response.status}`);
+          const payload = await response.json();
+          payload._dataMode = "live_api";
+          return payload;
+        } catch (error) {
+          const payload = staticTerminal();
+          payload._dataMode = window.location.protocol === "file:" ? "static_file_preview" : "static_api_fallback";
+          payload._loadError = text(error.message);
+          return payload;
+        }
       }
 
       function metric(label, value, tone = "") {
@@ -958,12 +1420,113 @@
             document.body.dataset.view = target;
             document.querySelectorAll("[data-view-target]").forEach((item) => {
               item.classList.toggle("active", item.dataset.viewTarget === target);
+              item.setAttribute("aria-pressed", String(item.dataset.viewTarget === target));
             });
             document.querySelectorAll("[data-view-panel]").forEach((panel) => {
               panel.classList.toggle("active", panel.dataset.viewPanel === target);
             });
           });
         });
+      }
+
+      function currentWeakGate(terminal) {
+        return (terminal.evidence?.top_gates || []).find((gate) => gate.status !== "pass");
+      }
+
+      function whatMattersNow(terminal) {
+        const evidence = terminal.evidence || {};
+        const market = terminal.market || {};
+        const counts = evidence.gate_counts || {};
+        const blockers = terminal.blockers || [];
+        return `${text(market.symbol)} hold: ${text(market.freshness?.label)} quote, ${text(evidence.verdict)} evidence, ${text(counts.warn ?? 0)} warnings, ${text(blockers.length)} blockers.`;
+      }
+
+      function whyHeld(terminal) {
+        const weakGate = currentWeakGate(terminal);
+        if (weakGate) return `${text(weakGate.name)} is unresolved: ${text(weakGate.detail)}`;
+        if (terminal.market?.freshness?.label !== "fresh") return "The latest observation is not fresh enough for a higher research stage.";
+        return "Promotion evidence is incomplete, so the packet stays in research review.";
+      }
+
+      function reviewDelta(terminal) {
+        if (terminal._dataMode === "static_file_preview") {
+          return "Static preview data; open the live local view for current API state.";
+        }
+        return "No prior comparable packet found; showing the current evidence state only.";
+      }
+
+      function sourceModeLabel(mode) {
+        if (mode === "live_api") return "Live API";
+        if (mode === "static_file_preview") return "Static file preview";
+        return "Static API fallback";
+      }
+
+      function renderStageRail(readiness) {
+        const current = readiness.current_stage || {};
+        const stages = readiness.stages || [];
+        document.querySelector("#stage-rail").innerHTML = stages.length
+          ? stages.map((stage) => {
+              const isCurrent = stage.id === current.id;
+              const locked = !isCurrent && stages.findIndex((item) => item.id === stage.id) > stages.findIndex((item) => item.id === current.id);
+              return `<div class="stage-node ${isCurrent ? "current" : locked ? "locked" : ""}"><span>${escapeHtml(stage.label)}</span></div>`;
+            }).join("")
+          : '<div class="stage-node current"><span>Stage unknown</span></div>';
+      }
+
+      function renderMindChangers(readiness) {
+        const missing = readiness.missing_checks || [];
+        document.querySelector("#mind-changers").innerHTML = missing.length
+          ? missing.slice(0, 3).map((check) => queueItem(text(check.label || check.id), text(check.why || check.detail), "warn")).join("")
+          : queueItem("No missing criteria", "The current readiness packet exposes no missing checks.", "ok");
+      }
+
+      function spineSteps(terminal) {
+        const evidence = terminal.evidence || {};
+        const market = terminal.market || {};
+        const readiness = terminal.confidence_readiness || {};
+        const stage = readiness.current_stage || {};
+        const topGate = currentWeakGate(terminal);
+        const move = (terminal.ranked_attention_items || [])[0];
+        return [
+          {
+            tone: "ok",
+            title: `Registered claim: ${text(evidence.run_id)}`,
+            body: `Source artifact ${text(evidence.source)} anchors this packet.`,
+          },
+          {
+            tone: toneFor(market.freshness?.label),
+            title: `Observation: ${text(market.symbol)} is ${text(market.freshness?.label)}`,
+            body: "Market facts stay source-labeled and non-actionable.",
+          },
+          {
+            tone: topGate ? toneFor(topGate.status) : "ok",
+            title: topGate ? `Weakest gate: ${text(topGate.name)}` : "Weakest gate: none exposed",
+            body: topGate ? text(topGate.detail) : "No warning or failure gate is exposed in the current top gate list.",
+          },
+          {
+            tone: "warn",
+            title: `Current rung: ${text(stage.label)}`,
+            body: text(readiness.allowed_output),
+          },
+          {
+            tone: "warn",
+            title: move ? `Next inspection: ${moveLabel(move.label)}` : "Next inspection: unknown",
+            body: move ? text(move.why) : "No ranked research move is exposed.",
+          },
+        ];
+      }
+
+      function renderSpineInto(selector, terminal) {
+        document.querySelector(selector).innerHTML = spineSteps(terminal)
+          .map((step) => `
+            <div class="spine-step ${step.tone}">
+              <div>
+                <strong>${escapeHtml(step.title)}</strong>
+                <p class="body-copy">${escapeHtml(step.body)}</p>
+              </div>
+            </div>
+          `)
+          .join("");
       }
 
       function renderHero(terminal) {
@@ -976,14 +1539,21 @@
         const firstMove = (terminal.ranked_attention_items || [])[0];
         document.querySelector("#decision-title").textContent = cockpitVerdict(terminal);
         document.querySelector("#meaning-text").textContent =
-          `${text(terminal.headline)} This is a research hold until the open evidence gaps are closed.`;
+          whatMattersNow(terminal);
+        document.querySelector("#why-text").textContent = whyHeld(terminal);
+        document.querySelector("#changed-text").textContent = reviewDelta(terminal);
         document.querySelector("#posture-text").textContent =
-          "Inspect the weakest gate, collect missing proof, and keep market facts source-labeled.";
+          "Inspect the weakest gate, collect missing proof, and keep every market fact source-labeled.";
         document.querySelector("#promotion-text").textContent =
           `${text(stage.label)}: ${text(readiness.allowed_output)}`;
         document.querySelector("#next-move").textContent = firstMove
           ? `${moveLabel(firstMove.label)}. ${text(firstMove.why)}`
           : "No ranked blocker is exposed by the current artifact.";
+        document.querySelector("#inspect-next-list").innerHTML = (terminal.ranked_attention_items || []).length
+          ? (terminal.ranked_attention_items || []).map((item, index) =>
+              queueItem(`#${index + 1} ${moveLabel(item.label)}`, text(item.why), index === 0 ? "warn" : ""),
+            ).join("")
+          : queueItem("No queue item", "Current artifacts do not expose a ranked blocker.");
         document.querySelector("#verdict-metrics").innerHTML = `
           ${metric("symbol", market.symbol || "unknown", "cyan")}
           ${metric("warnings", counts.warn ?? "unknown", counts.warn ? "warn" : "ok")}
@@ -992,11 +1562,31 @@
         `;
         document.querySelector("#freshness-pill").textContent = `Quote ${text(market.freshness?.label)}`;
         document.querySelector("#freshness-pill").className = `pill ${toneFor(market.freshness?.label)}`;
+        document.querySelector("#data-mode-pill").textContent = sourceModeLabel(terminal._dataMode);
+        document.querySelector("#data-mode-pill").className = terminal._dataMode === "live_api" ? "pill ok" : "pill warn";
+        document.querySelector("#api-pill").textContent = terminal._dataMode === "live_api" ? "API-backed" : "Preview-backed";
+        document.querySelector("#api-pill").className = terminal._dataMode === "live_api" ? "pill ok" : "pill warn";
+        document.querySelector("#source-note").innerHTML =
+          terminal._dataMode === "live_api"
+            ? `<strong>Live API:</strong> ${escapeHtml(API_BASE)}/terminal/overview`
+            : `<strong>${escapeHtml(sourceModeLabel(terminal._dataMode))}:</strong> ${escapeHtml(terminal._loadError || "using bundled static evidence preview")}`;
+        renderStageRail(readiness);
+        renderMindChangers(readiness);
+        renderSpineInto("#command-spine", terminal);
       }
 
       function renderBlockers(blockers) {
+        const categoryFor = (item) => {
+          const lower = text(item).toLowerCase();
+          if (lower.includes("quote") || lower.includes("snapshot")) return "Data freshness";
+          if (lower.includes("ledger") || lower.includes("shadow") || lower.includes("calibration")) return "Readiness artifacts";
+          if (lower.includes("human")) return "Human review";
+          if (lower.includes("advice") || lower.includes("execution") || lower.includes("routes")) return "Boundary lock";
+          if (lower.includes("evidence") || lower.includes("warning") || lower.includes("failure")) return "Falsification weakness";
+          return "Research blocker";
+        };
         const rows = (blockers || []).length
-          ? blockers.map((item) => `<li><span>${escapeHtml(item)}</span></li>`).join("")
+          ? blockers.map((item) => `<li><span><strong>${escapeHtml(categoryFor(item))}</strong><br>${escapeHtml(item)}</span></li>`).join("")
           : "<li><span>No current blocker is recorded.</span></li>";
         document.querySelector("#blocker-list").innerHTML = rows;
       }
@@ -1049,49 +1639,7 @@
       }
 
       function renderSpine(terminal) {
-        const evidence = terminal.evidence || {};
-        const market = terminal.market || {};
-        const readiness = terminal.confidence_readiness || {};
-        const stage = readiness.current_stage || {};
-        const topGate = (evidence.top_gates || []).find((gate) => gate.status !== "pass");
-        const move = (terminal.ranked_attention_items || [])[0];
-        const steps = [
-          {
-            tone: "ok",
-            title: `Registered claim: ${text(evidence.run_id)}`,
-            body: `Source artifact ${text(evidence.source)} is the current claim packet.`,
-          },
-          {
-            tone: toneFor(market.freshness?.label),
-            title: `Observation: ${text(market.symbol)} quote is ${text(market.freshness?.label)}`,
-            body: `Provider context is displayed as research observation, not guidance.`,
-          },
-          {
-            tone: topGate ? toneFor(topGate.status) : "ok",
-            title: topGate ? `Weakest gate: ${text(topGate.name)}` : "Weakest gate: none exposed",
-            body: topGate ? text(topGate.detail) : "No warning or failure gate is exposed in the current top gate list.",
-          },
-          {
-            tone: "warn",
-            title: `Current stage: ${text(stage.label)}`,
-            body: text(readiness.allowed_output),
-          },
-          {
-            tone: "warn",
-            title: move ? `Next test: ${moveLabel(move.label)}` : "Next test: unknown",
-            body: move ? text(move.why) : "No ranked research move is exposed.",
-          },
-        ];
-        document.querySelector("#evidence-spine").innerHTML = steps
-          .map((step) => `
-            <div class="spine-step ${step.tone}">
-              <div>
-                <strong>${escapeHtml(step.title)}</strong>
-                <p class="body-copy">${escapeHtml(step.body)}</p>
-              </div>
-            </div>
-          `)
-          .join("");
+        renderSpineInto("#evidence-spine", terminal);
       }
 
       function renderFastRead(terminal) {

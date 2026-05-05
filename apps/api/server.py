@@ -550,7 +550,7 @@ def _focus_queue(
     if spread_bps is not None:
         queue.append(
             {
-                "label": "Check execution reality",
+                "label": "Review market-friction context",
                 "why": f"Current observed spread is {spread_bps} bps; keep it as context, not advice.",
             }
         )

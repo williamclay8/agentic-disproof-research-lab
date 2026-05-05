@@ -97,6 +97,9 @@ def test_terminal_payload_ranks_attention_without_advice_or_execution():
         "unknown",
     }
     assert payload["ranked_attention_items"]
+    labels = [item["label"] for item in payload["ranked_attention_items"]]
+    assert "Review market-friction context" in labels
+    assert "Check execution reality" not in labels
     assert payload["blockers"]
     assert [role["name"] for role in payload["agentic_review"]["roles"]] == [
         "Leak Auditor",
@@ -134,9 +137,13 @@ def test_web_copy_blocks_recommendation_and_execution_language():
     ]
 
     assert "Decision Cockpit" in html
+    assert "What matters now" in html
     assert "What this means" in html
-    assert "Next best research move" in html
-    assert "Trust blockers" in html
+    assert "Inspect next" in html
+    assert "Why this is still research-only" in html
+    assert "Would change our mind" in html
+    assert "Static file preview" in html
+    assert "Live local view" in html
     assert "Agent council" in html
     assert "Evidence spine" in html
     assert "Claim packet" in html
