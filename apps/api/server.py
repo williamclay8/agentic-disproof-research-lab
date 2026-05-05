@@ -21,6 +21,7 @@ from trading_lab.agents import build_agentic_review
 from trading_lab.artifacts import read_run_artifact
 from trading_lab.control_plane import build_lab_control_plane
 from trading_lab.evidence import baseline_pack, summarize_evidence_rigor
+from trading_lab.platform import build_platform_overview
 from trading_lab.readiness import validate_readiness
 from trading_lab.snapshots import read_latest
 
@@ -169,6 +170,70 @@ def terminal_payload() -> dict[str, Any]:
             "Show the next falsification task before any upside story.",
             "Do not display live guidance, sizing, entry, or execution prompts.",
         ],
+    }
+
+
+def platform_payload() -> dict[str, Any]:
+    """Return the platform wedge payload assembled from existing evidence."""
+
+    run = run_payload()
+    snapshot = latest_snapshot_payload()
+    event = snapshot["events"][0] if snapshot["events"] else {}
+    quote = event.get("payload", {})
+    metadata = event.get("metadata", {})
+    spread_bps = _spread_bps(quote)
+    freshness = _freshness_label(metadata.get("source_timestamp"))
+    blockers = _terminal_blockers(run, snapshot, spread_bps, freshness)
+    ranked_attention_items = _focus_queue(run, snapshot, spread_bps, freshness)
+    readiness = confidence_readiness_payload(run, snapshot, spread_bps, freshness)
+    agentic_review = agentic_review_payload()
+    evidence_rigor = evidence_rigor_payload()
+    control_plane = control_plane_payload(
+        run=run,
+        snapshot=snapshot,
+        spread_bps=spread_bps,
+        freshness=freshness,
+        blockers=blockers,
+        readiness=readiness,
+        agentic_review=agentic_review,
+        evidence_rigor=evidence_rigor,
+        ranked_attention_items=ranked_attention_items,
+    )
+    artifact = read_run_artifact(PROJECT_ROOT / run["source"])
+    return build_platform_overview(
+        artifact,
+        run=run,
+        snapshot=snapshot,
+        readiness=readiness,
+        evidence_rigor=evidence_rigor,
+        agentic_review=agentic_review,
+        control_plane=control_plane,
+    )
+
+
+def claims_payload() -> dict[str, Any]:
+    return platform_payload()["claim_registry"]
+
+
+def claim_payload(claim_id: str) -> dict[str, Any]:
+    platform = platform_payload()
+    registry = platform["claim_registry"]
+    claims = registry.get("claims", [])
+    claim = next((item for item in claims if item.get("claim_id") == claim_id), None)
+    if claim is None:
+        return {
+            "error": "claim_not_found",
+            "claim_id": claim_id,
+            "available_claim_ids": [item.get("claim_id") for item in claims],
+        }
+    return {
+        "claim": claim,
+        "runs": [
+            run
+            for run in registry.get("runs", [])
+            if run.get("claim_id") == claim_id
+        ],
+        "trust_packet_ref": "/trust-packet/current",
     }
 
 
@@ -429,6 +494,29 @@ class TradingLabHandler(BaseHTTPRequestHandler):
                 self._send_json(terminal_payload())
             elif route == "/control-plane/lab":
                 self._send_json(control_plane_payload())
+            elif route == "/platform/overview":
+                self._send_json(platform_payload())
+            elif route == "/claims":
+                self._send_json(claims_payload())
+            elif route.startswith("/claims/"):
+                payload = claim_payload(route.split("/", 2)[2])
+                self._send_json(payload, status=404 if "error" in payload else 200)
+            elif route == "/evidence-graph/current":
+                self._send_json(platform_payload()["evidence_graph"])
+            elif route == "/point-in-time-contract/current":
+                self._send_json(platform_payload()["point_in_time_contract"])
+            elif route == "/falsification-engine/current":
+                self._send_json(platform_payload()["falsification_engine"])
+            elif route == "/agent-contracts":
+                self._send_json({"agent_contracts": platform_payload()["agent_contracts"]})
+            elif route == "/readiness/ledger":
+                self._send_json(platform_payload()["readiness_ledger"])
+            elif route == "/trust-packet/current":
+                self._send_json(platform_payload()["trust_packet"])
+            elif route == "/strategy-import/contract":
+                self._send_json(platform_payload()["strategy_import"])
+            elif route == "/failure-gallery":
+                self._send_json(platform_payload()["failure_gallery"])
             elif route == "/confidence/readiness":
                 self._send_json(confidence_readiness_payload())
             elif route == "/readiness/artifacts":
@@ -447,6 +535,17 @@ class TradingLabHandler(BaseHTTPRequestHandler):
                             "/snapshots/latest",
                             "/terminal",
                             "/control-plane/lab",
+                            "/platform/overview",
+                            "/claims",
+                            "/claims/{claim_id}",
+                            "/evidence-graph/current",
+                            "/point-in-time-contract/current",
+                            "/falsification-engine/current",
+                            "/agent-contracts",
+                            "/readiness/ledger",
+                            "/trust-packet/current",
+                            "/strategy-import/contract",
+                            "/failure-gallery",
                             "/confidence/readiness",
                             "/readiness/artifacts",
                             "/agentic/review",

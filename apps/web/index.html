@@ -1170,6 +1170,7 @@
             <p class="eyebrow">Views</p>
             <div class="nav-stack">
               <button class="nav-button active" type="button" data-view-target="overview" aria-pressed="true">Now</button>
+              <button class="nav-button" type="button" data-view-target="platform" aria-pressed="false">Platform</button>
               <button class="nav-button" type="button" data-view-target="tasks" aria-pressed="false">Tasks</button>
               <button class="nav-button" type="button" data-view-target="agents" aria-pressed="false">Agent Ownership</button>
               <button class="nav-button" type="button" data-view-target="evidence" aria-pressed="false">Evidence Gaps</button>
@@ -1243,6 +1244,104 @@
                 </div>
               </div>
               <div id="learning-loop" class="two-up"></div>
+            </section>
+          </article>
+
+          <article class="view-panel" data-view-panel="platform">
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Operating wedge</p>
+                  <h2>Claim Registry</h2>
+                </div>
+                <span id="platform-mode" class="badge warn">research only</span>
+              </div>
+              <p id="platform-wedge" class="body-copy">Loading platform wedge.</p>
+              <div id="claim-registry" class="three-up"></div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Auditable chain</p>
+                  <h2>Evidence Graph</h2>
+                </div>
+                <span id="evidence-graph-count" class="badge">loading</span>
+              </div>
+              <div id="evidence-graph" class="queue-list"></div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Lineage lock</p>
+                  <h2>Point-in-Time Contract</h2>
+                </div>
+                <span id="pit-contract-status" class="badge warn">needs review</span>
+              </div>
+              <div id="point-in-time-contract" class="two-up"></div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Kill weak claims first</p>
+                  <h2>Falsification Engine</h2>
+                </div>
+              </div>
+              <div id="falsification-engine" class="queue-list"></div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Evidence operators</p>
+                  <h2>Agent Contracts</h2>
+                </div>
+              </div>
+              <div id="agent-contracts" class="progress-ledger"></div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Promotion gate</p>
+                  <h2>Readiness Ledger</h2>
+                </div>
+                <span id="readiness-ledger-status" class="badge warn">not ready</span>
+              </div>
+              <div id="readiness-ledger" class="two-up"></div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Human review export</p>
+                  <h2>Trust Packet</h2>
+                </div>
+                <span id="trust-packet-status" class="badge ok">review-ready</span>
+              </div>
+              <div id="trust-packet" class="two-up"></div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Validate-only intake</p>
+                  <h2>Strategy Import</h2>
+                </div>
+              </div>
+              <div id="strategy-import" class="two-up"></div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Dead-claim memory</p>
+                  <h2>Failure Gallery</h2>
+                </div>
+              </div>
+              <div id="failure-gallery" class="queue-list"></div>
             </section>
           </article>
 
@@ -1779,6 +1878,127 @@
         };
       }
 
+      function staticPlatform() {
+        return {
+          mode: "research_only",
+          wedge_sentence: "The agentic trading lab that kills weak strategies faster than anyone else, and only lets surviving claims advance through auditable evidence gates.",
+          claim_registry: {
+            claims: [
+              {
+                claim_id: "toy-moving-average-crossover",
+                thesis: "A toy moving-average crossover may beat an offline comparator on the bundled sample.",
+                state: "research_only_hold",
+                verdict: "inconclusive",
+                disproof_score: 4,
+                open_gap_count: 10,
+                source_ref: "runs/example-run.json",
+              },
+            ],
+            runs: [
+              {
+                run_id: "toy-moving-average-crossover-52635e40",
+                claim_id: "toy-moving-average-crossover",
+                verdict: "inconclusive",
+                source_ref: "runs/example-run.json",
+                gate_counts: { pass: 8, warn: 2, fail: 0 },
+                dataset_hash: "52635e40771bdd93cb3df91e76808bcdf5cbb67446bebb28c136611068e3ea06",
+              },
+            ],
+          },
+          evidence_graph: {
+            node_count: 8,
+            edge_count: 10,
+            nodes: [
+              { id: "claim:toy-moving-average-crossover", kind: "claim", label: "toy-moving-average-crossover", status: "inconclusive", source_ref: "runs/example-run.json" },
+              { id: "run:toy-moving-average-crossover-52635e40", kind: "run", label: "toy-moving-average-crossover-52635e40", status: "inconclusive", source_ref: "runs/example-run.json" },
+              { id: "gate:baseline-comparison", kind: "gate", label: "baseline comparison", status: "warn", owner: "Baseline Challenger", source_ref: "runs/example-run.json" },
+              { id: "gate:walk-forward-robustness", kind: "gate", label: "walk-forward robustness", status: "warn", owner: "Regime Skeptic", source_ref: "runs/example-run.json" },
+              { id: "rigor:missing_baseline:random-control", kind: "gap", label: "random-control baseline", status: "open", owner: "Baseline Challenger", source_ref: "runs/example-run.json" },
+            ],
+            edges: [
+              { from: "claim:toy-moving-average-crossover", to: "run:toy-moving-average-crossover-52635e40", relationship: "tested_by", source_ref: "runs/example-run.json" },
+              { from: "run:toy-moving-average-crossover-52635e40", to: "gate:baseline-comparison", relationship: "evaluated_by", source_ref: "runs/example-run.json" },
+              { from: "gate:baseline-comparison", to: "claim:toy-moving-average-crossover", relationship: "blocks_promotion", source_ref: "runs/example-run.json" },
+            ],
+          },
+          point_in_time_contract: {
+            claim_id: "toy-moving-average-crossover",
+            status: "needs_review",
+            as_of_policy: "known-at-time inputs only",
+            allowed_fields: ["close", "date", "high", "low", "open", "symbol", "volume"],
+            missing_baselines: ["equal-weight", "naive-mean-reversion", "naive-momentum", "random-control"],
+            gaps: [
+              { id: "missing_baseline:equal-weight", status: "open", owner: "Baseline Challenger", source_ref: "runs/example-run.json" },
+              { id: "missing_baseline:random-control", status: "open", owner: "Baseline Challenger", source_ref: "runs/example-run.json" },
+            ],
+          },
+          falsification_engine: {
+            principle: "First try to kill the claim; only survivors earn more UI surface area.",
+            packs: [
+              { pack_id: "baseline-pack", status: "open", owner: "Baseline Challenger", objective: "Force every strategy to beat boring offline comparators.", missing_items: ["random-control"], source_ref: "runs/example-run.json" },
+              { pack_id: "walk-forward-pack", status: "open", owner: "Regime Skeptic", objective: "Break fold-fragile claims with chronological out-of-sample tests.", missing_items: ["additional fold evidence"], source_ref: "runs/example-run.json" },
+              { pack_id: "cost-stress-pack", status: "ready", owner: "Cost Stress Critic", objective: "Stress fees, slippage, and delay before claims can sound useful.", missing_items: [], source_ref: "runs/example-run.json" },
+            ],
+            queue: [
+              { task_id: "task:baseline-comparison:retest", priority: 1, owner: "Baseline Challenger", label: "Retest baseline comparison against stricter offline evidence.", source_ref: "runs/example-run.json" },
+            ],
+          },
+          agent_contracts: [
+            { agent: "Leak Auditor", agent_id: "leak_auditor", focus: "Feature timing, chronology, schema, and forward-looking evidence.", boundary: "offline research evidence only", input_schema: "evidence_packet.v1", output_schema: "agent_finding.v1", open_finding_count: 0 },
+            { agent: "Baseline Challenger", agent_id: "baseline_challenger", focus: "Same-sample comparator discipline and baseline weakness.", boundary: "offline research evidence only", input_schema: "evidence_packet.v1", output_schema: "agent_finding.v1", open_finding_count: 1 },
+            { agent: "Regime Skeptic", agent_id: "regime_skeptic", focus: "Walk-forward, parameter, and regime-fragility evidence.", boundary: "offline research evidence only", input_schema: "evidence_packet.v1", output_schema: "agent_finding.v1", open_finding_count: 1 },
+          ],
+          readiness_ledger: {
+            promotion_ready: false,
+            current_stage: { id: "observe_only", label: "Observe-only" },
+            completed_checks: ["provider_provenance", "spread_context"],
+            missing_checks: [
+              { id: "no_warning_gates", label: "No warning evidence gates", detail: "Warnings keep the claim in research mode." },
+              { id: "human_review", label: "Human review", detail: "Human review must be recorded before promotion." },
+            ],
+            sample_thresholds: {
+              paper_ledger: { current: 6, required: 30 },
+              live_shadow_drift: { current: 0, required: 30 },
+              calibration_history: { current: 5, required: 30 },
+            },
+          },
+          trust_packet: {
+            claim_id: "toy-moving-average-crossover",
+            run_id: "toy-moving-average-crossover-52635e40",
+            verdict: "inconclusive",
+            export_status: "ready_for_research_review",
+            summary: "The current claim stays in research hold with warning gates and open evidence gaps.",
+            open_gaps: ["gate:baseline-comparison", "gate:walk-forward-robustness", "rigor:missing_baseline:random-control"],
+            blocker_count: 10,
+          },
+          strategy_import: {
+            supported_sources: ["plain_language_claim", "csv_backtest", "pine_script", "lean_algorithm", "notebook_summary"],
+            intake_contract: { default_state: "quarantine_until_evidence_exists", first_gate: "point_in_time_contract" },
+            normalization_steps: [
+              "Extract the claim and null hypothesis.",
+              "Convert source material into a research-only test spec.",
+              "Attach dataset, timestamp, and source references.",
+              "Run disproof packs before the claim appears in the main console.",
+            ],
+            blocked_imports: ["credentialed account connectors", "unstamped live-feed dependencies", "claims without a null hypothesis"],
+          },
+          failure_gallery: {
+            failed_or_blocked_claims: [
+              {
+                claim_id: "toy-moving-average-crossover",
+                run_id: "toy-moving-average-crossover-52635e40",
+                stage: "research_only_hold",
+                verdict: "inconclusive",
+                primary_failure_reason: "Comparator evidence weakened the claim.",
+                open_warning_gates: ["baseline comparison", "walk-forward robustness"],
+                source_ref: "runs/example-run.json",
+              },
+            ],
+            learning_value: "Dead and blocked claims become training data for faster future falsification.",
+          },
+        };
+      }
+
       async function loadTerminal() {
         try {
           const response = await fetch(`${API_BASE}/terminal/overview`, { cache: "no-store" });
@@ -1788,6 +2008,21 @@
           return payload;
         } catch (error) {
           const payload = staticTerminal();
+          payload._dataMode = window.location.protocol === "file:" ? "static_file_preview" : "static_api_fallback";
+          payload._loadError = text(error.message);
+          return payload;
+        }
+      }
+
+      async function loadPlatform() {
+        try {
+          const response = await fetch(`${API_BASE}/platform/overview`, { cache: "no-store" });
+          if (!response.ok) throw new Error(`/platform/overview returned ${response.status}`);
+          const payload = await response.json();
+          payload._dataMode = "live_api";
+          return payload;
+        } catch (error) {
+          const payload = staticPlatform();
           payload._dataMode = window.location.protocol === "file:" ? "static_file_preview" : "static_api_fallback";
           payload._loadError = text(error.message);
           return payload;
@@ -2283,6 +2518,128 @@
           .join("");
       }
 
+      function renderPlatform(platform) {
+        const registry = platform.claim_registry || {};
+        const claim = (registry.claims || [])[0] || {};
+        const run = (registry.runs || [])[0] || {};
+        const graph = platform.evidence_graph || {};
+        const pit = platform.point_in_time_contract || {};
+        const engine = platform.falsification_engine || {};
+        const contracts = platform.agent_contracts || [];
+        const ledger = platform.readiness_ledger || {};
+        const packet = platform.trust_packet || {};
+        const strategyImport = platform.strategy_import || {};
+        const gallery = platform.failure_gallery || {};
+        document.querySelector("#platform-mode").textContent = pretty(platform.mode || "research_only");
+        document.querySelector("#platform-mode").className = "badge warn";
+        document.querySelector("#platform-wedge").textContent = text(platform.wedge_sentence);
+        document.querySelector("#claim-registry").innerHTML = `
+          <div class="metric-tile">
+            <span class="eyebrow">Active claim</span>
+            <strong>${escapeHtml(claim.claim_id || "unknown")}</strong>
+            <p class="body-copy">${escapeHtml(claim.thesis || "No thesis exposed.")}</p>
+          </div>
+          <div class="metric-tile">
+            <span class="eyebrow">Registry state</span>
+            <strong class="${claim.state === "offline_reviewed_research_packet" ? "ok" : "warn"}">${escapeHtml(pretty(claim.state || "unknown"))}</strong>
+            <p class="body-copy">${escapeHtml(text(claim.open_gap_count ?? 0))} open gaps and verdict ${escapeHtml(text(claim.verdict))}.</p>
+          </div>
+          <div class="metric-tile">
+            <span class="eyebrow">Latest run</span>
+            <strong class="mono">${escapeHtml(run.run_id || "unknown")}</strong>
+            <p class="body-copy">Source ref ${escapeHtml(run.source_ref || claim.source_ref || "source pending")}.</p>
+          </div>
+        `;
+
+        const graphNodes = graph.nodes || [];
+        const graphEdges = graph.edges || [];
+        const graphPreview = graphNodes
+          .filter((node) => ["claim", "run", "gate", "gap", "point_in_time_gap"].includes(node.kind || node.type))
+          .slice(0, 8);
+        document.querySelector("#evidence-graph-count").textContent =
+          `${text(graph.node_count ?? graphNodes.length)} nodes / ${text(graph.edge_count ?? graphEdges.length)} edges`;
+        document.querySelector("#evidence-graph").innerHTML = graphPreview.length
+          ? graphPreview.map((node) => `
+              <div class="gap-row" tabindex="0">
+                <strong>${escapeHtml(node.id)}</strong>
+                ${badge(text(node.status), toneFor(node.status))}
+                <p>${escapeHtml(node.owner || pretty(node.kind || node.type || "node"))}<br><span class="mono">${escapeHtml(node.source_ref || "source pending")}</span></p>
+                <p>${escapeHtml(node.label || "Graph node")}<br><span class="mono">${escapeHtml(text((graphEdges.find((edge) => edge.from === node.id || edge.source === node.id) || {}).relationship || "linked"))}</span></p>
+              </div>
+            `).join("")
+          : queueItem("No graph nodes", "The platform payload did not expose an evidence graph.");
+
+        document.querySelector("#pit-contract-status").textContent = pretty(pit.status || "needs_review");
+        document.querySelector("#pit-contract-status").className = `badge ${pit.status === "ready" ? "ok" : "warn"}`;
+        document.querySelector("#point-in-time-contract").innerHTML = `
+          ${dataRow("As-of policy", text(pit.as_of_policy), pit.status === "ready" ? "ok" : "warn")}
+          ${dataRow("Allowed fields", text((pit.allowed_fields || []).join(", ")), "mono")}
+          ${dataRow("Dataset window", `${text(pit.dataset_window?.start)} to ${text(pit.dataset_window?.end)}`, "mono")}
+          ${dataRow("Open PIT gaps", text((pit.gaps || []).map((gap) => gap.id).join(", ") || "none"), (pit.gaps || []).length ? "warn" : "ok")}
+        `;
+
+        document.querySelector("#falsification-engine").innerHTML = (engine.packs || []).length
+          ? (engine.packs || []).map((pack, index) => `
+              <div class="task-row" tabindex="0">
+                <strong class="mono">${escapeHtml(pack.pack_id || `pack-${index + 1}`)}</strong>
+                <div>${badge(text(pack.status), toneFor(pack.status))}<p>${escapeHtml(pack.owner || "owner pending")}</p></div>
+                <p>${escapeHtml(pack.objective || pack.pack_id)}<br><span class="mono">${escapeHtml((pack.required_artifacts || []).join(", ") || "offline artifact")}</span></p>
+                <p class="mono">${escapeHtml((pack.missing_items || []).join(", ") || pack.source_ref || "ready")}</p>
+              </div>
+            `).join("")
+          : queueItem("No packs", "No falsification packs are exposed.");
+
+        document.querySelector("#agent-contracts").innerHTML = contracts.length
+          ? contracts.map((contract) =>
+              scoreCard(
+                contract.agent,
+                contract.output_schema || "agent_finding.v1",
+                `${text(contract.open_finding_count ?? 0)} open findings; ${text(contract.boundary)}`,
+                (contract.open_finding_count || 0) ? "warn" : "ok",
+              ),
+            ).join("")
+          : queueItem("No agent contracts", "No agent evidence contracts are exposed.");
+
+        document.querySelector("#readiness-ledger-status").textContent =
+          ledger.promotion_ready ? "promotion ready" : "promotion blocked";
+        document.querySelector("#readiness-ledger-status").className = `badge ${ledger.promotion_ready ? "ok" : "warn"}`;
+        const thresholds = ledger.sample_thresholds || {};
+        document.querySelector("#readiness-ledger").innerHTML = `
+          ${dataRow("Current stage", text(ledger.current_stage?.label), ledger.promotion_ready ? "ok" : "warn")}
+          ${dataRow("Completed checks", text((ledger.completed_checks || []).slice(0, 6).join(", ") || "none"), "mono")}
+          ${dataRow("Missing checks", text((ledger.missing_checks || []).slice(0, 6).map((check) => check.label || check.id).join(", ") || "none"), (ledger.missing_checks || []).length ? "warn" : "ok")}
+          ${dataRow("Sample thresholds", text(Object.entries(thresholds).map(([name, value]) => `${name}: ${value.current ?? value.recorded ?? 0}/${value.required ?? true}`).join(", ") || "none"), "mono")}
+        `;
+
+        document.querySelector("#trust-packet-status").textContent = pretty(packet.export_status || "ready_for_research_review");
+        document.querySelector("#trust-packet-status").className = "badge ok";
+        document.querySelector("#trust-packet").innerHTML = `
+          ${dataRow("Packet claim", text(packet.claim_id), "mono")}
+          ${dataRow("Verdict", text(packet.verdict), packet.verdict === "passed preliminary gates" ? "ok" : "warn")}
+          ${dataRow("Human review summary", text(packet.summary), "muted")}
+          ${dataRow("Open blockers", text(packet.blocker_count ?? (packet.open_gaps || []).length), (packet.blocker_count || 0) ? "warn" : "ok")}
+        `;
+
+        document.querySelector("#strategy-import").innerHTML = `
+          ${dataRow("Supported sources", text((strategyImport.supported_sources || []).join(", ")), "mono")}
+          ${dataRow("Default state", text(strategyImport.intake_contract?.default_state || strategyImport.mode || "validate_only"), "warn")}
+          ${dataRow("First gate", text(strategyImport.intake_contract?.first_gate || "point_in_time_contract"), "mono")}
+          ${dataRow("Blocked imports", text((strategyImport.blocked_imports || strategyImport.blocked_fields || []).join(", ") || "execution surfaces"), "warn")}
+        `;
+
+        const failures = gallery.failed_or_blocked_claims || [];
+        document.querySelector("#failure-gallery").innerHTML = failures.length
+          ? failures.map((item) => `
+              <div class="mission-row" tabindex="0">
+                <strong>${escapeHtml(item.claim_id)}</strong>
+                ${badge(text(item.verdict), "warn")}
+                <p>${escapeHtml(item.primary_failure_reason || item.failure_mode || "Blocked claim")}<br><span class="mono">${escapeHtml(text((item.open_warning_gates || item.open_gate_names || []).join(", ") || item.stage))}</span></p>
+                <p class="mono">${escapeHtml(item.source_ref || "source pending")}</p>
+              </div>
+            `).join("")
+          : queueItem("No failed claims", "The failure gallery has no blocked claim to display yet.", "ok");
+      }
+
       function renderRaw(terminal) {
         document.querySelector("#raw-evidence").innerHTML = `
           <details open>
@@ -2302,6 +2659,7 @@
                 lab_scorecard: terminal.lab_scorecard,
                 learning_loop: terminal.learning_loop,
                 evidence_rigor: terminal.evidence_rigor,
+                platform: terminal.platform,
                 provenance: terminal.snapshot_event,
               },
               null,
@@ -2331,14 +2689,18 @@
       }
 
       renderNavigation();
-      loadTerminal()
-        .then(renderTerminal)
+      Promise.all([loadTerminal(), loadPlatform()])
+        .then(([terminal, platform]) => {
+          terminal.platform = platform;
+          renderTerminal(terminal);
+          renderPlatform(platform);
+        })
         .catch((error) => {
           document.querySelector("#decision-title").textContent = "API unavailable";
           document.querySelector("#meaning-text").textContent = text(error.message);
           document.querySelector("#next-move").innerHTML =
             'Start the local product lane with <span class="mono">make dev</span>.';
-          document.querySelector("#rail-queue").innerHTML = queueItem("Start API", "The cockpit needs /terminal/overview to render evidence.");
+          document.querySelector("#rail-queue").innerHTML = queueItem("Start API", "The cockpit needs /terminal/overview and /platform/overview to render evidence.");
         });
     </script>
   </body>

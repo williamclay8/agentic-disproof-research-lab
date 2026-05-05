@@ -37,6 +37,80 @@ paths:
       responses:
         "200":
           description: Research-only missions, evidence gaps, claim lifecycle, task board, scorecard, and learning loop
+  /platform/overview:
+    get:
+      summary: Read the full agentic claim-disproof platform overview
+      responses:
+        "200":
+          description: Research-only wedge payload spanning claim registry, evidence graph, falsification packs, readiness ledger, and trust packet
+  /claims:
+    get:
+      summary: Read the claim registry
+      responses:
+        "200":
+          description: Research-only registered claims and run references
+  /claims/{claim_id}:
+    get:
+      summary: Read one registered claim and its evidence runs
+      parameters:
+        - name: claim_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Research-only claim detail and trust packet reference
+        "404":
+          description: Claim id was not found
+  /evidence-graph/current:
+    get:
+      summary: Read the current evidence graph
+      responses:
+        "200":
+          description: Research-only graph of claims, runs, gates, gaps, readiness, and source references
+  /point-in-time-contract/current:
+    get:
+      summary: Read the current point-in-time evidence contract
+      responses:
+        "200":
+          description: Known-at-time field policy, lineage gaps, baseline gaps, and dataset window
+  /falsification-engine/current:
+    get:
+      summary: Read active falsification packs and tasks
+      responses:
+        "200":
+          description: Research-only disproof packs and open offline test queue
+  /agent-contracts:
+    get:
+      summary: Read agent evidence contracts
+      responses:
+        "200":
+          description: Offline agent roles, boundaries, input schema, and output schema
+  /readiness/ledger:
+    get:
+      summary: Read the promotion-readiness ledger
+      responses:
+        "200":
+          description: Research-only readiness checks, artifacts, sample thresholds, and current stage
+  /trust-packet/current:
+    get:
+      summary: Read the current research trust packet
+      responses:
+        "200":
+          description: Export-ready research review packet with source refs and open blockers
+  /strategy-import/contract:
+    get:
+      summary: Read the validate-only strategy import contract
+      responses:
+        "200":
+          description: Supported research-source imports and blocked execution fields
+  /failure-gallery:
+    get:
+      summary: Read failed or blocked claim gallery
+      responses:
+        "200":
+          description: Research-only archive of dead, blocked, and lesson-bearing claims
   /confidence/readiness:
     get:
       summary: Read evidence maturity gates for future setup visibility

@@ -5,9 +5,12 @@ import json
 from pathlib import Path
 
 from apps.api.server import (
+    claim_payload,
+    claims_payload,
     control_plane_payload,
     health_payload,
     latest_snapshot_payload,
+    platform_payload,
     run_payload,
     terminal_payload,
 )
@@ -185,6 +188,117 @@ def test_control_plane_payload_turns_evidence_into_lab_workflows():
     json.dumps(payload)
 
 
+def test_platform_payload_owns_agentic_claim_disproof_wedge():
+    payload = platform_payload()
+
+    assert payload["mode"] == "research_only"
+    assert (
+        payload["wedge_sentence"]
+        == "The agentic trading lab that kills weak strategies faster than anyone else, and only lets surviving claims advance through auditable evidence gates."
+    )
+    assert payload["claim_registry"]["claims"][0]["claim_id"] == "toy-moving-average-crossover"
+    assert payload["claim_registry"]["runs"][0]["source_ref"] == "runs/example-run.json"
+    assert payload["evidence_graph"]["nodes"]
+    assert payload["evidence_graph"]["edges"]
+    assert "gate:baseline-comparison" in {
+        node["id"] for node in payload["evidence_graph"]["nodes"]
+    }
+    assert payload["point_in_time_contract"]["status"] == "needs_review"
+    assert payload["point_in_time_contract"]["as_of_policy"] == "known-at-time inputs only"
+    assert "missing_baseline:random-control" in {
+        gap["id"] for gap in payload["point_in_time_contract"]["gaps"]
+    }
+    assert payload["falsification_engine"]["packs"][0]["pack_id"] == "baseline-pack"
+    assert payload["falsification_engine"]["packs"][0]["status"] == "open"
+    assert payload["agent_contracts"][0]["agent"] == "Leak Auditor"
+    assert payload["agent_contracts"][0]["output_schema"] == "agent_finding.v1"
+    assert payload["readiness_ledger"]["promotion_ready"] is False
+    assert payload["trust_packet"]["claim_id"] == "toy-moving-average-crossover"
+    assert payload["trust_packet"]["verdict"] == "inconclusive"
+    assert payload["trust_packet"]["export_status"] == "ready_for_research_review"
+    assert payload["strategy_import"]["supported_sources"] == [
+        "plain_language_claim",
+        "csv_backtest",
+        "pine_script",
+        "lean_algorithm",
+        "notebook_summary",
+    ]
+    assert payload["failure_gallery"]["failed_or_blocked_claims"]
+    serialized = json.dumps(payload).lower()
+    assert "buy now" not in serialized
+    assert "sell now" not in serialized
+    assert "submit order" not in serialized
+
+
+def test_platform_payload_sections_are_source_referenced_and_research_only():
+    payload = platform_payload()
+
+    assert payload["mode"] == "research_only"
+    assert payload["claim_registry"]["claims"][0]["source_ref"] == "runs/example-run.json"
+    assert payload["evidence_graph"]["nodes"][0]["source_ref"]
+    assert payload["evidence_graph"]["edges"][0]["source_ref"]
+    assert payload["point_in_time_contract"]["source_refs"]["run"] == "runs/example-run.json"
+    assert payload["falsification_engine"]["queue"]
+    assert payload["agent_contracts"][0]["source_refs"] == ["runs/example-run.json"]
+    assert payload["readiness_ledger"]["write_policy"] == "append_only"
+    assert payload["readiness_ledger"]["append_only_entries"]
+    assert payload["trust_packet"]["research_only"] is True
+    assert payload["trust_packet"]["source_refs"]["run"] == "runs/example-run.json"
+    assert payload["failure_gallery"]["failed_or_blocked_claims"][0]["source_ref"] == "runs/example-run.json"
+
+    serialized = json.dumps(payload).lower()
+    assert "autonomous execution actor" not in serialized
+    assert "buy now" not in serialized
+    assert "sell now" not in serialized
+    assert "submit order" not in serialized
+
+
+def test_platform_subpayload_helpers_project_current_claim():
+    registry = claims_payload()
+    claim = claim_payload("toy-moving-average-crossover")
+    missing = claim_payload("missing-claim")
+
+    assert registry["claims"][0]["claim_id"] == "toy-moving-average-crossover"
+    assert claim["claim"]["claim_id"] == "toy-moving-average-crossover"
+    assert claim["runs"][0]["source_ref"] == "runs/example-run.json"
+    assert claim["trust_packet_ref"] == "/trust-packet/current"
+    assert missing["error"] == "claim_not_found"
+
+
+def test_evidence_graph_links_claim_run_dataset_gates_and_readiness():
+    graph = platform_payload()["evidence_graph"]
+    node_ids = {node["id"] for node in graph["nodes"]}
+    edge_pairs = {(edge["from"], edge["to"], edge["relationship"]) for edge in graph["edges"]}
+
+    assert "claim:toy-moving-average-crossover" in node_ids
+    assert "run:toy-moving-average-crossover-52635e40" in node_ids
+    assert any(node_id.startswith("dataset:") for node_id in node_ids)
+    assert "gate:baseline-comparison" in node_ids
+    assert "readiness:current" in node_ids
+    assert (
+        "claim:toy-moving-average-crossover",
+        "run:toy-moving-average-crossover-52635e40",
+        "tested_by",
+    ) in edge_pairs
+    assert any(edge["relationship"] == "uses_dataset" for edge in graph["edges"])
+    assert any(edge["relationship"] == "blocks_promotion" for edge in graph["edges"])
+
+
+def test_point_in_time_contract_and_import_contract_block_promotion_surfaces():
+    payload = platform_payload()
+    pit = payload["point_in_time_contract"]
+    strategy_import = payload["strategy_import"]
+
+    assert pit["status"] == "needs_review"
+    assert pit["fields"]
+    assert "random-control" in pit["missing_baselines"]
+    assert "missing_baseline:random-control" in {gap["id"] for gap in pit["gaps"]}
+    assert strategy_import["intake_contract"]["default_state"] == "quarantine_until_evidence_exists"
+    assert "broker" in strategy_import["blocked_fields"]
+    assert "order" in strategy_import["blocked_fields"]
+    assert "live_signal" in strategy_import["blocked_fields"]
+
+
 def test_active_mission_holds_when_readiness_gaps_remain_after_gate_passes():
     artifact = read_run_artifact(PROJECT_ROOT / "runs" / "example-run.json")
     all_pass_artifact = replace(
@@ -230,6 +344,26 @@ def test_web_copy_blocks_recommendation_and_execution_language():
     assert "Evidence Gap Register" in html
     assert "Falsification Task Board" in html
     assert "Claim Lifecycle" in html
+    assert "Claim Registry" in html
+    assert "Evidence Graph" in html
+    assert "Point-in-Time Contract" in html
+    assert 'id="claim-registry"' in html
+    assert 'id="evidence-graph"' in html
+    assert 'id="point-in-time-contract"' in html
+    assert 'id="falsification-engine"' in html
+    assert 'id="agent-contracts"' in html
+    assert 'id="readiness-ledger"' in html
+    assert 'id="trust-packet"' in html
+    assert 'id="strategy-import"' in html
+    assert 'id="failure-gallery"' in html
+    assert "loadPlatform" in html
+    assert "renderPlatform" in html
+    assert "/platform/overview" in html
+    assert "Agent Contracts" in html
+    assert "Readiness Ledger" in html
+    assert "Trust Packet" in html
+    assert "Strategy Import" in html
+    assert "Failure Gallery" in html
     assert "Gate x-ray" in html
     assert "Lab scorecard" in html
     assert "Learning Loop" in html
@@ -257,6 +391,17 @@ def test_openapi_contract_excludes_order_and_account_routes():
     assert "/agentic/review" in contract
     assert "/evidence/rigor" in contract
     assert "/control-plane/lab" in contract
+    assert "/platform/overview" in contract
+    assert "/claims" in contract
+    assert "/claims/{claim_id}" in contract
+    assert "/evidence-graph/current" in contract
+    assert "/point-in-time-contract/current" in contract
+    assert "/falsification-engine/current" in contract
+    assert "/agent-contracts" in contract
+    assert "/readiness/ledger" in contract
+    assert "/trust-packet/current" in contract
+    assert "/strategy-import/contract" in contract
+    assert "/failure-gallery" in contract
     assert "/orders" not in contract
     assert "/accounts" not in contract
     assert "execution routes" in contract
