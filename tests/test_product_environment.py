@@ -133,16 +133,18 @@ def test_web_copy_blocks_recommendation_and_execution_language():
         "broker api key",
     ]
 
-    assert "Evidence Summary" in html
-    assert "Fix Before Trusting" in html
-    assert "Confidence Ladder" in html
-    assert "Missing Proof" in html
-    assert "Evidence Passport" in html
-    assert "Weakest Gates" in html
-    assert "Agent Review" in html
-    assert "Evidence Rigor" in html
-    assert "Latest Observation" in html
-    assert "Provenance" in html
+    assert "Decision Cockpit" in html
+    assert "What this means" in html
+    assert "Next best research move" in html
+    assert "Trust blockers" in html
+    assert "Agent council" in html
+    assert "Evidence spine" in html
+    assert "Claim packet" in html
+    assert "Basis panel" in html
+    assert "Missing proof" in html
+    assert "Observation tape" in html
+    assert "Provenance ledger" in html
+    assert "Raw evidence drawer" in html
     assert "Source ref" in html
     assert "How To Use This" not in html
     assert "Promotion Blockers" not in html
