@@ -8,29 +8,29 @@ inconclusive
 
 - This report can falsify pre-registered claims, compare local evidence, and expose fragility.
 - This report cannot trade, advise, fetch live data, connect brokers, or watch markets.
-- This offline research lab helps focus symbols, register hypotheses, run local falsification, and review evidence.
-- No live market data is requested or implied; use local CSVs and generated artifacts only.
+- This research lab helps focus symbols, register hypotheses, collect explicit observations, run local falsification, and review evidence.
+- Market observations must be explicitly collected and labeled with source, freshness, and provenance.
 - No broker or execution actions are available from this terminal layer.
 - Type '?' for catalog help, use command aliases, or enter an uppercase ticker-like token such as MSFT.
 
 ## Hypothesis
 
 - ID: toy-moving-average-crossover
-- Thesis: A toy moving-average crossover may outperform a buy-and-hold baseline on the bundled offline sample.
+- Thesis: A toy moving-average crossover may beat an offline comparator on the bundled sample.
 - Null hypothesis: The toy moving-average crossover has no edge after costs, slippage, and one-bar execution delay.
 - Asset universe: AAA, BBB
 - Time horizon: daily bars over a tiny educational sample
-- Signal definition: Long when the 2-bar moving average is above the 3-bar moving average; flat otherwise.
-- Expected failure modes: lookahead leakage, cost sensitivity, failure to beat buy-and-hold baseline, non-reproducible run outputs
-- Falsification tests: lookahead column scan, explicit cost realism check, baseline comparison, higher-cost stress run, deterministic rerun fingerprint check
+- Signal definition: Moving-average crossover on toy OHLCV bars.
+- Expected failure modes: lookahead leakage, cost sensitivity, failure to beat the offline comparator, non-reproducible run outputs, walk-forward fold fragility, parameter-grid fragility
+- Falsification tests: lookahead columns, baseline comparison, walk_forward, parameter_sensitivity, cost_grid, reproducibility
 - Pre-registered metrics: strategy_cumulative_return, baseline_cumulative_return, max_drawdown, turnover, total_cost
-- Thresholds: {'baseline_comparison': 'strategy_cumulative_return > baseline', 'cost_sensitivity': 'stressed return remains positive', 'reproducibility': 'rerun fingerprints match'}
+- Thresholds: {'baseline_comparison': 'strategy_cumulative_return > baseline', 'walk_forward': 'majority of folds beat the comparator on the same offline bars', 'parameter_sensitivity': 'nearby parameter cells show broad non-negative evidence', 'cost_grid': 'returns remain positive across at least half of cost grid cells'}
 - Data requirements: local CSV only, date, symbol, OHLCV columns, rows sorted by date then symbol
 - Posthoc edit policy: Do not change the hypothesis or thresholds after observing results.
 
 ## Dataset
 
-- Source: /Users/clay/Documents/New project 4/examples/toy_prices.csv
+- Source: examples/toy_prices.csv
 - Symbols: AAA, BBB
 - Date range: 2024-01-02 to 2024-01-09
 - Columns: date, symbol, open, high, low, close, volume

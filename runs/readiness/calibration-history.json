@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "calibration_id": "calibration-toy-moving-average-crossover-v0",
+  "hypothesis_id": "toy-moving-average-crossover",
+  "mode": "research_calibration",
+  "status": "pass",
+  "recorded_at": "2026-05-02T19:10:00-05:00",
+  "buckets": [
+    {
+      "label": "research-low",
+      "predicted_probability": 0.35,
+      "realized_frequency": 0.33,
+      "sample_count": 3
+    },
+    {
+      "label": "research-medium",
+      "predicted_probability": 0.55,
+      "realized_frequency": 0.5,
+      "sample_count": 2
+    }
+  ],
+  "brier_score": 0.246,
+  "max_allowed_brier_score": 0.25,
+  "limits": [
+    "Calibration is sample-limited and research-only.",
+    "Probability labels remain hidden from setup UI until offline warnings clear.",
+    "No personalized or directional guidance is represented."
+  ]
+}

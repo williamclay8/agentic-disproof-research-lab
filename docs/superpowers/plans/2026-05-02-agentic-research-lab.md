@@ -8,6 +8,13 @@
 
 **Tech Stack:** Python 3.11+, `pytest`, standard-library dataclasses, `csv`, `argparse`, and `pathlib`.
 
+**Status Note (2026-05-05):** The V1 kernel described here has been implemented
+and extended into a local product lane with API, web shell, worker, bounded
+market-observation snapshots, deterministic research-agent review, evidence
+rigor contracts, and stricter readiness validation. See
+`docs/architecture/product-environment.md` and
+`docs/architecture/premier-agentic-research-lab.md` for the current roadmap.
+
 ---
 
 ## File Structure

@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: trading_lab
+      POSTGRES_USER: trading_lab
+      POSTGRES_PASSWORD: trading_lab_dev
+    ports:
+      - "54329:5432"
+    volumes:
+      - trading_lab_postgres:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "63799:6379"
+
+  api:
+    image: python:3.11-slim
+    working_dir: /workspace
+    command: sh -lc "pip install -e . >/tmp/trading-lab-install.log && python apps/api/server.py"
+    environment:
+      TRADING_LAB_API_HOST: 0.0.0.0
+      TRADING_LAB_API_PORT: "5299"
+      PYTHONUNBUFFERED: "1"
+    ports:
+      - "5299:5299"
+    volumes:
+      - ..:/workspace
+    depends_on:
+      - postgres
+      - redis
+
+  web:
+    image: python:3.11-slim
+    working_dir: /workspace
+    command: python apps/web/server.py
+    environment:
+      TRADING_LAB_WEB_HOST: 0.0.0.0
+      TRADING_LAB_WEB_PORT: "5199"
+      PYTHONUNBUFFERED: "1"
+    ports:
+      - "5199:5199"
+    volumes:
+      - ..:/workspace
+    depends_on:
+      - api
+
+  worker:
+    image: python:3.11-slim
+    working_dir: /workspace
+    command: sh -lc "pip install -e . >/tmp/trading-lab-install.log && python apps/worker/worker.py example-run"
+    environment:
+      PYTHONUNBUFFERED: "1"
+      TRADING_LAB_DISABLE_NETWORK: "1"
+      TRADING_LAB_DISABLE_REALTIME: "1"
+    volumes:
+      - ..:/workspace
+    depends_on:
+      - postgres
+      - redis
+
+volumes:
+  trading_lab_postgres:

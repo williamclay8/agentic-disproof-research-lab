@@ -246,8 +246,9 @@
   "hypothesis": {
     "acceptance_thresholds": {
       "baseline_comparison": "strategy_cumulative_return > baseline",
-      "cost_sensitivity": "stressed return remains positive",
-      "reproducibility": "rerun fingerprints match"
+      "cost_grid": "returns remain positive across at least half of cost grid cells",
+      "parameter_sensitivity": "nearby parameter cells show broad non-negative evidence",
+      "walk_forward": "majority of folds beat the comparator on the same offline bars"
     },
     "asset_universe": [
       "AAA",
@@ -261,15 +262,18 @@
     "expected_failure_modes": [
       "lookahead leakage",
       "cost sensitivity",
-      "failure to beat buy-and-hold baseline",
-      "non-reproducible run outputs"
+      "failure to beat the offline comparator",
+      "non-reproducible run outputs",
+      "walk-forward fold fragility",
+      "parameter-grid fragility"
     ],
     "falsification_tests": [
-      "lookahead column scan",
-      "explicit cost realism check",
+      "lookahead columns",
       "baseline comparison",
-      "higher-cost stress run",
-      "deterministic rerun fingerprint check"
+      "walk_forward",
+      "parameter_sensitivity",
+      "cost_grid",
+      "reproducibility"
     ],
     "id": "toy-moving-average-crossover",
     "null_hypothesis": "The toy moving-average crossover has no edge after costs, slippage, and one-bar execution delay.",
@@ -281,8 +285,8 @@
       "turnover",
       "total_cost"
     ],
-    "signal_definition": "Long when the 2-bar moving average is above the 3-bar moving average; flat otherwise.",
-    "thesis": "A toy moving-average crossover may outperform a buy-and-hold baseline on the bundled offline sample.",
+    "signal_definition": "Moving-average crossover on toy OHLCV bars.",
+    "thesis": "A toy moving-average crossover may beat an offline comparator on the bundled sample.",
     "time_horizon": "daily bars over a tiny educational sample"
   },
   "limitations": [
@@ -301,7 +305,7 @@
     ],
     "content_hash": "52635e40771bdd93cb3df91e76808bcdf5cbb67446bebb28c136611068e3ea06",
     "end_date": "2024-01-09",
-    "source": "/Users/clay/Documents/New project 4/examples/toy_prices.csv",
+    "source": "examples/toy_prices.csv",
     "start_date": "2024-01-02",
     "symbols": [
       "AAA",
@@ -369,7 +373,7 @@
     ],
     "warnings": []
   },
-  "run_id": "toy-moving-average-crossover",
+  "run_id": "toy-moving-average-crossover-52635e40",
   "schema_version": 1,
   "spec": {
     "dataset_hash": "52635e40771bdd93cb3df91e76808bcdf5cbb67446bebb28c136611068e3ea06",

@@ -1,7 +1,8 @@
 # Trading Lab
 
-Trading Lab is a local-only Python research scaffold for falsifying trading
-hypotheses with typed artifacts and deterministic offline workflows.
+Trading Lab is a local-first agentic research lab for falsifying trading
+hypotheses with typed artifacts, deterministic offline workflows, bounded
+market-observation snapshots, and research-agent review roles.
 
 This repository is intentionally separate from Vanta and the Vanta privacy
 suite. Dashboard articles, reports, ledgers, and research narratives should stay
@@ -11,7 +12,9 @@ here unless Clay explicitly asks to merge or cross-link them. See
 This project is intentionally limited to research records, local data, and
 explicitly collected market-observation snapshots. It does not include live
 trading, broker APIs, paper trading, credentials, order routing, or investment
-recommendation features.
+recommendation features. The product wedge is disproof first: bring a trading
+claim, preserve the evidence, and let the lab try to kill it before anyone
+trusts it.
 
 ## Quickstart
 
@@ -41,6 +44,7 @@ python3 -m trading_lab.cli collect-live \
 python3 -m trading_lab.cli snapshot-dashboard \
   --snapshot runs/live/latest.json \
   --output reports/live-snapshot.html
+make dev
 ```
 
 Open `reports/dashboard.html` in a browser to inspect the local falsification
@@ -55,6 +59,9 @@ views over that evidence, not separate sources of truth.
 - Describe local dataset manifests.
 - Configure offline backtest specifications.
 - Store backtest results, falsification gate outcomes, and research reports.
+- Run deterministic research-agent reviews over recorded gates.
+- Classify point-in-time fields, leakage-suspect fields, unknown lineage, and
+  missing baseline-pack evidence.
 - Use a research terminal catalog to focus symbols, discover research actions,
   and explain power boundaries without adding execution.
 - Share local research snapshots through an in-memory topic hub for future
@@ -63,6 +70,9 @@ views over that evidence, not separate sources of truth.
   with source, freshness, and provenance labels.
 - Optionally collect public Kraken ticker observations, gated by explicit CLI
   invocation and the same safety kill switches.
+- Validate readiness artifacts separately from promotion readiness so sample-
+  limited paper, drift, calibration, and risk packets do not unlock confident
+  setup language.
 
 The bundled example is intentionally skeptical: it can produce an
 `inconclusive` verdict when a toy idea fails to beat its baseline after costs.

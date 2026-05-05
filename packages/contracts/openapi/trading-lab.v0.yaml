@@ -1,0 +1,57 @@
+openapi: 3.1.0
+info:
+  title: Trading Lab Research API
+  version: 0.0.1
+  description: >
+    Research-only API contract for local Trading Lab product development. This
+    contract exposes evidence artifacts and market-observation snapshots. It
+    does not expose advice, broker, account, order, fill, or execution routes.
+paths:
+  /health:
+    get:
+      summary: Service health and product boundary
+      responses:
+        "200":
+          description: API is available
+  /runs/example:
+    get:
+      summary: Read the bundled example research run
+      responses:
+        "200":
+          description: Example research run evidence
+  /snapshots/latest:
+    get:
+      summary: Read the latest bounded market-observation snapshot
+      responses:
+        "200":
+          description: Snapshot events with provenance metadata
+  /terminal/overview:
+    get:
+      summary: Read the compact ranked falsification terminal overview
+      responses:
+        "200":
+          description: Research-only attention queue, evidence summary, and observation provenance
+  /confidence/readiness:
+    get:
+      summary: Read evidence maturity gates for future setup visibility
+      responses:
+        "200":
+          description: Research-only confidence readiness stages and missing proof
+  /readiness/artifacts:
+    get:
+      summary: Read local paper, shadow, calibration, and risk evidence artifacts
+      responses:
+        "200":
+          description: Research-only readiness artifact status and source paths
+  /agentic/review:
+    get:
+      summary: Read deterministic research-agent review of the current evidence
+      responses:
+        "200":
+          description: Research-only agent roles, findings, next actions, and promotion decision
+  /evidence/rigor:
+    get:
+      summary: Read point-in-time, leakage, and baseline-pack evidence rigor summary
+      responses:
+        "200":
+          description: Research-only evidence rigor score, gaps, and baseline descriptors

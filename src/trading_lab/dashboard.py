@@ -104,7 +104,8 @@ def render_dashboard_html(
                 "trading, broker connectivity, or execution instructions. Treat "
                 "any non-rejected result as a request for harder tests, not as "
                 "evidence of a tradable edge. No broker APIs, live trading, or "
-                "network data are connected."
+                "execution routes are connected; bounded observations require "
+                "explicit collection and provenance."
             ),
             "</section>",
             '<section class="grid metrics">',
@@ -419,7 +420,7 @@ def _power_boundary_panel() -> str:
         "Guide the next offline review move.",
     ]
     cannot_items = [
-        "Trade, advise, fetch live data, connect brokers, or watch markets.",
+        "Trade, advise, collect unbounded data, connect brokers, or watch markets.",
         "Turn a non-rejected claim into an allocation or recommendation.",
         "Hide raw evidence behind a polished summary.",
     ]

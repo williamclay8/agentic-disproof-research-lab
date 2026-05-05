@@ -8,6 +8,10 @@ Build a local-only agentic trading research lab that is better at disproving ide
 
 The first version is a Python CLI/package. It loads local example data, validates a pre-registered hypothesis, runs an offline backtest with realistic frictions, applies falsification gates, and writes a markdown report.
 
+The current product lane also includes a local API, web shell, worker, static
+dashboard, and bounded market-observation snapshots. These are evidence views
+and research workflow surfaces, not trading terminals.
+
 The lab is educational tooling only. It does not provide investment advice, trade recommendations, broker connectivity, live credentials, paper trading, autonomous execution, leverage, derivatives, or portfolio management.
 
 ## Architecture
@@ -21,6 +25,9 @@ The core is a falsification kernel:
 - `trading_lab.gates`: hygiene and anti-overfitting checks that fail closed where evidence is missing.
 - `trading_lab.reports`: markdown report generation with verdicts and evidence.
 - `trading_lab.cli`: command entry point for running the example experiment.
+- `trading_lab.agents`: deterministic research-agent review roles.
+- `trading_lab.evidence`: point-in-time and baseline-pack evidence contracts.
+- `trading_lab.readiness`: artifact validation for research promotion gates.
 
 Agents are represented in V1 as deterministic critique prompts and gate outputs, not LLM-driven autonomous actors. LLM agents can be added later only after the evaluation substrate is reliable.
 
@@ -70,8 +77,8 @@ Use TDD for the kernel:
 - No live trading.
 - No broker APIs.
 - No account keys or secrets.
-- No paper trading.
-- No web dashboard.
+- No paper trading or execution simulation.
+- No live-signal dashboard.
 - No autonomous order creation.
 - No advice or recommendations.
 - No complex portfolio optimizer.

@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "risk_packet_id": "risk-packet-toy-moving-average-crossover-v0",
+  "hypothesis_id": "toy-moving-average-crossover",
+  "mode": "research_risk_packet",
+  "status": "pass",
+  "recorded_at": "2026-05-02T19:10:00-05:00",
+  "horizon": "daily educational bars",
+  "expiry_rule": "expire when source observation is older than 60 seconds",
+  "invalidation_evidence": [
+    "baseline comparison remains weaker than comparator",
+    "walk-forward pass ratio remains below promotion threshold"
+  ],
+  "friction_context": {
+    "requires_spread_bps": true,
+    "requires_cost_grid": true,
+    "requires_delay_model": true
+  },
+  "limits": [
+    "This packet does not contain position sizing, entry, exit, target, or order instructions.",
+    "Risk context is used only to decide whether research information can be displayed.",
+    "The current claim remains blocked by warning gates."
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "shadow_id": "live-shadow-toy-moving-average-crossover-v0",
+  "hypothesis_id": "toy-moving-average-crossover",
+  "mode": "research_live_shadow",
+  "status": "pass",
+  "recorded_at": "2026-05-02T19:10:00-05:00",
+  "window": "bounded observations only",
+  "drift": {
+    "expected_vs_observed_return_delta": 0.0042,
+    "max_allowed_delta": 0.01,
+    "quote_freshness_failures": 0,
+    "provider_mismatch_count": 0
+  },
+  "limits": [
+    "Live shadow compares observations to research expectations without emitting calls.",
+    "Drift pass does not override failed or warning offline gates.",
+    "No execution simulation is represented by this artifact."
+  ]
+}

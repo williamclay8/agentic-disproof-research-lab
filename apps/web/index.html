@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Trading Lab</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0f1213;
+        --panel: #171b1d;
+        --panel-2: #202629;
+        --text: #f4f2ea;
+        --muted: #a8b0ad;
+        --line: #313b40;
+        --ok: #8fc98a;
+        --warn: #f0c36a;
+        --bad: #ff8d7a;
+        --accent: #79a7ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+      }
+
+      main {
+        width: min(1180px, calc(100vw - 28px));
+        margin: 0 auto;
+        padding: 18px 0 34px;
+      }
+
+      header {
+        align-items: end;
+        border-bottom: 1px solid var(--line);
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1fr auto;
+        padding-bottom: 14px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 24px;
+        letter-spacing: 0;
+        line-height: 1;
+      }
+
+      h2 {
+        font-size: 15px;
+        letter-spacing: 0;
+      }
+
+      button {
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--text);
+        cursor: pointer;
+        font: inherit;
+        padding: 8px 10px;
+      }
+
+      button:hover {
+        border-color: var(--accent);
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .mono {
+        color: var(--accent);
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+
+      .terminal-strip,
+      .pills,
+      .metrics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .terminal-strip {
+        justify-content: flex-end;
+      }
+
+      .pill,
+      .metric {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 12px;
+        padding: 6px 9px;
+      }
+
+      .ok {
+        color: var(--ok);
+      }
+
+      .warn {
+        color: var(--warn);
+      }
+
+      .bad {
+        color: var(--bad);
+      }
+
+      .grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(12, 1fr);
+        margin-top: 14px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+      }
+
+      .verdict-band {
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1fr auto;
+        padding: 14px;
+      }
+
+      .verdict-band h2 {
+        color: var(--bad);
+        font-size: 22px;
+      }
+
+      .lanes {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .lane {
+        background: #121618;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px;
+      }
+
+      .span-8 {
+        grid-column: span 8;
+      }
+
+      .span-4 {
+        grid-column: span 4;
+      }
+
+      .span-6 {
+        grid-column: span 6;
+      }
+
+      .span-7 {
+        grid-column: span 7;
+      }
+
+      .span-5 {
+        grid-column: span 5;
+      }
+
+      .full {
+        grid-column: 1 / -1;
+      }
+
+      .stack {
+        display: grid;
+        gap: 9px;
+        margin-top: 10px;
+      }
+
+      .row {
+        border-top: 1px solid var(--line);
+        display: grid;
+        gap: 10px;
+        grid-template-columns: minmax(128px, 0.45fr) 1fr;
+        padding-top: 9px;
+      }
+
+      .table {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .table-row {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1.2fr 0.6fr 0.7fr 1.7fr;
+        padding: 10px;
+      }
+
+      .table-row + .table-row {
+        border-top: 1px solid var(--line);
+      }
+
+      .table-head {
+        background: #121618;
+        color: var(--muted);
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+
+      details {
+        border-top: 1px solid var(--line);
+        padding-top: 9px;
+      }
+
+      summary {
+        cursor: pointer;
+      }
+
+      pre {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+        overflow: auto;
+        white-space: pre-wrap;
+      }
+
+      @media (max-width: 860px) {
+        header,
+        .verdict-band,
+        .row,
+        .table-row {
+          grid-template-columns: 1fr;
+        }
+
+        .lanes {
+          grid-template-columns: 1fr;
+        }
+
+        .span-8,
+        .span-4,
+        .span-6,
+        .span-7,
+        .span-5 {
+          grid-column: 1 / -1;
+        }
+
+        .terminal-strip {
+          justify-content: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>Trading Lab</h1>
+          <p class="muted">
+            Local falsification runs plus bounded market-observation snapshots.
+            Research only; no advice, broker APIs, or execution.
+          </p>
+        </div>
+        <div class="terminal-strip">
+          <span class="pill ok">API-backed</span>
+          <span class="pill warn">Research only</span>
+          <span id="freshness-pill" class="pill">Freshness unknown</span>
+        </div>
+      </header>
+
+      <section class="grid">
+        <article class="panel full">
+          <div id="readiness-band" class="verdict-band">
+            <div>
+              <h2>Loading readiness...</h2>
+              <p class="muted">Checking market, setup, and boundary lanes.</p>
+            </div>
+          </div>
+          <div id="readiness-lanes" class="lanes" style="margin-top: 12px"></div>
+        </article>
+
+        <article class="panel span-8">
+          <h2>Fix Before Trusting</h2>
+          <p id="headline" class="muted">Loading terminal overview...</p>
+          <div id="attention" class="stack"></div>
+        </article>
+
+        <aside class="panel span-4">
+          <h2>Evidence Summary</h2>
+          <div id="summary" class="stack"></div>
+        </aside>
+
+        <article class="panel span-6">
+          <h2>Agent Review</h2>
+          <div id="agent-review" class="stack"></div>
+        </article>
+
+        <article class="panel span-6">
+          <h2>Evidence Rigor</h2>
+          <div id="evidence-rigor" class="stack"></div>
+        </article>
+
+        <article class="panel span-6">
+          <h2>Weakest Gates</h2>
+          <div id="gates" class="table"></div>
+        </article>
+
+        <article class="panel span-6">
+          <h2>Latest Observation</h2>
+          <div id="observation" class="stack"></div>
+        </article>
+
+        <article class="panel span-6">
+          <h2>Provenance</h2>
+          <div id="provenance" class="stack"></div>
+        </article>
+
+        <article class="panel span-6">
+          <h2>Noise Filters</h2>
+          <div id="filters" class="stack"></div>
+        </article>
+
+        <article class="panel span-7">
+          <h2>Confidence Ladder</h2>
+          <div id="confidence" class="stack"></div>
+        </article>
+
+        <article class="panel span-5">
+          <h2>Missing Proof</h2>
+          <div id="missing-proof" class="stack"></div>
+        </article>
+
+        <article class="panel full">
+          <h2>Evidence Passport</h2>
+          <div id="passport" class="stack"></div>
+        </article>
+
+        <article class="panel full">
+          <h2>Raw Evidence Drawer</h2>
+          <div id="raw" class="stack"></div>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const API_BASE = window.TRADING_LAB_API_BASE_URL || "http://127.0.0.1:5299";
+      const text = (value) =>
+        value === undefined || value === null || value === "" ? "unknown" : String(value);
+      const escapeHtml = (value) =>
+        text(value).replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[char]);
+      const fmt = (value) =>
+        typeof value === "number" ? new Intl.NumberFormat(undefined, { maximumFractionDigits: 8 }).format(value) : escapeHtml(value);
+      const shortHash = (value) => (value ? escapeHtml(`${String(value).slice(0, 12)}...`) : "unknown");
+
+      async function loadTerminal() {
+        const response = await fetch(`${API_BASE}/terminal/overview`, { cache: "no-store" });
+        if (!response.ok) throw new Error(`/terminal/overview returned ${response.status}`);
+        return response.json();
+      }
+
+      function renderMetric(label, value, tone = "") {
+        return `<span class="metric ${tone}">${escapeHtml(label)}: ${escapeHtml(value)}</span>`;
+      }
+
+      function renderRow(label, value, className = "") {
+        return `<div class="row"><strong>${escapeHtml(label)}</strong><p class="${className}">${escapeHtml(value)}</p></div>`;
+      }
+
+      function renderAttention(items) {
+        const rows = items.length
+          ? items.map((item, index) => renderRow(`#${index + 1} ${text(item.label)}`, text(item.why), "muted")).join("")
+          : renderRow("No priority item", "Current artifacts do not expose a ranked blocker.", "muted");
+        document.querySelector("#attention").innerHTML = rows;
+      }
+
+      function renderSummary(terminal) {
+        const evidence = terminal.evidence;
+        const counts = evidence.gate_counts;
+        document.querySelector("#summary").innerHTML = `
+          <div class="metrics">
+            ${renderMetric("verdict", evidence.verdict)}
+            ${renderMetric("score", evidence.disproof_score)}
+            ${renderMetric("warn", counts.warn, counts.warn ? "warn" : "")}
+            ${renderMetric("fail", counts.fail, counts.fail ? "bad" : "ok")}
+            ${renderMetric("pass", counts.pass, "ok")}
+          </div>
+          ${renderRow("Claim under test", text(evidence.run_id), "mono")}
+          ${renderRow("Artifact", text(evidence.source), "mono")}
+          ${renderRow("Boundary", text(terminal.mode), "warn")}
+        `;
+      }
+
+      function renderReadinessBand(terminal) {
+        const verdict = terminal.readiness_verdict || {};
+        const market = terminal.market || {};
+        const counts = terminal.evidence?.gate_counts || {};
+        document.querySelector("#readiness-band").innerHTML = `
+          <div>
+            <h2>${text(verdict.label)}</h2>
+            <p class="muted">${text(verdict.subline)}</p>
+          </div>
+          <div class="metrics">
+            ${renderMetric(market.symbol, market.venue, "mono")}
+            ${renderMetric("quote", market.freshness?.label || "unknown", market.freshness?.label === "fresh" ? "ok" : "warn")}
+            ${renderMetric("warnings", counts.warn ?? "unknown", counts.warn ? "warn" : "ok")}
+            ${renderMetric("hard stops", verdict.blocker_count ?? "unknown", verdict.blocker_count ? "bad" : "ok")}
+          </div>
+        `;
+      }
+
+      function renderReadinessLanes(terminal) {
+        const verdict = terminal.readiness_verdict || {};
+        const market = terminal.market || {};
+        const evidence = terminal.evidence || {};
+        document.querySelector("#readiness-lanes").innerHTML = `
+          <div class="lane">
+            <h2>Market</h2>
+            <div class="stack">
+            ${renderRow("State", verdict.market_ready ? "fresh observation" : `${text(market.freshness?.label)} observation`, verdict.market_ready ? "ok" : "warn")}
+              ${renderRow("Spread", `${fmt(market.spread_bps)} bps`, "mono")}
+              ${renderRow("Provider", text(terminal.snapshot_event?.provider?.name), "mono")}
+            </div>
+          </div>
+          <div class="lane">
+            <h2>Setup Quality</h2>
+            <div class="stack">
+              ${renderRow("State", verdict.setup_ready ? "offline evidence clean" : "falsification unresolved", verdict.setup_ready ? "ok" : "warn")}
+              ${renderRow("Verdict", text(evidence.verdict))}
+              ${renderRow("Score", text(evidence.disproof_score), evidence.disproof_score ? "warn" : "ok")}
+            </div>
+          </div>
+          <div class="lane">
+            <h2>Boundary</h2>
+            <div class="stack">
+              ${renderRow("State", "execution disabled", "warn")}
+              ${renderRow("Advice", "disabled", "warn")}
+              ${renderRow("Confidence", text(verdict.confidence_label), "warn")}
+            </div>
+          </div>
+        `;
+      }
+
+      function renderGates(gates) {
+        const weak = gates.filter((gate) => gate.status !== "pass");
+        const visible = weak.length ? weak : gates.slice(0, 4);
+        const body = visible
+          .map(
+            (gate) => `
+              <div class="table-row">
+                <strong>${escapeHtml(gate.name)}</strong>
+                <span class="${gate.status === "fail" ? "bad" : gate.status === "warn" ? "warn" : "ok"}">${escapeHtml(gate.status)}</span>
+                <span>${escapeHtml(gate.severity)}</span>
+                <span class="muted">${escapeHtml(gate.detail)}</span>
+              </div>
+            `,
+          )
+          .join("");
+        document.querySelector("#gates").innerHTML = `
+          <div class="table-row table-head">
+            <span>Name</span><span>Status</span><span>Severity</span><span>Why it matters</span>
+          </div>
+          ${body}
+        `;
+      }
+
+      function renderAgentReview(review) {
+        const decision = review?.promotion_decision || {};
+        const roles = (review?.roles || [])
+          .map((role) => `<span class="metric">${escapeHtml(role.name)}</span>`)
+          .join("");
+        const findings = (review?.findings || [])
+          .filter((finding) => finding.status !== "pass")
+          .slice(0, 3)
+          .map((finding) =>
+            renderRow(`${text(finding.role)}: ${text(finding.gate_name)}`, text(finding.finding), finding.status === "fail" ? "bad" : "warn"),
+          )
+          .join("");
+        document.querySelector("#agent-review").innerHTML = `
+          <div class="metrics">${roles}</div>
+          ${renderRow("Decision", text(decision.decision), "warn")}
+          ${renderRow("Reason", text(decision.reason), "muted")}
+          ${findings || renderRow("Findings", "Recorded controls are clean for this pass.", "ok")}
+        `;
+      }
+
+      function renderEvidenceRigor(rigor) {
+        const summary = rigor?.summary || {};
+        document.querySelector("#evidence-rigor").innerHTML = `
+          <div class="metrics">
+            ${renderMetric("score", summary.score ?? "unknown", summary.status === "ready" ? "ok" : "warn")}
+            ${renderMetric("status", summary.status || "unknown", summary.status === "ready" ? "ok" : "warn")}
+            ${renderMetric("baselines missing", (summary.missing_baselines || []).length, (summary.missing_baselines || []).length ? "warn" : "ok")}
+          </div>
+          ${renderRow("Allowed fields", text((summary.allowed_fields || []).join(", ")), "mono")}
+          ${renderRow("Evidence gaps", text((summary.evidence_gaps || []).slice(0, 5).join(", ") || "none"), (summary.evidence_gaps || []).length ? "warn" : "ok")}
+          ${renderRow("Baseline pack", text((rigor?.baseline_pack || []).map((item) => item.name).join(", ")), "muted")}
+        `;
+      }
+
+      function renderObservation(market) {
+        document.querySelector("#freshness-pill").textContent = `Quote ${text(market.freshness.label)}`;
+        document.querySelector("#freshness-pill").className =
+          market.freshness.label === "fresh" ? "pill ok" : market.freshness.label === "aging" ? "pill warn" : "pill bad";
+        document.querySelector("#observation").innerHTML = `
+          ${renderRow("Symbol", text(market.symbol), "mono")}
+          ${renderRow("Venue", text(market.venue))}
+          ${renderRow("Bid / ask / last", `${fmt(market.bid)} / ${fmt(market.ask)} / ${fmt(market.last)}`, "mono")}
+          ${renderRow("Mid / spread", `${fmt(market.mid)} / ${fmt(market.spread_abs)} (${fmt(market.spread_bps)} bps)`, "mono")}
+          ${renderRow("Last location", text(market.last_location))}
+          ${renderRow("Observed", text(market.source_timestamp), "mono")}
+        `;
+      }
+
+      function renderProvenance(event, market) {
+        document.querySelector("#provenance").innerHTML = `
+          ${renderRow("Source", text(market.source))}
+          ${renderRow("Delay / license", `${text(market.freshness.label)} / ${text(market.license_note)}`)}
+          ${renderRow("Source ref", text(event.source_ref), "mono")}
+          ${renderRow("Provider", `${text(event.provider?.name)} / ${text(event.provider?.dataset)}`, "mono")}
+          ${renderRow("Raw hash", shortHash(event.raw_hash), "mono")}
+          ${renderRow("Normalized hash", shortHash(event.normalized_hash), "mono")}
+          ${renderRow("Record hash", shortHash(event.record_hash), "mono")}
+        `;
+      }
+
+      function renderFilters(filters) {
+        document.querySelector("#filters").innerHTML = filters
+          .map((filter) => renderRow("Filter", text(filter), "muted"))
+          .join("");
+      }
+
+      function renderConfidence(readiness) {
+        const stage = readiness.current_stage || {};
+        const rows = (readiness.stages || [])
+          .map((item) => {
+            const complete = item.id === stage.id;
+            return renderRow(complete ? `Current: ${text(item.label)}` : text(item.label), text(item.output), complete ? "warn" : "muted");
+          })
+          .join("");
+        document.querySelector("#confidence").innerHTML = `
+          ${renderRow("Allowed now", text(readiness.allowed_output), "warn")}
+          ${rows}
+        `;
+      }
+
+      function renderMissingProof(readiness) {
+        const missing = readiness.missing_checks || [];
+        const rows = missing.slice(0, 6)
+          .map((check) => renderRow(text(check.label), text(check.why), "muted"))
+          .join("");
+        document.querySelector("#missing-proof").innerHTML = rows || renderRow("No missing checks", "Current stage has no unresolved checks.", "ok");
+      }
+
+      function renderPassport(passport) {
+        document.querySelector("#passport").innerHTML = `
+          ${renderRow("Registered hypothesis", text(passport.registered_hypothesis_id), "mono")}
+          ${renderRow("Run fingerprint", shortHash(passport.run_fingerprint), "mono")}
+          ${renderRow("Warnings", text((passport.open_warning_gates || []).join(", ") || "none"), "warn")}
+          ${renderRow("Failures", text((passport.open_failure_gates || []).join(", ") || "none"), "bad")}
+        `;
+      }
+
+      function renderRaw(terminal) {
+        document.querySelector("#raw").innerHTML = `
+          <details>
+            <summary>Gate evidence, readiness, and blockers</summary>
+            <pre>${escapeHtml(JSON.stringify(
+              {
+                top_gates: terminal.evidence.top_gates,
+                confidence_readiness: terminal.confidence_readiness,
+                blockers: terminal.blockers,
+              },
+              null,
+              2,
+            ))}</pre>
+          </details>
+        `;
+      }
+
+      loadTerminal()
+        .then((terminal) => {
+          const event = terminal.market.symbol === "unknown" ? {} : terminal;
+          document.querySelector("#headline").textContent = terminal.headline;
+          renderReadinessBand(terminal);
+          renderReadinessLanes(terminal);
+          renderAttention(terminal.ranked_attention_items || []);
+          renderSummary(terminal);
+          renderAgentReview(terminal.agentic_review || {});
+          renderEvidenceRigor(terminal.evidence_rigor || {});
+          renderGates(terminal.evidence.top_gates || []);
+          renderObservation(terminal.market);
+          renderProvenance(terminal.market_event || terminal.snapshot_event || {}, terminal.market);
+          renderFilters(terminal.noise_filters || []);
+          renderConfidence(terminal.confidence_readiness || {});
+          renderMissingProof(terminal.confidence_readiness || {});
+          renderPassport(terminal.evidence_passport || {});
+          renderRaw(terminal);
+        })
+        .catch((error) => {
+          document.querySelector("#headline").textContent = text(error.message);
+          document.querySelector("#attention").innerHTML =
+            '<p class="muted">Start the API with <span class="mono">make api</span>.</p>';
+        });
+    </script>
+  </body>
+</html>

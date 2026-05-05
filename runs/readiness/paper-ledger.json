@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "ledger_id": "paper-ledger-toy-moving-average-crossover-v0",
+  "hypothesis_id": "toy-moving-average-crossover",
+  "mode": "research_paper_ledger",
+  "status": "pass",
+  "recorded_at": "2026-05-02T19:10:00-05:00",
+  "sample_count": 6,
+  "outcome_window": "offline replay over bundled educational bars",
+  "summary": {
+    "hypothetical_setups_recorded": 6,
+    "favorable_outcomes": 2,
+    "unfavorable_outcomes": 4,
+    "skipped_for_cost_or_gate": 2
+  },
+  "limits": [
+    "No broker, account, order, fill, or credential path exists.",
+    "This ledger records research outcomes only.",
+    "The current claim still has warning gates and is not displayable as a live setup."
+  ]
+}
