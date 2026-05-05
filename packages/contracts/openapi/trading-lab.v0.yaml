@@ -31,6 +31,12 @@ paths:
       responses:
         "200":
           description: Research-only attention queue, evidence summary, and observation provenance
+  /control-plane/lab:
+    get:
+      summary: Read the research lab control plane
+      responses:
+        "200":
+          description: Research-only missions, evidence gaps, claim lifecycle, task board, scorecard, and learning loop
   /confidence/readiness:
     get:
       summary: Read evidence maturity gates for future setup visibility

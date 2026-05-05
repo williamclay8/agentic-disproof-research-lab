@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import json
 from pathlib import Path
 
 from apps.api.server import (
+    control_plane_payload,
     health_payload,
     latest_snapshot_payload,
     run_payload,
     terminal_payload,
 )
+from trading_lab.artifacts import read_run_artifact
+from trading_lab.control_plane import build_active_mission
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -119,10 +123,82 @@ def test_terminal_payload_ranks_attention_without_advice_or_execution():
     assert "paper_ledger_promotion_ready" not in payload["confidence_readiness"]["completed_checks"]
     assert payload["confidence_readiness"]["validation"]["promotion_ready"] is False
     assert payload["confidence_readiness"]["readiness_artifacts"]["paper_ledger"]["status"] == "pass"
+    assert payload["human_brief"]["what_matters_now"]
+    assert payload["human_brief"]["would_change_our_mind"]
+    assert payload["agent_mission_board"]
+    assert payload["evidence_gaps"]
+    assert payload["next_falsification_tasks"]
+    assert payload["claim_lifecycle"]["stage"] == "research_only_hold"
+    assert payload["gate_summaries"]["weakest"][0]["name"] == "baseline comparison"
+    assert payload["lab_scorecard"]["promotion_ready"] is False
+    assert payload["learning_loop"]["current_lesson"] == "Comparator Discipline"
     serialized = json.dumps(payload).lower()
     assert "buy now" not in serialized
     assert "sell now" not in serialized
     assert "submit order" not in serialized
+
+
+def test_control_plane_payload_turns_evidence_into_lab_workflows():
+    payload = control_plane_payload()
+
+    assert payload["mode"] == "research_only"
+    assert payload["boundary"]["execution"] == "disabled"
+    assert payload["boundary"]["advice"] == "disabled"
+    assert payload["active_mission"]["state"] == "warning_hold"
+    assert payload["claim_lifecycle"]["claim_id"] == "toy-moving-average-crossover"
+    assert payload["claim_lifecycle"]["stage"] == "research_only_hold"
+    assert "baseline comparison" in payload["claim_lifecycle"]["blocking_gate_names"]
+    assert "walk-forward robustness" in payload["claim_lifecycle"]["blocking_gate_names"]
+    assert [role["name"] for role in payload["agent_mission_board"]] == [
+        "Leak Auditor",
+        "Baseline Challenger",
+        "Cost Stress Critic",
+        "Reproducibility Clerk",
+        "Promotion Gatekeeper",
+        "Regime Skeptic",
+    ]
+    baseline_mission = next(
+        role for role in payload["agent_mission_board"] if role["name"] == "Baseline Challenger"
+    )
+    assert baseline_mission["status"] == "active"
+    assert baseline_mission["top_finding"]["gate_name"] == "baseline comparison"
+    assert baseline_mission["source_refs"] == ["runs/example-run.json"]
+    assert payload["gate_summaries"]["counts"]["warn"] == 2
+    assert [gate["name"] for gate in payload["gate_summaries"]["weakest"][:2]] == [
+        "baseline comparison",
+        "walk-forward robustness",
+    ]
+    gap_ids = {gap["id"] for gap in payload["evidence_gaps"]}
+    assert "gate:baseline-comparison" in gap_ids
+    assert "rigor:missing_baseline:random-control" in gap_ids
+    assert "readiness:paper_ledger_sample_count" in gap_ids
+    first_task = payload["next_falsification_tasks"][0]
+    assert first_task["owner"] == "Baseline Challenger"
+    assert first_task["research_only"] is True
+    assert "baseline comparison" in first_task["label"]
+    assert payload["lab_scorecard"]["research_maturity"]["score"] == 100
+    assert payload["lab_scorecard"]["evidence_rigor"]["score"] == 60
+    assert payload["learning_loop"]["recurring_mistakes"] == [
+        "Comparator weakness",
+        "Fold fragility",
+    ]
+    json.dumps(payload)
+
+
+def test_active_mission_holds_when_readiness_gaps_remain_after_gate_passes():
+    artifact = read_run_artifact(PROJECT_ROOT / "runs" / "example-run.json")
+    all_pass_artifact = replace(
+        artifact,
+        gate_results=[replace(gate, status="pass") for gate in artifact.gate_results],
+    )
+
+    mission = build_active_mission(
+        all_pass_artifact,
+        [{"id": "readiness:paper_ledger_sample_count"}],
+        "runs/example-run.json",
+    )
+
+    assert mission["state"] == "readiness_hold"
 
 
 def test_web_copy_blocks_recommendation_and_execution_language():
@@ -149,6 +225,14 @@ def test_web_copy_blocks_recommendation_and_execution_language():
     assert "Claim packet" in html
     assert "Basis panel" in html
     assert "Missing proof" in html
+    assert "Mission Control" in html
+    assert "Agent mission board" in html
+    assert "Evidence Gap Register" in html
+    assert "Falsification Task Board" in html
+    assert "Claim Lifecycle" in html
+    assert "Gate x-ray" in html
+    assert "Lab scorecard" in html
+    assert "Learning Loop" in html
     assert "Observation tape" in html
     assert "Provenance ledger" in html
     assert "Raw evidence drawer" in html
@@ -172,6 +256,7 @@ def test_openapi_contract_excludes_order_and_account_routes():
     assert "/readiness/artifacts" in contract
     assert "/agentic/review" in contract
     assert "/evidence/rigor" in contract
+    assert "/control-plane/lab" in contract
     assert "/orders" not in contract
     assert "/accounts" not in contract
     assert "execution routes" in contract

@@ -19,6 +19,7 @@ from urllib.parse import urlparse
 
 from trading_lab.agents import build_agentic_review
 from trading_lab.artifacts import read_run_artifact
+from trading_lab.control_plane import build_lab_control_plane
 from trading_lab.evidence import baseline_pack, summarize_evidence_rigor
 from trading_lab.readiness import validate_readiness
 from trading_lab.snapshots import read_latest
@@ -101,9 +102,21 @@ def terminal_payload() -> dict[str, Any]:
     spread_bps = _spread_bps(quote)
     freshness = _freshness_label(metadata.get("source_timestamp"))
     blockers = _terminal_blockers(run, snapshot, spread_bps, freshness)
+    ranked_attention_items = _focus_queue(run, snapshot, spread_bps, freshness)
     readiness = confidence_readiness_payload(run, snapshot, spread_bps, freshness)
     agentic_review = agentic_review_payload()
     evidence_rigor = evidence_rigor_payload()
+    control_plane = control_plane_payload(
+        run=run,
+        snapshot=snapshot,
+        spread_bps=spread_bps,
+        freshness=freshness,
+        blockers=blockers,
+        readiness=readiness,
+        agentic_review=agentic_review,
+        evidence_rigor=evidence_rigor,
+        ranked_attention_items=ranked_attention_items,
+    )
 
     return {
         "mode": "research_only",
@@ -138,9 +151,18 @@ def terminal_payload() -> dict[str, Any]:
         "evidence_passport": _evidence_passport(run),
         "agentic_review": agentic_review,
         "evidence_rigor": evidence_rigor,
-        "ranked_attention_items": _focus_queue(run, snapshot, spread_bps, freshness),
+        "ranked_attention_items": ranked_attention_items,
         "blockers": blockers,
         "confidence_readiness": readiness,
+        "mission_control": control_plane,
+        "human_brief": control_plane["human_brief"],
+        "agent_mission_board": control_plane["agent_mission_board"],
+        "claim_lifecycle": control_plane["claim_lifecycle"],
+        "gate_summaries": control_plane["gate_summaries"],
+        "evidence_gaps": control_plane["evidence_gaps"],
+        "next_falsification_tasks": control_plane["next_falsification_tasks"],
+        "lab_scorecard": control_plane["lab_scorecard"],
+        "learning_loop": control_plane["learning_loop"],
         "noise_filters": [
             "Hide any setup without source timestamp, provider, and artifact ref.",
             "Collapse passed gates; show warnings and failures first.",
@@ -148,6 +170,54 @@ def terminal_payload() -> dict[str, Any]:
             "Do not display live guidance, sizing, entry, or execution prompts.",
         ],
     }
+
+
+def control_plane_payload(
+    run: dict[str, Any] | None = None,
+    snapshot: dict[str, Any] | None = None,
+    spread_bps: float | None = None,
+    freshness: dict[str, Any] | None = None,
+    blockers: list[str] | None = None,
+    readiness: dict[str, Any] | None = None,
+    agentic_review: dict[str, Any] | None = None,
+    evidence_rigor: dict[str, Any] | None = None,
+    ranked_attention_items: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Return the derived research lab control plane for the current packet."""
+
+    run = run or run_payload()
+    snapshot = snapshot or latest_snapshot_payload()
+    event = snapshot["events"][0] if snapshot["events"] else {}
+    quote = event.get("payload", {})
+    metadata = event.get("metadata", {})
+    if spread_bps is None:
+        spread_bps = _spread_bps(quote)
+    if freshness is None:
+        freshness = _freshness_label(metadata.get("source_timestamp"))
+    if blockers is None:
+        blockers = _terminal_blockers(run, snapshot, spread_bps, freshness)
+    readiness = readiness or confidence_readiness_payload(run, snapshot, spread_bps, freshness)
+    agentic_review = agentic_review or agentic_review_payload()
+    evidence_rigor = evidence_rigor or evidence_rigor_payload()
+    ranked_attention_items = ranked_attention_items or _focus_queue(
+        run,
+        snapshot,
+        spread_bps,
+        freshness,
+    )
+    artifact = read_run_artifact(PROJECT_ROOT / run["source"])
+    return build_lab_control_plane(
+        artifact,
+        run=run,
+        snapshot=snapshot,
+        readiness=readiness,
+        evidence_rigor=evidence_rigor,
+        agentic_review=agentic_review,
+        blockers=blockers,
+        ranked_attention_items=ranked_attention_items,
+        spread_bps=spread_bps,
+        freshness=freshness,
+    )
 
 
 def confidence_readiness_payload(
@@ -357,6 +427,8 @@ class TradingLabHandler(BaseHTTPRequestHandler):
                 self._send_json(terminal_payload())
             elif route == "/terminal/overview":
                 self._send_json(terminal_payload())
+            elif route == "/control-plane/lab":
+                self._send_json(control_plane_payload())
             elif route == "/confidence/readiness":
                 self._send_json(confidence_readiness_payload())
             elif route == "/readiness/artifacts":
@@ -374,6 +446,7 @@ class TradingLabHandler(BaseHTTPRequestHandler):
                             "/runs/example",
                             "/snapshots/latest",
                             "/terminal",
+                            "/control-plane/lab",
                             "/confidence/readiness",
                             "/readiness/artifacts",
                             "/agentic/review",

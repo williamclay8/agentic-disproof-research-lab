@@ -571,6 +571,11 @@
       .data-row,
       .finding-row,
       .gate-row,
+      .gap-row,
+      .task-row,
+      .mission-row,
+      .score-row,
+      .lifecycle-row,
       .check-row,
       .provenance-row {
         border-top: 1px solid var(--line);
@@ -586,6 +591,11 @@
       .data-row:first-child,
       .finding-row:first-child,
       .gate-row:first-child,
+      .gap-row:first-child,
+      .task-row:first-child,
+      .mission-row:first-child,
+      .score-row:first-child,
+      .lifecycle-row:first-child,
       .check-row:first-child,
       .provenance-row:first-child {
         border-top: 0;
@@ -596,6 +606,11 @@
       .data-row strong,
       .finding-row strong,
       .gate-row strong,
+      .gap-row strong,
+      .task-row strong,
+      .mission-row strong,
+      .score-row strong,
+      .lifecycle-row strong,
       .check-row strong,
       .provenance-row strong {
         font-size: 13px;
@@ -606,6 +621,11 @@
       .data-row p,
       .finding-row p,
       .gate-row p,
+      .gap-row p,
+      .task-row p,
+      .mission-row p,
+      .score-row p,
+      .lifecycle-row p,
       .check-row p,
       .provenance-row p {
         color: var(--muted);
@@ -618,6 +638,11 @@
       .data-row:hover,
       .finding-row:hover,
       .gate-row:hover,
+      .gap-row:hover,
+      .task-row:hover,
+      .mission-row:hover,
+      .score-row:hover,
+      .lifecycle-row:hover,
       .provenance-row:hover {
         background: rgba(218, 232, 250, 0.025);
       }
@@ -665,6 +690,103 @@
         display: grid;
         gap: 12px;
         grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .ops-strip {
+        border-bottom: 1px solid var(--line);
+        display: grid;
+        gap: 0;
+        grid-template-columns: minmax(0, 0.88fr) minmax(320px, 1.12fr);
+      }
+
+      .ops-panel {
+        display: grid;
+        gap: 12px;
+        min-width: 0;
+        padding: 15px 18px;
+      }
+
+      .ops-panel + .ops-panel {
+        border-left: 1px solid var(--line);
+      }
+
+      .score-grid,
+      .progress-ledger {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .score-card {
+        background: rgba(255, 255, 255, 0.028);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        display: grid;
+        gap: 4px;
+        min-height: 76px;
+        padding: 10px;
+      }
+
+      .score-card strong {
+        font-size: 20px;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.1;
+        overflow-wrap: anywhere;
+      }
+
+      .mission-row {
+        grid-template-columns: minmax(150px, 0.34fr) 96px minmax(0, 1fr) minmax(170px, 0.38fr);
+      }
+
+      .task-row {
+        grid-template-columns: 54px minmax(150px, 0.28fr) minmax(0, 1fr) minmax(150px, 0.24fr);
+      }
+
+      .gap-row {
+        grid-template-columns: minmax(154px, 0.24fr) 92px minmax(150px, 0.24fr) minmax(0, 1fr);
+      }
+
+      .score-row,
+      .lifecycle-row {
+        grid-template-columns: minmax(148px, 0.34fr) minmax(0, 1fr);
+      }
+
+      .xray-grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .xray-card {
+        background: rgba(255, 255, 255, 0.026);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        display: grid;
+        gap: 8px;
+        padding: 12px;
+      }
+
+      .lifecycle-track {
+        display: grid;
+        gap: 8px;
+      }
+
+      .lifecycle-step {
+        align-items: center;
+        border-top: 1px solid var(--line);
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 14px minmax(0, 1fr);
+        min-height: 34px;
+        padding-top: 8px;
+      }
+
+      .lifecycle-step::before {
+        background: var(--warn);
+        border-radius: 999px;
+        content: "";
+        height: 9px;
+        width: 9px;
       }
 
       .metric-tile {
@@ -791,8 +913,14 @@
         .hero,
         .shell,
         .command-top,
-        .command-grid {
+        .command-grid,
+        .ops-strip {
           grid-template-columns: 1fr;
+        }
+
+        .ops-panel + .ops-panel {
+          border-left: 0;
+          border-top: 1px solid var(--line);
         }
 
         .verdict-cell,
@@ -808,7 +936,7 @@
         }
 
         .nav-stack {
-          grid-template-columns: repeat(5, minmax(126px, 1fr));
+          grid-template-columns: repeat(6, minmax(126px, 1fr));
         }
       }
 
@@ -824,10 +952,18 @@
         .two-up,
         .three-up,
         .meaning-grid,
-        .gate-row,
-        .finding-row,
-        .provenance-row,
-        .brief-grid {
+          .gate-row,
+          .gap-row,
+          .task-row,
+          .mission-row,
+          .score-row,
+          .lifecycle-row,
+          .finding-row,
+          .provenance-row,
+          .brief-grid,
+          .xray-grid,
+          .score-grid,
+          .progress-ledger {
           grid-template-columns: 1fr;
         }
 
@@ -922,10 +1058,10 @@
       <header class="topbar">
         <div class="brand">
           <p class="eyebrow">Agentic Trading Lab</p>
-          <h1>Decision Cockpit</h1>
+          <h1>Research Ops Console</h1>
           <p>
-            Local falsification for research claims, evidence gates, bounded
-            observations, and agent review. Research only.
+            Local falsification for research claims, evidence gaps, agent
+            missions, bounded observations, and learning loops. Research only.
           </p>
         </div>
         <div class="system-pills" aria-label="System status">
@@ -979,6 +1115,25 @@
           </aside>
         </div>
 
+        <div class="ops-strip">
+          <section class="ops-panel" aria-labelledby="mission-control-title">
+            <div>
+              <p class="eyebrow">Mission Control</p>
+              <h2 id="mission-control-title">Falsification mission</h2>
+            </div>
+            <p id="mission-objective" class="body-copy">Loading current lab mission.</p>
+            <div id="claim-lifecycle-inline" class="lifecycle-track"></div>
+          </section>
+
+          <section class="ops-panel" aria-labelledby="lab-scorecard-title">
+            <div>
+              <p class="eyebrow">Lab scorecard</p>
+              <h2 id="lab-scorecard-title">Progress ledger</h2>
+            </div>
+            <div id="lab-scorecard" class="score-grid"></div>
+          </section>
+        </div>
+
         <div class="command-grid">
           <section class="path-cell" aria-labelledby="path-title">
             <div>
@@ -1015,10 +1170,11 @@
             <p class="eyebrow">Views</p>
             <div class="nav-stack">
               <button class="nav-button active" type="button" data-view-target="overview" aria-pressed="true">Now</button>
-              <button class="nav-button" type="button" data-view-target="agents" aria-pressed="false">Reviewers</button>
-              <button class="nav-button" type="button" data-view-target="evidence" aria-pressed="false">Weakest Evidence</button>
-              <button class="nav-button" type="button" data-view-target="provenance" aria-pressed="false">Sources</button>
-              <button class="nav-button" type="button" data-view-target="raw" aria-pressed="false">Artifacts</button>
+              <button class="nav-button" type="button" data-view-target="tasks" aria-pressed="false">Tasks</button>
+              <button class="nav-button" type="button" data-view-target="agents" aria-pressed="false">Agent Ownership</button>
+              <button class="nav-button" type="button" data-view-target="evidence" aria-pressed="false">Evidence Gaps</button>
+              <button class="nav-button" type="button" data-view-target="provenance" aria-pressed="false">Provenance Trace</button>
+              <button class="nav-button" type="button" data-view-target="raw" aria-pressed="false">Evidence Ledger</button>
             </div>
           </div>
           <div>
@@ -1050,6 +1206,16 @@
             <section class="surface">
               <div class="surface-head">
                 <div>
+                  <p class="eyebrow">Claim Lifecycle</p>
+                  <h2>State, blockers, allowed outputs</h2>
+                </div>
+              </div>
+              <div id="claim-lifecycle" class="queue-list"></div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
                   <p class="eyebrow">Disproof path</p>
                   <h2>Evidence spine</h2>
                 </div>
@@ -1068,19 +1234,52 @@
               </div>
               <div id="fast-read" class="two-up"></div>
             </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Learning Loop</p>
+                  <h2>Research habits to improve</h2>
+                </div>
+              </div>
+              <div id="learning-loop" class="two-up"></div>
+            </section>
+          </article>
+
+          <article class="view-panel" data-view-panel="tasks">
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Research Command Queue</p>
+                  <h2>Falsification Task Board</h2>
+                </div>
+                <span id="task-count" class="badge warn">loading</span>
+              </div>
+              <div id="falsification-task-board" class="queue-list"></div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Best-next falsification</p>
+                  <h2>Command queue detail</h2>
+                </div>
+              </div>
+              <div id="command-queue-detail" class="queue-list"></div>
+            </section>
           </article>
 
           <article class="view-panel" data-view-panel="agents">
             <section class="surface">
               <div class="surface-head">
                 <div>
-                  <p class="eyebrow">Agentic review</p>
-                  <h2>Agent council</h2>
+                  <p class="eyebrow">Agent council ownership</p>
+                  <h2>Agent mission board</h2>
                 </div>
                 <span id="agent-decision" class="badge warn">research-only hold</span>
               </div>
-              <div id="agent-roles" class="metrics"></div>
-              <div id="agent-findings" class="queue-list"></div>
+              <div id="agent-roles" class="progress-ledger"></div>
+              <div id="agent-mission-board" class="queue-list"></div>
             </section>
           </article>
 
@@ -1089,10 +1288,21 @@
               <div class="surface-head">
                 <div>
                   <p class="eyebrow">Weakest controls</p>
-                  <h2>Evidence gates</h2>
+                  <h2>Gate x-ray</h2>
                 </div>
               </div>
+              <div id="gate-xray" class="xray-grid"></div>
               <div id="gate-list" class="queue-list"></div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Missing proof</p>
+                  <h2>Evidence Gap Register</h2>
+                </div>
+              </div>
+              <div id="evidence-gap-register" class="queue-list"></div>
             </section>
 
             <section class="surface">
@@ -1103,16 +1313,6 @@
                 </div>
               </div>
               <div id="evidence-rigor" class="two-up"></div>
-            </section>
-
-            <section class="surface">
-              <div class="surface-head">
-                <div>
-                  <p class="eyebrow">Readiness threshold</p>
-                  <h2>Missing proof</h2>
-                </div>
-              </div>
-              <div id="missing-proof" class="queue-list"></div>
             </section>
           </article>
 
@@ -1173,6 +1373,12 @@
       const API_BASE = window.TRADING_LAB_API_BASE_URL || "http://127.0.0.1:5299";
       const text = (value) =>
         value === undefined || value === null || value === "" ? "unknown" : String(value);
+      const pretty = (value) =>
+        text(value)
+          .replace(/[_-]+/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .replace(/\b\w/g, (char) => char.toUpperCase());
       const escapeHtml = (value) =>
         text(value).replace(/[&<>"']/g, (char) => ({
           "&": "&amp;",
@@ -1328,6 +1534,207 @@
               { id: "shadow_confidence", label: "Shadow confidence", output: "Show calibrated confidence bands and live-vs-expected drift state." },
             ],
           },
+          human_brief: {
+            what_matters_now: "BTC/USD stays in research hold: stale observation, inconclusive evidence, 2 warnings, 5 blockers.",
+            why_it_matters: "baseline comparison is unresolved: Comparator evidence weakened the claim.",
+            changed_since_last: "Static preview data; open the live local view for current API state.",
+            best_next_action: "Refresh bounded observation",
+            would_change_our_mind: ["Fresh market observation", "No warning evidence gates", "Comparator beaten", "Human review"],
+            market_context: "Observed spread stays context only.",
+          },
+          active_mission: {
+            mission_id: "mission-toy-moving-average-crossover-v0",
+            objective: "Falsify, quarantine, or document the current registered claim.",
+            state: "warning_hold",
+            primary_blocker_ids: ["gate:baseline-comparison", "gate:walk-forward-robustness"],
+            source_refs: ["runs/example-run.json"],
+          },
+          agent_mission_board: [
+            {
+              name: "Leak Auditor",
+              status: "monitoring",
+              mission: "Protect point-in-time lineage, schema, and chronology.",
+              owned_gates: ["schema columns", "chronology", "lookahead columns"],
+              open_findings: 0,
+              top_finding: { gate_name: "schema columns", status: "pass", severity: "info" },
+              next_action: "Keep source timestamp visible in the evidence ledger.",
+              source_refs: ["runs/example-run.json"],
+            },
+            {
+              name: "Baseline Challenger",
+              status: "active",
+              mission: "Attack comparator discipline and missing baseline evidence.",
+              owned_gates: ["baseline comparison"],
+              open_findings: 1,
+              top_finding: { gate_name: "baseline comparison", status: "warn", severity: "warning" },
+              next_action: "Resolve baseline comparison with harder offline proof.",
+              source_refs: ["runs/example-run.json"],
+            },
+            {
+              name: "Cost Stress Critic",
+              status: "monitoring",
+              mission: "Stress friction, delay, and cost-grid assumptions.",
+              owned_gates: ["cost realism", "cost sensitivity", "cost grid robustness"],
+              open_findings: 0,
+              top_finding: { gate_name: "cost realism", status: "pass", severity: "info" },
+              next_action: "Keep spread as context only.",
+              source_refs: ["runs/example-run.json"],
+            },
+            {
+              name: "Reproducibility Clerk",
+              status: "monitoring",
+              mission: "Keep source hashes, manifests, and reruns auditable.",
+              owned_gates: ["reproducibility"],
+              open_findings: 0,
+              top_finding: { gate_name: "reproducibility", status: "pass", severity: "info" },
+              next_action: "Expose run and source hashes.",
+              source_refs: ["runs/example-run.json"],
+            },
+            {
+              name: "Promotion Gatekeeper",
+              status: "active",
+              mission: "Hold the display ladder until readiness proof clears.",
+              owned_gates: [],
+              open_findings: 0,
+              top_finding: { gate_name: "readiness", status: "blocked", severity: "warning" },
+              next_action: "Clear missing readiness checks.",
+              source_refs: ["runs/example-run.json"],
+            },
+            {
+              name: "Regime Skeptic",
+              status: "active",
+              mission: "Attack fold, parameter, and regime fragility.",
+              owned_gates: ["walk-forward robustness", "parameter sensitivity"],
+              open_findings: 1,
+              top_finding: { gate_name: "walk-forward robustness", status: "warn", severity: "warning" },
+              next_action: "Record additional offline walk-forward folds.",
+              source_refs: ["runs/example-run.json"],
+            },
+          ],
+          claim_lifecycle: {
+            claim_id: "toy-moving-average-crossover",
+            run_id: "toy-moving-average-crossover-52635e40",
+            stage: "research_only_hold",
+            state_reason: "Open warning gates: baseline comparison, walk-forward robustness.",
+            verdict: "inconclusive",
+            disproof_score: 4,
+            gate_counts: { pass: 8, warn: 2, fail: 0 },
+            blocking_gate_names: ["baseline comparison", "walk-forward robustness"],
+            lifecycle: ["pre_registered", "offline_tested", "agent_reviewed", "warning_hold"],
+            allowed_outputs: ["claim under test", "next falsification task", "evidence blockers"],
+            blocked_outputs: ["directional live call", "position sizing guidance", "account route", "autonomous execution"],
+          },
+          gate_summaries: {
+            counts: { pass: 8, warn: 2, fail: 0 },
+            weakest: [
+              {
+                name: "baseline comparison",
+                status: "warn",
+                severity: "warning",
+                threshold: "strategy_cumulative_return > baseline_cumulative_return",
+                evidence_summary: "strategy 0.03883048242570175 vs baseline 0.0419350221840562",
+                plain_english: "The strategy value did not clear the baseline value.",
+                remediation_hint: "Comparator evidence weakened the claim.",
+                owner: "Baseline Challenger",
+              },
+              {
+                name: "walk-forward robustness",
+                status: "warn",
+                severity: "warning",
+                threshold: "majority of folds beat the comparator on the same offline bars",
+                evidence_summary: "0 / 3 folds passed; pass_ratio 0.0",
+                plain_english: "Fold evidence is not strong enough.",
+                remediation_hint: "Record more fold evidence or mark the claim as fold-fragile.",
+                owner: "Regime Skeptic",
+              },
+            ],
+          },
+          evidence_gaps: [
+            {
+              id: "gate:baseline-comparison",
+              kind: "warning_gate",
+              severity: "warning",
+              owner: "Baseline Challenger",
+              detail: "Comparator evidence weakened the claim.",
+              blocks_stage: "validated_setup_note",
+              acceptance_test: "strategy_cumulative_return > baseline_cumulative_return",
+              source_ref: "runs/example-run.json",
+            },
+            {
+              id: "gate:walk-forward-robustness",
+              kind: "warning_gate",
+              severity: "warning",
+              owner: "Regime Skeptic",
+              detail: "Record more fold evidence or mark the claim as fold-fragile.",
+              blocks_stage: "validated_setup_note",
+              acceptance_test: "majority of folds beat the comparator on the same offline bars",
+              source_ref: "runs/example-run.json",
+            },
+            {
+              id: "rigor:missing_baseline:random-control",
+              kind: "missing_baseline",
+              severity: "warning",
+              owner: "Baseline Challenger",
+              detail: "Missing required baseline: random-control.",
+              blocks_stage: "validated_setup_note",
+              acceptance_test: "record the missing offline evidence with source references",
+              source_ref: "runs/example-run.json",
+            },
+          ],
+          next_falsification_tasks: [
+            {
+              task_id: "task:baseline-comparison:retest",
+              priority: 1,
+              owner: "Baseline Challenger",
+              label: "Retest baseline comparison against stricter offline evidence.",
+              status: "open",
+              expected_artifact: "baseline_pack_result",
+              source_ref: "runs/example-run.json",
+              research_only: true,
+            },
+            {
+              task_id: "task:walk-forward-robustness:retest",
+              priority: 2,
+              owner: "Regime Skeptic",
+              label: "Record additional offline walk-forward folds.",
+              status: "open",
+              expected_artifact: "walk_forward_fold_ledger",
+              source_ref: "runs/example-run.json",
+              research_only: true,
+            },
+          ],
+          lab_scorecard: {
+            readiness_stage: "observe_only",
+            promotion_ready: false,
+            disproof_pressure: 4,
+            open_gap_count: 10,
+            open_task_count: 12,
+            research_maturity: { score: 100, label: "substantial evidence coverage" },
+            evidence_rigor: { score: 60, status: "needs_evidence", present_baselines: ["buy-and-hold"], missing_baselines: ["equal-weight", "naive-mean-reversion", "naive-momentum", "random-control"] },
+            open_gate_counts: { warn: 2, fail: 0 },
+            readiness_samples: {
+              paper_ledger: { current: 6, required: 30 },
+              live_shadow_drift: { current: 0, required: 30 },
+              calibration_history: { current: 5, required: 30 },
+              human_review: { recorded: false, required: true },
+            },
+          },
+          learning_loop: {
+            current_lesson: "Comparator Discipline",
+            recurring_mistakes: ["Comparator weakness", "Fold fragility"],
+            next_curriculum_round: 31,
+            training_focus: "Comparator Discipline: record same-bar baselines and comparator deltas for offline evidence review.",
+            lab_memory: [
+              {
+                pattern: "Comparator evidence weakened the claim; focus on same-sample baseline discipline.",
+                next_behavior: "Run full baseline packs before interpreting any upside.",
+              },
+              {
+                pattern: "Fold evidence weakened the claim; focus on out-of-sample chronology.",
+                next_behavior: "Require fold-level proof before promoting a claim narrative.",
+              },
+            ],
+          },
           agentic_review: {
             promotion_decision: {
               decision: "research-only hold",
@@ -1434,6 +1841,7 @@
       }
 
       function whatMattersNow(terminal) {
+        if (terminal.human_brief?.what_matters_now) return terminal.human_brief.what_matters_now;
         const evidence = terminal.evidence || {};
         const market = terminal.market || {};
         const counts = evidence.gate_counts || {};
@@ -1442,6 +1850,7 @@
       }
 
       function whyHeld(terminal) {
+        if (terminal.human_brief?.why_it_matters) return terminal.human_brief.why_it_matters;
         const weakGate = currentWeakGate(terminal);
         if (weakGate) return `${text(weakGate.name)} is unresolved: ${text(weakGate.detail)}`;
         if (terminal.market?.freshness?.label !== "fresh") return "The latest observation is not fresh enough for a higher research stage.";
@@ -1449,6 +1858,7 @@
       }
 
       function reviewDelta(terminal) {
+        if (terminal.human_brief?.changed_since_last) return terminal.human_brief.changed_since_last;
         if (terminal._dataMode === "static_file_preview") {
           return "Static preview data; open the live local view for current API state.";
         }
@@ -1543,7 +1953,9 @@
         document.querySelector("#why-text").textContent = whyHeld(terminal);
         document.querySelector("#changed-text").textContent = reviewDelta(terminal);
         document.querySelector("#posture-text").textContent =
-          "Inspect the weakest gate, collect missing proof, and keep every market fact source-labeled.";
+          terminal.human_brief?.best_next_action
+            ? `Next lab move: ${text(terminal.human_brief.best_next_action)}.`
+            : "Inspect the weakest gate, collect missing proof, and keep every market fact source-labeled.";
         document.querySelector("#promotion-text").textContent =
           `${text(stage.label)}: ${text(readiness.allowed_output)}`;
         document.querySelector("#next-move").textContent = firstMove
@@ -1595,6 +2007,106 @@
         document.querySelector("#rail-queue").innerHTML = (items || []).length
           ? items.map((item, index) => queueItem(`#${index + 1} ${moveLabel(item.label)}`, text(item.why), index === 0 ? "warn" : "")).join("")
           : queueItem("No queue item", "Current artifacts do not expose a ranked blocker.");
+      }
+
+      function scoreCard(label, value, detail = "", tone = "") {
+        return `
+          <div class="score-card">
+            <span class="eyebrow">${escapeHtml(label)}</span>
+            <strong class="${tone}">${escapeHtml(value)}</strong>
+            <p class="body-copy">${escapeHtml(detail)}</p>
+          </div>
+        `;
+      }
+
+      function renderMissionControl(terminal) {
+        const mission = terminal.active_mission || terminal.mission_control?.active_mission || {};
+        const lifecycle = terminal.claim_lifecycle || {};
+        document.querySelector("#mission-control-title").textContent = pretty(mission.state || lifecycle.stage || "research hold");
+        document.querySelector("#mission-objective").textContent =
+          text(mission.objective || "Falsify or quarantine the current registered claim.");
+        const steps = lifecycle.lifecycle || ["pre_registered", "offline_tested", "agent_reviewed"];
+        document.querySelector("#claim-lifecycle-inline").innerHTML = steps
+          .map((step) => `<div class="lifecycle-step"><strong>${escapeHtml(pretty(step))}</strong></div>`)
+          .join("");
+      }
+
+      function renderLabScorecard(terminal) {
+        const score = terminal.lab_scorecard || {};
+        const rigor = score.evidence_rigor || {};
+        const samples = score.readiness_samples || {};
+        const paper = samples.paper_ledger || {};
+        const shadow = samples.live_shadow_drift || {};
+        const calibration = samples.calibration_history || {};
+        const human = samples.human_review || {};
+        document.querySelector("#lab-scorecard").innerHTML = `
+          ${scoreCard("Stage", pretty(score.readiness_stage), score.promotion_ready ? "promotion checks clear" : "promotion not ready", score.promotion_ready ? "ok" : "warn")}
+          ${scoreCard("Gate health", `${text(score.open_gate_counts?.warn ?? 0)} warn / ${text(score.open_gate_counts?.fail ?? 0)} fail`, `${text(score.research_maturity?.score)} maturity score`, (score.open_gate_counts?.warn || score.open_gate_counts?.fail) ? "warn" : "ok")}
+          ${scoreCard("Baseline pack", `${text((rigor.present_baselines || []).length)} / ${text(((rigor.present_baselines || []).length + (rigor.missing_baselines || []).length) || 0)}`, text(rigor.status), (rigor.missing_baselines || []).length ? "warn" : "ok")}
+          ${scoreCard("Paper ledger", `${text(paper.current ?? 0)} / ${text(paper.required ?? 30)}`, "sample threshold", (paper.current || 0) >= (paper.required || 30) ? "ok" : "warn")}
+          ${scoreCard("Live-shadow", `${text(shadow.current ?? 0)} / ${text(shadow.required ?? 30)}`, "sample threshold", (shadow.current || 0) >= (shadow.required || 30) ? "ok" : "warn")}
+          ${scoreCard("Calibration", `${text(calibration.current ?? 0)} / ${text(calibration.required ?? 30)}`, "sample threshold", (calibration.current || 0) >= (calibration.required || 30) ? "ok" : "warn")}
+          ${scoreCard("Human review", human.recorded ? "recorded" : "missing", "required before promotion", human.recorded ? "ok" : "warn")}
+          ${scoreCard("Open work", `${text(score.open_gap_count ?? 0)} gaps`, `${text(score.open_task_count ?? 0)} tasks`, (score.open_gap_count || 0) ? "warn" : "ok")}
+        `;
+      }
+
+      function renderClaimLifecycle(terminal) {
+        const lifecycle = terminal.claim_lifecycle || {};
+        const rows = [
+          ["Stage", pretty(lifecycle.stage || "unknown")],
+          ["State reason", lifecycle.state_reason || "No state reason exposed."],
+          ["Blocking gates", (lifecycle.blocking_gate_names || []).join(", ") || "none"],
+          ["Allowed outputs", (lifecycle.allowed_outputs || []).join(", ") || "research facts only"],
+          ["Blocked outputs", (lifecycle.blocked_outputs || []).join(", ") || "higher-risk surfaces disabled"],
+        ];
+        document.querySelector("#claim-lifecycle").innerHTML = rows
+          .map(([label, value]) => `
+            <div class="lifecycle-row">
+              <strong>${escapeHtml(label)}</strong>
+              <p>${escapeHtml(value)}</p>
+            </div>
+          `)
+          .join("");
+      }
+
+      function renderLearningLoop(terminal) {
+        const loop = terminal.learning_loop || {};
+        const memory = loop.lab_memory || [];
+        document.querySelector("#learning-loop").innerHTML = `
+          ${dataRow("Current lesson", text(loop.current_lesson), "warn")}
+          ${dataRow("Next curriculum round", text(loop.next_curriculum_round), "mono")}
+          ${dataRow("Recurring mistakes", text((loop.recurring_mistakes || []).join(", ") || "none recorded"), (loop.recurring_mistakes || []).length ? "warn" : "ok")}
+          ${dataRow("Training focus", text(loop.training_focus), "muted")}
+          ${memory.map((item) => dataRow("Lab memory", `${text(item.pattern)} Next habit: ${text(item.next_behavior)}`, "muted")).join("")}
+        `;
+      }
+
+      function renderTasks(terminal) {
+        const tasks = terminal.next_falsification_tasks || [];
+        document.querySelector("#task-count").textContent = `${tasks.length} open`;
+        document.querySelector("#task-count").className = tasks.length ? "badge warn" : "badge ok";
+        document.querySelector("#falsification-task-board").innerHTML = tasks.length
+          ? tasks.map((task) => `
+              <div class="task-row" tabindex="0">
+                <strong>#${escapeHtml(task.priority)}</strong>
+                <div>${badge(text(task.status), toneFor(task.status))}<p>${escapeHtml(task.owner)}</p></div>
+                <p>${escapeHtml(task.label)}<br><span class="mono">${escapeHtml(task.expected_artifact || "offline artifact")}</span></p>
+                <p class="mono">${escapeHtml(task.source_ref || task.source || "source unknown")}</p>
+              </div>
+            `).join("")
+          : queueItem("No open tasks", "The current packet exposes no falsification task.", "ok");
+
+        document.querySelector("#command-queue-detail").innerHTML = (terminal.ranked_attention_items || []).length
+          ? (terminal.ranked_attention_items || []).map((item, index) => `
+              <div class="task-row" tabindex="0">
+                <strong>#${index + 1}</strong>
+                <p>${escapeHtml(moveLabel(item.label))}</p>
+                <p>${escapeHtml(item.why)}</p>
+                <p class="mono">${escapeHtml(item.source_ref || "terminal queue")}</p>
+              </div>
+            `).join("")
+          : queueItem("No command", "The current packet exposes no ranked command.");
       }
 
       function renderClaimPacket(terminal) {
@@ -1654,40 +2166,78 @@
         `;
       }
 
-      function renderAgents(review) {
+      function renderAgents(terminal) {
+        const review = terminal.agentic_review || {};
+        const missions = terminal.agent_mission_board || [];
         const decision = review?.promotion_decision || {};
         document.querySelector("#agent-decision").textContent = text(decision.decision);
         document.querySelector("#agent-decision").className = `badge ${decision.decision === "promote" ? "ok" : "warn"}`;
-        document.querySelector("#agent-roles").innerHTML = (review?.roles || [])
-          .map((role) => metric(role.name, role.responsibility || "review", ""))
-          .join("");
-        const findings = (review?.findings || [])
-          .filter((finding) => finding.status !== "pass")
-          .concat((review?.findings || []).filter((finding) => finding.status === "pass").slice(0, 2));
-        document.querySelector("#agent-findings").innerHTML = findings.length
-          ? findings.map((finding) => `
-              <div class="finding-row">
-                <strong>${escapeHtml(text(finding.role))}<br>${badge(text(finding.status), toneFor(finding.status))}</strong>
-                <p>${escapeHtml(`${text(finding.gate_name)}: ${text(finding.finding)} ${text(finding.remediation_hint)}`)}</p>
+        const rows = missions.length
+          ? missions
+          : (review?.roles || []).map((role) => ({
+              name: role.name,
+              status: "monitoring",
+              mission: role.focus || role.responsibility || "review offline evidence",
+              owned_gates: [],
+              open_findings: 0,
+              top_finding: { gate_name: "not assigned", status: "pass", severity: "info" },
+              next_action: role.focus || "Keep evidence observable.",
+              source_refs: [],
+            }));
+        document.querySelector("#agent-roles").innerHTML = rows.map((role) =>
+          scoreCard(role.name, role.status, `${text(role.open_findings)} open findings`, role.status === "active" ? "warn" : "ok"),
+        ).join("");
+        document.querySelector("#agent-mission-board").innerHTML = rows.length
+          ? rows.map((role) => `
+              <div class="mission-row" tabindex="0">
+                <strong>${escapeHtml(role.name)}</strong>
+                ${badge(text(role.status), role.status === "active" ? "warn" : "ok")}
+                <p>${escapeHtml(role.mission)}<br><span class="mono">${escapeHtml((role.owned_gates || []).join(", ") || "readiness controls")}</span></p>
+                <p>${escapeHtml(role.next_action)}<br><span class="mono">${escapeHtml((role.source_refs || []).join(", ") || "source pending")}</span></p>
               </div>
             `).join("")
-          : queueItem("No findings", "The current review did not expose role findings.");
+          : queueItem("No agent missions", "The current review did not expose agent ownership.");
       }
 
       function renderEvidence(terminal) {
-        const gates = terminal.evidence?.top_gates || [];
+        const gates = terminal.gate_summaries?.weakest || terminal.evidence?.top_gates || [];
         const weak = gates.filter((gate) => gate.status !== "pass");
         const visible = weak.length ? weak.concat(gates.filter((gate) => gate.status === "pass").slice(0, 2)) : gates;
+        document.querySelector("#gate-xray").innerHTML = visible.length
+          ? visible.slice(0, 4).map((gate) => `
+              <div class="xray-card">
+                <div class="surface-head">
+                  <strong>${escapeHtml(gate.name)}</strong>
+                  ${badge(gate.status, toneFor(gate.status))}
+                </div>
+                <p class="body-copy">${escapeHtml(gate.plain_english || gate.detail || gate.remediation_hint || "Recorded evidence is available.")}</p>
+                <p class="mono">${escapeHtml(gate.evidence_summary || gate.threshold || "evidence summary unavailable")}</p>
+                <p class="body-copy">${escapeHtml(gate.owner || "owner pending")}</p>
+              </div>
+            `).join("")
+          : '<p class="empty-state">No gate x-ray is exposed.</p>';
         document.querySelector("#gate-list").innerHTML = visible.length
           ? visible.map((gate) => `
               <div class="gate-row">
                 <strong>${escapeHtml(gate.name)}</strong>
                 ${badge(gate.status, toneFor(gate.status))}
                 <span class="badge">${escapeHtml(gate.severity)}</span>
-                <p>${escapeHtml(gate.detail)}<br><span class="mono">${escapeHtml(gate.threshold)}</span></p>
+                <p>${escapeHtml(gate.detail || gate.remediation_hint || gate.plain_english)}<br><span class="mono">${escapeHtml(gate.threshold)}</span></p>
               </div>
             `).join("")
           : queueItem("No gates", "No evidence gates are exposed.");
+
+        const gaps = terminal.evidence_gaps || [];
+        document.querySelector("#evidence-gap-register").innerHTML = gaps.length
+          ? gaps.map((gap) => `
+              <div class="gap-row" tabindex="0">
+                <strong>${escapeHtml(gap.id)}</strong>
+                ${badge(text(gap.severity || gap.status), toneFor(gap.status === "open" ? "warn" : gap.status))}
+                <p>${escapeHtml(gap.owner)}<br><span class="mono">${escapeHtml(gap.blocks_stage || "stage pending")}</span></p>
+                <p>${escapeHtml(gap.detail)}<br><span class="mono">${escapeHtml(gap.source_ref || "source unknown")}</span></p>
+              </div>
+            `).join("")
+          : queueItem("No evidence gaps", "The current packet exposes no missing proof.", "ok");
 
         const rigor = terminal.evidence_rigor?.summary || {};
         document.querySelector("#evidence-rigor").innerHTML = `
@@ -1696,11 +2246,6 @@
           ${dataRow("Missing baselines", text((rigor.missing_baselines || []).join(", ") || "none"), (rigor.missing_baselines || []).length ? "warn" : "ok")}
           ${dataRow("Evidence gaps", text((rigor.evidence_gaps || []).join(", ") || "none"), (rigor.evidence_gaps || []).length ? "warn" : "ok")}
         `;
-
-        const missing = terminal.confidence_readiness?.missing_checks || [];
-        document.querySelector("#missing-proof").innerHTML = missing.length
-          ? missing.slice(0, 10).map((check) => queueItem(text(check.label || check.id), text(check.why || check.detail), "warn")).join("")
-          : queueItem("No missing proof", "Current stage has no unresolved checks.", "ok");
       }
 
       function renderProvenance(terminal) {
@@ -1745,10 +2290,17 @@
             <pre>${escapeHtml(JSON.stringify(
               {
                 evidence: terminal.evidence,
+                human_brief: terminal.human_brief,
                 ranked_attention_items: terminal.ranked_attention_items,
                 blockers: terminal.blockers,
                 confidence_readiness: terminal.confidence_readiness,
                 agentic_review: terminal.agentic_review,
+                agent_mission_board: terminal.agent_mission_board,
+                claim_lifecycle: terminal.claim_lifecycle,
+                evidence_gaps: terminal.evidence_gaps,
+                next_falsification_tasks: terminal.next_falsification_tasks,
+                lab_scorecard: terminal.lab_scorecard,
+                learning_loop: terminal.learning_loop,
                 evidence_rigor: terminal.evidence_rigor,
                 provenance: terminal.snapshot_event,
               },
@@ -1761,12 +2313,17 @@
 
       function renderTerminal(terminal) {
         renderHero(terminal);
+        renderMissionControl(terminal);
+        renderLabScorecard(terminal);
         renderBlockers(terminal.blockers || []);
         renderRailQueue(terminal.ranked_attention_items || []);
         renderClaimPacket(terminal);
+        renderClaimLifecycle(terminal);
         renderSpine(terminal);
         renderFastRead(terminal);
-        renderAgents(terminal.agentic_review || {});
+        renderLearningLoop(terminal);
+        renderTasks(terminal);
+        renderAgents(terminal);
         renderEvidence(terminal);
         renderProvenance(terminal);
         renderBasis(terminal);
