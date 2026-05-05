@@ -105,6 +105,33 @@ paths:
       responses:
         "200":
           description: Supported research-source imports and blocked execution fields
+  /strategy-import/preview:
+    post:
+      summary: Preview a validate-only strategy import draft
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                source_type:
+                  type: string
+                raw_text:
+                  type: string
+                source_ref:
+                  type: string
+      responses:
+        "200":
+          description: Quarantined research draft, missing fields, blocked terms, and first falsification tasks
+        "400":
+          description: Invalid preview request body
+  /strategy-import/example-preview:
+    get:
+      summary: Read a bundled validate-only strategy import preview
+      responses:
+        "200":
+          description: Example quarantined research draft for UI preview and local smoke checks
   /failure-gallery:
     get:
       summary: Read failed or blocked claim gallery

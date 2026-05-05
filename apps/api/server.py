@@ -21,6 +21,7 @@ from trading_lab.agents import build_agentic_review
 from trading_lab.artifacts import read_run_artifact
 from trading_lab.control_plane import build_lab_control_plane
 from trading_lab.evidence import baseline_pack, summarize_evidence_rigor
+from trading_lab.intake import build_strategy_import_preview
 from trading_lab.platform import build_platform_overview
 from trading_lab.readiness import validate_readiness
 from trading_lab.snapshots import read_latest
@@ -200,7 +201,7 @@ def platform_payload() -> dict[str, Any]:
         ranked_attention_items=ranked_attention_items,
     )
     artifact = read_run_artifact(PROJECT_ROOT / run["source"])
-    return build_platform_overview(
+    payload = build_platform_overview(
         artifact,
         run=run,
         snapshot=snapshot,
@@ -209,6 +210,18 @@ def platform_payload() -> dict[str, Any]:
         agentic_review=agentic_review,
         control_plane=control_plane,
     )
+    payload["strategy_import_preview"] = strategy_import_preview_payload(
+        {
+            "source_type": "plain_language_claim",
+            "raw_text": (
+                "Thesis: BTC/USD daily momentum may beat buy-and-hold after costs. "
+                "Null: no edge after costs. Universe: BTC/USD. Horizon: daily bars. "
+                "Signal: close above 20 day high. Data: local OHLCV CSV."
+            ),
+            "source_ref": "manual:intake:example",
+        }
+    )
+    return payload
 
 
 def claims_payload() -> dict[str, Any]:
@@ -235,6 +248,15 @@ def claim_payload(claim_id: str) -> dict[str, Any]:
         ],
         "trust_packet_ref": "/trust-packet/current",
     }
+
+
+def strategy_import_preview_payload(payload: dict[str, Any] | None = None) -> dict[str, Any]:
+    payload = payload or {}
+    return build_strategy_import_preview(
+        source_type=str(payload.get("source_type", "plain_language_claim")),
+        raw_text=str(payload.get("raw_text", "")),
+        source_ref=str(payload.get("source_ref", "manual:intake")),
+    )
 
 
 def control_plane_payload(
@@ -515,6 +537,20 @@ class TradingLabHandler(BaseHTTPRequestHandler):
                 self._send_json(platform_payload()["trust_packet"])
             elif route == "/strategy-import/contract":
                 self._send_json(platform_payload()["strategy_import"])
+            elif route == "/strategy-import/example-preview":
+                self._send_json(
+                    strategy_import_preview_payload(
+                        {
+                            "source_type": "plain_language_claim",
+                            "raw_text": (
+                                "Thesis: BTC/USD daily momentum may beat buy-and-hold after costs. "
+                                "Null: no edge after costs. Universe: BTC/USD. Horizon: daily bars. "
+                                "Signal: close above 20 day high. Data: local OHLCV CSV."
+                            ),
+                            "source_ref": "manual:intake:example",
+                        }
+                    )
+                )
             elif route == "/failure-gallery":
                 self._send_json(platform_payload()["failure_gallery"])
             elif route == "/confidence/readiness":
@@ -545,6 +581,8 @@ class TradingLabHandler(BaseHTTPRequestHandler):
                             "/readiness/ledger",
                             "/trust-packet/current",
                             "/strategy-import/contract",
+                            "/strategy-import/preview",
+                            "/strategy-import/example-preview",
                             "/failure-gallery",
                             "/confidence/readiness",
                             "/readiness/artifacts",
@@ -560,6 +598,29 @@ class TradingLabHandler(BaseHTTPRequestHandler):
                 status=500,
             )
 
+    def do_POST(self) -> None:  # noqa: N802 - stdlib handler convention
+        route = urlparse(self.path).path.rstrip("/") or "/"
+        try:
+            if route == "/strategy-import/preview":
+                self._send_json(strategy_import_preview_payload(self._read_json_body()))
+            else:
+                self._send_json(
+                    {"error": "not_found", "routes": ["/strategy-import/preview"]},
+                    status=404,
+                )
+        except ValueError as exc:
+            self._send_json({"error": "bad_request", "detail": str(exc)}, status=400)
+        except Exception as exc:  # pragma: no cover - defensive server boundary
+            self._send_json(
+                {"error": type(exc).__name__, "detail": str(exc)},
+                status=500,
+            )
+
+    def do_OPTIONS(self) -> None:  # noqa: N802 - stdlib handler convention
+        self.send_response(204)
+        self._send_common_headers(content_length=0)
+        self.end_headers()
+
     def log_message(self, format: str, *args: object) -> None:
         if os.environ.get("TRADING_LAB_API_ACCESS_LOG") == "1":
             super().log_message(format, *args)
@@ -567,12 +628,31 @@ class TradingLabHandler(BaseHTTPRequestHandler):
     def _send_json(self, payload: dict[str, Any], *, status: int = 200) -> None:
         body = json.dumps(payload, indent=2, sort_keys=True).encode("utf-8")
         self.send_response(status)
-        self.send_header("Access-Control-Allow-Origin", "http://127.0.0.1:5199")
-        self.send_header("Cache-Control", "no-store")
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Content-Length", str(len(body)))
+        self._send_common_headers(content_length=len(body))
         self.end_headers()
         self.wfile.write(body)
+
+    def _send_common_headers(self, *, content_length: int) -> None:
+        self.send_header("Access-Control-Allow-Origin", "http://127.0.0.1:5199")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(content_length))
+
+    def _read_json_body(self) -> dict[str, Any]:
+        length = int(self.headers.get("Content-Length", "0") or "0")
+        if length > 64_000:
+            raise ValueError("request body is too large for local preview")
+        if length == 0:
+            return {}
+        try:
+            payload = json.loads(self.rfile.read(length).decode("utf-8"))
+        except json.JSONDecodeError as exc:
+            raise ValueError("request body must be JSON") from exc
+        if not isinstance(payload, dict):
+            raise ValueError("request body must be a JSON object")
+        return payload
 
 
 def serve(host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> None:

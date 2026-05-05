@@ -751,6 +751,35 @@
         grid-template-columns: minmax(148px, 0.34fr) minmax(0, 1fr);
       }
 
+      .intake-form {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        display: grid;
+        gap: 10px;
+        padding: 12px;
+      }
+
+      .intake-form textarea,
+      .intake-form select {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        color: var(--text);
+        font: inherit;
+        min-height: 44px;
+        padding: 10px 12px;
+        width: 100%;
+      }
+
+      .intake-form textarea {
+        min-height: 128px;
+        resize: vertical;
+      }
+
+      .intake-form button {
+        justify-content: center;
+      }
+
       .xray-grid {
         display: grid;
         gap: 10px;
@@ -1332,6 +1361,20 @@
                 </div>
               </div>
               <div id="strategy-import" class="two-up"></div>
+              <div class="intake-form">
+                <label class="eyebrow" for="strategy-import-source">Source type</label>
+                <select id="strategy-import-source">
+                  <option value="plain_language_claim">Plain language claim</option>
+                  <option value="csv_backtest">CSV backtest</option>
+                  <option value="pine_script">Pine Script</option>
+                  <option value="lean_algorithm">LEAN algorithm</option>
+                  <option value="notebook_summary">Notebook summary</option>
+                </select>
+                <label class="eyebrow" for="strategy-import-text">Research claim text</label>
+                <textarea id="strategy-import-text"></textarea>
+                <button id="strategy-import-run" type="button">Preview Research Draft</button>
+              </div>
+              <div id="strategy-import-preview" class="queue-list"></div>
             </section>
 
             <section class="surface">
@@ -1982,6 +2025,7 @@
             ],
             blocked_imports: ["credentialed account connectors", "unstamped live-feed dependencies", "claims without a null hypothesis"],
           },
+          strategy_import_preview: staticStrategyImportPreview(),
           failure_gallery: {
             failed_or_blocked_claims: [
               {
@@ -2053,6 +2097,41 @@
             <p class="${className}">${escapeHtml(value)}</p>
           </div>
         `;
+      }
+
+      function defaultStrategyImportText() {
+        return "Thesis: BTC/USD daily momentum may beat buy-and-hold after costs. Null: no edge after costs. Universe: BTC/USD. Horizon: daily bars. Signal: close above 20 day high. Data: local OHLCV CSV.";
+      }
+
+      function staticStrategyImportPreview(overrides = {}) {
+        return {
+          mode: "research_only",
+          status: "quarantine_until_evidence_exists",
+          promotion_allowed: false,
+          source_type: "plain_language_claim",
+          draft_id: "intake:static-preview",
+          source_refs: ["manual:intake:preview"],
+          candidate_claim: {
+            claim_id: "draft-btc-usd-daily-momentum",
+            thesis: "BTC/USD daily momentum may beat buy-and-hold after costs",
+            null_hypothesis: "no edge after costs",
+            asset_universe: ["BTC/USD"],
+            time_horizon: "daily bars",
+            signal_definition: "close above 20 day high",
+          },
+          missing_fields: [],
+          blocked_terms: [],
+          first_falsification_tasks: [
+            { pack_id: "point-in-time-pack", owner: "Leak Auditor", label: "Prove every field was known at the tested timestamp.", expected_artifact: "point_in_time_contract", status: "open" },
+            { pack_id: "baseline-pack", owner: "Baseline Challenger", label: "Compare against boring same-sample baselines before interpreting edge.", expected_artifact: "baseline_pack_result", status: "open" },
+            { pack_id: "walk-forward-pack", owner: "Regime Skeptic", label: "Run chronological folds and mark fold-fragile claims early.", expected_artifact: "walk_forward_fold_ledger", status: "open" },
+          ],
+          next_action: {
+            label: "Create offline evidence packet",
+            why: "The draft is structured enough to run point-in-time, baseline, fold, cost, and readiness checks.",
+          },
+          ...overrides,
+        };
       }
 
       function renderNavigation() {
@@ -2626,6 +2705,12 @@
           ${dataRow("First gate", text(strategyImport.intake_contract?.first_gate || "point_in_time_contract"), "mono")}
           ${dataRow("Blocked imports", text((strategyImport.blocked_imports || strategyImport.blocked_fields || []).join(", ") || "execution surfaces"), "warn")}
         `;
+        const intakeText = document.querySelector("#strategy-import-text");
+        if (intakeText && !intakeText.value) {
+          intakeText.value = defaultStrategyImportText();
+        }
+        renderStrategyImportPreview(platform.strategy_import_preview || staticStrategyImportPreview());
+        bindStrategyImportPreview();
 
         const failures = gallery.failed_or_blocked_claims || [];
         document.querySelector("#failure-gallery").innerHTML = failures.length
@@ -2638,6 +2723,72 @@
               </div>
             `).join("")
           : queueItem("No failed claims", "The failure gallery has no blocked claim to display yet.", "ok");
+      }
+
+      function renderStrategyImportPreview(preview) {
+        const claim = preview.candidate_claim || {};
+        const tasks = preview.first_falsification_tasks || [];
+        document.querySelector("#strategy-import-preview").innerHTML = `
+          <div class="task-row" tabindex="0">
+            <strong>${escapeHtml(preview.draft_id || "draft pending")}</strong>
+            <div>${badge(pretty(preview.status || "preview"), preview.status === "quarantine_until_evidence_exists" ? "warn" : "bad")}<p>${escapeHtml(preview.promotion_allowed ? "promotion allowed" : "promotion blocked")}</p></div>
+            <p>${escapeHtml(claim.claim_id || "draft claim")}<br><span class="mono">${escapeHtml((claim.asset_universe || []).join(", ") || "universe pending")}</span></p>
+            <p>${escapeHtml(preview.next_action?.label || "Review draft")}<br><span class="mono">${escapeHtml((preview.missing_fields || []).join(", ") || (preview.blocked_terms || []).join(", ") || "ready for evidence packet")}</span></p>
+          </div>
+          ${dataRow("Draft thesis", text(claim.thesis), "muted")}
+          ${dataRow("Null hypothesis", text(claim.null_hypothesis), claim.null_hypothesis ? "ok" : "warn")}
+          ${dataRow("Signal definition", text(claim.signal_definition), "mono")}
+          ${tasks.slice(0, 5).map((task) => `
+            <div class="task-row" tabindex="0">
+              <strong class="mono">${escapeHtml(task.pack_id)}</strong>
+              <div>${badge(text(task.status || "open"), "warn")}<p>${escapeHtml(task.owner || "owner pending")}</p></div>
+              <p>${escapeHtml(task.label || "Run offline review.")}<br><span class="mono">${escapeHtml(task.expected_artifact || "offline artifact")}</span></p>
+              <p class="mono">${escapeHtml(task.source_ref || "manual:intake")}</p>
+            </div>
+          `).join("")}
+        `;
+      }
+
+      function bindStrategyImportPreview() {
+        const button = document.querySelector("#strategy-import-run");
+        if (!button || button.dataset.bound === "true") return;
+        button.dataset.bound = "true";
+        button.addEventListener("click", runStrategyImportPreview);
+      }
+
+      async function runStrategyImportPreview() {
+        const button = document.querySelector("#strategy-import-run");
+        const source = document.querySelector("#strategy-import-source");
+        const input = document.querySelector("#strategy-import-text");
+        button.disabled = true;
+        document.querySelector("#strategy-import-preview").innerHTML =
+          queueItem("Previewing research draft", "Quarantining the claim and building first falsification tasks.", "warn");
+        try {
+          const response = await fetch(`${API_BASE}/strategy-import/preview`, {
+            method: "POST",
+            cache: "no-store",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              source_type: source?.value || "plain_language_claim",
+              raw_text: input?.value || "",
+              source_ref: "manual:intake:web",
+            }),
+          });
+          if (!response.ok) throw new Error(`/strategy-import/preview returned ${response.status}`);
+          renderStrategyImportPreview(await response.json());
+        } catch (error) {
+          renderStrategyImportPreview(
+            staticStrategyImportPreview({
+              status: "api_unavailable",
+              next_action: {
+                label: "Use live local API",
+                why: text(error.message),
+              },
+            }),
+          );
+        } finally {
+          button.disabled = false;
+        }
       }
 
       function renderRaw(terminal) {

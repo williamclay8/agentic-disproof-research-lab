@@ -12,6 +12,7 @@ from apps.api.server import (
     latest_snapshot_payload,
     platform_payload,
     run_payload,
+    strategy_import_preview_payload,
     terminal_payload,
 )
 from trading_lab.artifacts import read_run_artifact
@@ -299,6 +300,26 @@ def test_point_in_time_contract_and_import_contract_block_promotion_surfaces():
     assert "live_signal" in strategy_import["blocked_fields"]
 
 
+def test_strategy_import_preview_payload_keeps_new_ideas_in_quarantine():
+    payload = strategy_import_preview_payload(
+        {
+            "source_type": "plain_language_claim",
+            "raw_text": (
+                "Thesis: BTC/USD daily momentum may beat buy-and-hold after costs. "
+                "Null: no edge after costs. Universe: BTC/USD. Horizon: daily bars. "
+                "Signal: close above 20 day high. Data: local OHLCV CSV."
+            ),
+        }
+    )
+
+    assert payload["mode"] == "research_only"
+    assert payload["status"] == "quarantine_until_evidence_exists"
+    assert payload["promotion_allowed"] is False
+    assert payload["candidate_claim"]["claim_id"].startswith("draft-btc-usd-daily-momentum")
+    assert payload["first_falsification_tasks"][0]["pack_id"] == "point-in-time-pack"
+    assert payload["next_action"]["label"] == "Create offline evidence packet"
+
+
 def test_active_mission_holds_when_readiness_gaps_remain_after_gate_passes():
     artifact = read_run_artifact(PROJECT_ROOT / "runs" / "example-run.json")
     all_pass_artifact = replace(
@@ -355,10 +376,15 @@ def test_web_copy_blocks_recommendation_and_execution_language():
     assert 'id="readiness-ledger"' in html
     assert 'id="trust-packet"' in html
     assert 'id="strategy-import"' in html
+    assert 'id="strategy-import-preview"' in html
+    assert 'id="strategy-import-text"' in html
+    assert 'id="strategy-import-run"' in html
     assert 'id="failure-gallery"' in html
     assert "loadPlatform" in html
     assert "renderPlatform" in html
+    assert "runStrategyImportPreview" in html
     assert "/platform/overview" in html
+    assert "/strategy-import/preview" in html
     assert "Agent Contracts" in html
     assert "Readiness Ledger" in html
     assert "Trust Packet" in html
@@ -401,6 +427,7 @@ def test_openapi_contract_excludes_order_and_account_routes():
     assert "/readiness/ledger" in contract
     assert "/trust-packet/current" in contract
     assert "/strategy-import/contract" in contract
+    assert "/strategy-import/preview" in contract
     assert "/failure-gallery" in contract
     assert "/orders" not in contract
     assert "/accounts" not in contract
