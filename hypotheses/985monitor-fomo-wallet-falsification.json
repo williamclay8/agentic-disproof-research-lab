@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "985monitor-fomo-wallet-falsification",
+  "status": "active",
+  "registered_at": "2026-05-13T00:00:00Z",
+  "thesis": "Source-reported 985monitor FOMO wallet leaderboard and common-follow snapshots may contain research value only if forward-only tests survive baseline, latency, provenance, and friction controls.",
+  "null_hypothesis": "The 985monitor FOMO snapshot has no monetizable or predictive research value after provenance gaps, lookahead risk, execution delay, fees, slippage, capacity, and simple baselines are applied.",
+  "asset_universe": [
+    "FOMO wallet leaderboard cohorts",
+    "source-reported common-follow cohorts"
+  ],
+  "time_horizon": "delayed point-in-time snapshots; no live signal horizon",
+  "signal_definition": "Aggregate cohort features derived from source-reported row counts, leaderboard-window persistence, common-follow buckets, wallet coverage, concentration, and provenance gaps.",
+  "expected_failure_modes": [
+    "stale snapshot mistaken for live data",
+    "survivorship bias from leaderboard inclusion",
+    "lookahead leakage from source-reported PnL",
+    "wallet ownership or linkage misclassification",
+    "PnL concentration dominated by a tiny head cohort",
+    "monetization erased by latency, fees, slippage, spread, and capacity",
+    "social/common-follow context misread as coordination or identity proof",
+    "redistribution rights block commercial dataset packaging"
+  ],
+  "falsification_tests": [
+    "point_in_time_lineage",
+    "leaderboard_persistence",
+    "baseline_comparison",
+    "concentration_stress",
+    "social_context_null",
+    "latency_fee_slippage_capacity",
+    "provenance_rights_review"
+  ],
+  "pre_registered_metrics": [
+    "forward_return_after_inclusion",
+    "rank_persistence_rate",
+    "baseline_delta_after_costs",
+    "top10_concentration_share",
+    "latency_adjusted_edge",
+    "wallet_coverage_completeness",
+    "provenance_gap_count"
+  ],
+  "acceptance_thresholds": {
+    "point_in_time_lineage": "all tested rows have source timestamp, ingest timestamp, and no future-only fields",
+    "leaderboard_persistence": "top cohorts beat random active-wallet and volume-weighted baselines in forward-only holdouts",
+    "baseline_comparison": "aggregate cohort edge remains positive after costs, slippage, execution delay, and capacity limits",
+    "concentration_stress": "result does not depend on the top 10 rows or one repeated identity cohort",
+    "social_context_null": "common-follow buckets add value beyond simple volume and activity controls without identity or coordination claims",
+    "provenance_rights_review": "source rights and wallet-label provenance are reviewed before any external licensing"
+  },
+  "data_requirements": [
+    "static 985monitor source URL",
+    "five CSV filenames, row counts, schemas, hashes, and source timestamp",
+    "historical snapshots with collection timestamps before any forward test",
+    "market data snapshots known at each tested timestamp",
+    "fee, slippage, spread, latency, and capacity assumptions",
+    "rights-review note before commercial redistribution"
+  ],
+  "posthoc_edit_policy": "Do not loosen thresholds, remove provenance blockers, or convert source-reported context into recommendations after observing outcomes."
+}

@@ -30,12 +30,34 @@ from trading_lab.snapshots import read_latest
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 5299
+ALLOWED_WEB_ORIGINS = {
+    "http://127.0.0.1:5199",
+    "http://localhost:5199",
+}
 READINESS_ARTIFACTS = {
     "paper_ledger": PROJECT_ROOT / "runs" / "readiness" / "paper-ledger.json",
     "live_shadow_drift": PROJECT_ROOT / "runs" / "readiness" / "live-shadow-drift.json",
     "calibration_history": PROJECT_ROOT / "runs" / "readiness" / "calibration-history.json",
     "risk_packet": PROJECT_ROOT / "runs" / "readiness" / "risk-packet.json",
 }
+RESEARCH_DEVELOPMENT_FORBIDDEN_OUTPUTS = [
+    "personalized recommendation",
+    "directional live call",
+    "position sizing guidance",
+    "broker/account/order route",
+    "autonomous execution",
+]
+RESEARCH_DEVELOPMENT_STEP_REQUIRED_FIELDS = [
+    "id",
+    "title",
+    "status",
+    "owner",
+    "current_research_state",
+    "visible_api_fields",
+    "source_refs",
+    "missing_proof",
+    "next_safe_research_action",
+]
 
 
 def health_payload() -> dict[str, Any]:
@@ -92,6 +114,395 @@ def latest_snapshot_payload(path: Path | None = None) -> dict[str, Any]:
     }
 
 
+def product_release_rule_payload(
+    *,
+    run: dict[str, Any],
+    readiness: dict[str, Any],
+    blockers: list[str],
+    control_plane: dict[str, Any],
+    ranked_attention_items: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Return the four answers every Trading Lab surface must expose."""
+
+    lifecycle = control_plane.get("claim_lifecycle", {})
+    gates = control_plane.get("gate_summaries", {}).get("weakest", [])
+    weak_gate = gates[0] if gates else {}
+    missing_checks = readiness.get("missing_checks", [])
+    first_missing = missing_checks[0] if missing_checks else {}
+    tasks = control_plane.get("next_falsification_tasks", [])
+    first_task = tasks[0] if tasks else (ranked_attention_items[0] if ranked_attention_items else {})
+    stage = readiness.get("current_stage", {}).get("label") or lifecycle.get("stage", "research-only hold")
+    return {
+        "current_research_state": (
+            f"{stage}: verdict {run.get('verdict', 'unknown')} with "
+            f"{len(blockers)} promotion blockers."
+        ),
+        "plain_english_meaning": (
+            weak_gate.get("plain_english")
+            or weak_gate.get("detail")
+            or "The claim remains a research artifact until stronger evidence exists."
+        ),
+        "missing_proof": (
+            first_missing.get("label")
+            or first_missing.get("id")
+            or weak_gate.get("name")
+            or "No missing proof is exposed by the current packet."
+        ),
+        "next_safe_research_action": (
+            "Research: "
+            + (
+                first_task.get("label")
+                or first_task.get("why")
+                or "Review the current evidence packet before increasing trust."
+            )
+        ),
+        "blocked_actions": [
+            "investment advice",
+            "broker connection",
+            "order routing",
+            "live signal language",
+            "personalized guidance",
+            "position sizing",
+        ],
+    }
+
+
+def claim_journey_payload(
+    *,
+    run: dict[str, Any],
+    snapshot: dict[str, Any],
+    readiness: dict[str, Any],
+    blockers: list[str],
+    control_plane: dict[str, Any],
+    ranked_attention_items: list[dict[str, Any]],
+    evidence_rigor: dict[str, Any],
+) -> dict[str, Any]:
+    """Return the six-step plain-to-pro claim journey."""
+
+    gates = {gate.get("name"): gate for gate in run.get("gate_results", [])}
+    baseline_gate = gates.get("baseline comparison", {})
+    walk_gate = gates.get("walk-forward robustness", {})
+    weak_gate = (control_plane.get("gate_summaries", {}).get("weakest") or [{}])[0]
+    missing_checks = readiness.get("missing_checks", [])
+    first_missing = missing_checks[0] if missing_checks else {}
+    tasks = control_plane.get("next_falsification_tasks", [])
+    first_task = tasks[0] if tasks else (ranked_attention_items[0] if ranked_attention_items else {})
+    rigor_summary = evidence_rigor.get("summary", evidence_rigor)
+    missing_baselines = rigor_summary.get("missing_baselines", [])
+    current_stage = readiness.get("current_stage", {}).get("label", "research-only hold")
+    source_ref = run.get("source", "runs/example-run.json")
+    snapshot_ref = snapshot.get("snapshot", "runs/live/latest.json")
+
+    def step(
+        step_number: int,
+        step_id: str,
+        title: str,
+        question: str,
+        state: str,
+        meaning: str,
+        missing_proof: str,
+        next_action: str,
+        *,
+        status: str = "warn",
+        owner: str = "Promotion Gatekeeper",
+        source: str | None = None,
+    ) -> dict[str, Any]:
+        return {
+            "step_number": step_number,
+            "id": step_id,
+            "title": title,
+            "question": question,
+            "status": status,
+            "owner": owner,
+            "current_research_state": state,
+            "plain_english_meaning": meaning,
+            "missing_proof": missing_proof,
+            "next_safe_research_action": f"Research: {next_action}",
+            "source_ref": source or source_ref,
+        }
+
+    steps = [
+        step(
+            1,
+            "what_are_we_testing",
+            "What are we testing?",
+            "What claim is under test?",
+            f"{run.get('id', 'unknown')} is registered with verdict {run.get('verdict', 'unknown')}.",
+            run.get("thesis", "The lab has no thesis text for this claim."),
+            "The claim must keep a thesis, null hypothesis, dataset, and source artifact attached.",
+            "keep the claim registered and inspect the baseline evidence before trust increases.",
+            status="ok",
+            owner="Reproducibility Clerk",
+        ),
+        step(
+            2,
+            "simple_baseline",
+            "Can it beat a simple baseline?",
+            "Did the idea beat a boring comparison?",
+            f"Baseline comparison is {baseline_gate.get('status', 'unknown')}.",
+            baseline_gate.get("detail", "Comparator evidence is not exposed."),
+            ", ".join(missing_baselines) or baseline_gate.get("threshold", "Baseline evidence is required."),
+            "rerun or inspect the baseline pack with same-sample comparators.",
+            status=baseline_gate.get("status", "warn"),
+            owner="Baseline Challenger",
+        ),
+        step(
+            3,
+            "fooling_risks",
+            "What could be fooling us?",
+            "Could leakage, costs, slippage, or regime fragility explain the result?",
+            f"Weakest exposed gate is {weak_gate.get('name', 'unknown')}.",
+            weak_gate.get("plain_english") or weak_gate.get("detail") or "The lab is still checking ways the result could be misleading.",
+            walk_gate.get("detail") or "Leakage, cost, slippage, and regime checks must stay visible.",
+            "inspect leakage, cost stress, slippage, and walk-forward evidence before adding trust.",
+            status=weak_gate.get("status", "warn"),
+            owner=weak_gate.get("owner", "Regime Skeptic"),
+        ),
+        step(
+            4,
+            "evidence_origin",
+            "Where did this evidence come from?",
+            "Can we trace the result to data, code, source refs, and hashes?",
+            f"Evidence is anchored to {source_ref} and {snapshot_ref}.",
+            "Every result should be explainable from artifacts, not dashboard copy.",
+            "Run artifact, snapshot provenance, source timestamps, and hashes must remain available.",
+            "open the ledger or provenance view when any result feels unclear.",
+            status="ok",
+            owner="Reproducibility Clerk",
+            source=snapshot_ref,
+        ),
+        step(
+            5,
+            "research_readiness",
+            "Is this ready for more research?",
+            "Can the claim advance beyond the current research stage?",
+            f"Current stage is {current_stage} with {len(blockers)} blockers.",
+            "Promotion is blocked until evidence quality and human review requirements clear.",
+            first_missing.get("label") or first_missing.get("id") or "No missing readiness check is exposed.",
+            "clear the first missing readiness check before changing the claim state.",
+            status="warn",
+            owner="Promotion Gatekeeper",
+        ),
+        step(
+            6,
+            "next_research_test",
+            "What should we test next?",
+            "What is the next safe research action?",
+            first_task.get("label", "No next task is exposed."),
+            first_task.get("why") or "The next action must stay inside offline research.",
+            first_task.get("expected_artifact") or first_task.get("source_ref") or "A source-referenced offline artifact is required.",
+            first_task.get("label", "review the current evidence packet."),
+            status=first_task.get("status", "warn"),
+            owner=first_task.get("owner", "Promotion Gatekeeper"),
+            source=first_task.get("source_ref", source_ref),
+        ),
+    ]
+    return {
+        "mode": "research_only",
+        "boundary": "claim journey is research-only and not a trade instruction",
+        "steps": steps,
+    }
+
+
+def research_development_pass_payload(
+    *,
+    platform: dict[str, Any] | None = None,
+    agentic_review: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Return the eight-step R&D pass from existing product evidence."""
+
+    if platform is None:
+        return platform_payload()["research_development_pass"]
+
+    engine = platform.get("falsification_engine", {})
+    pit = platform.get("point_in_time_contract", {})
+    contracts = platform.get("agent_contracts", [])
+    readiness = platform.get("readiness_ledger", {})
+    gallery = platform.get("failure_gallery", {})
+    strategy_import = platform.get("strategy_import", {})
+    strategy_preview = platform.get("strategy_import_preview", {})
+    product_rule = platform.get("product_release_rule", {})
+    claim_journey = platform.get("claim_journey", {})
+    baseline_pack = _pack_by_id(engine, "baseline-pack")
+    walk_forward_pack = _pack_by_id(engine, "walk-forward-pack")
+    findings = (agentic_review or {}).get("findings", [])
+    first_failure = (gallery.get("failed_or_blocked_claims") or [{}])[0]
+    first_missing = (readiness.get("missing_checks") or [{}])[0]
+
+    steps = [
+        _research_development_step(
+            1,
+            "action_native_first_move",
+            "Action-native first move",
+            "ready",
+            "Promotion Gatekeeper",
+            "Validate-only intake is available as the first native action.",
+            ["strategy_import", "strategy_import_preview", "first_falsification_tasks"],
+            _source_refs(strategy_preview, "manual:intake:example"),
+            "A quarantined draft still needs point-in-time, baseline, fold, cost, and readiness proof.",
+            "Research: preview a quarantined research draft before adding it to the claim surface.",
+            "ActionNativeFirstMove",
+            source_payload="/strategy-import/preview",
+            native_action={
+                "label": "Preview Research Draft",
+                "method": "POST",
+                "route": "/strategy-import/preview",
+                "default_state": strategy_import.get("intake_contract", {}).get(
+                    "default_state",
+                    "quarantine_until_evidence_exists",
+                ),
+                "creates": "quarantined_claim_draft",
+                "research_only": True,
+            },
+        ),
+        _research_development_step(
+            2,
+            "baseline_ledger",
+            "Baseline ledger",
+            baseline_pack.get("status", "open"),
+            baseline_pack.get("owner", "Baseline Challenger"),
+            f"baseline comparison pack is {baseline_pack.get('status', 'open')}.",
+            ["baseline_pack", "packs", "queue", "missing_items", "required_artifacts"],
+            _source_refs(baseline_pack, "runs/example-run.json"),
+            _join_or_default(
+                baseline_pack.get("missing_items"),
+                "Same-sample boring comparators must be recorded.",
+            ),
+            "Research: rerun the baseline ledger with same-sample comparator artifacts.",
+            "BaselineLedgerStep",
+            source_payload="/falsification-engine/current",
+            expected_artifacts=baseline_pack.get("required_artifacts", ["baseline_pack_result"]),
+        ),
+        _research_development_step(
+            3,
+            "walk_forward_ledger",
+            "Walk-forward ledger",
+            walk_forward_pack.get("status", "open"),
+            walk_forward_pack.get("owner", "Regime Skeptic"),
+            f"walk-forward robustness pack is {walk_forward_pack.get('status', 'open')}.",
+            ["packs", "queue", "open_gate_names", "missing_items", "required_artifacts"],
+            _source_refs(walk_forward_pack, "runs/example-run.json"),
+            _join_or_default(
+                walk_forward_pack.get("missing_items"),
+                "Chronological fold evidence must be recorded.",
+            ),
+            "Research: record additional offline walk-forward folds and mark fold fragility.",
+            "WalkForwardLedgerStep",
+            source_payload="/falsification-engine/current",
+            expected_artifacts=walk_forward_pack.get(
+                "required_artifacts",
+                ["walk_forward_fold_ledger"],
+            ),
+        ),
+        _research_development_step(
+            4,
+            "point_in_time_proof",
+            "Point-in-time proof",
+            pit.get("status", "needs_review"),
+            "Leak Auditor",
+            f"Point-in-time contract is {pit.get('status', 'needs_review')}.",
+            ["contract_schema", "allowed_fields", "fields", "gaps", "source_refs"],
+            _source_refs(pit.get("source_refs", {}), "runs/example-run.json"),
+            _join_or_default(
+                [gap.get("id") for gap in pit.get("gaps", [])],
+                "Known-at-time field lineage must stay source-referenced.",
+            ),
+            "Research: resolve open point-in-time gaps before trusting any field.",
+            "PointInTimeProofStep",
+            source_payload="/point-in-time-contract/current",
+            contract_refs=[pit.get("contract_schema", "point_in_time_contract.v1")],
+        ),
+        _research_development_step(
+            5,
+            "agent_reviewer_artifacts",
+            "Measurable agent reviewer artifacts",
+            "open" if any(contract.get("open_finding_count", 0) for contract in contracts) else "ready",
+            "Reproducibility Clerk",
+            f"{sum(contract.get('open_finding_count', 0) for contract in contracts)} open reviewer findings are measurable.",
+            ["agent_contracts", "open_finding_count", "required_output_fields", "source_refs"],
+            _source_refs({"source_refs": [ref for contract in contracts for ref in contract.get("source_refs", [])]}, "runs/example-run.json"),
+            _join_or_default(
+                [finding.get("gate_name") for finding in findings if finding.get("status") != "pass"],
+                "Agent findings must include status, severity, source refs, and next falsification step.",
+            ),
+            "Research: attach measurable reviewer findings to each owned evidence gap.",
+            "AgentReviewerArtifactStep",
+            source_payload="/agent-contracts",
+            measurement_fields=["open_finding_count", "required_output_fields", "source_refs"],
+        ),
+        _research_development_step(
+            6,
+            "failure_gallery",
+            "Failure gallery",
+            "open" if gallery.get("failed_or_blocked_claims") else "ready",
+            "Baseline Challenger",
+            f"{len(gallery.get('failed_or_blocked_claims', []))} failed or blocked claims are visible.",
+            ["failed_or_blocked_claims", "learning_value", "next_archive_action"],
+            _source_refs(first_failure, "runs/example-run.json"),
+            first_failure.get("primary_failure_reason", "No blocked claim failure reason is recorded."),
+            "Research: archive the failure reason and reviewer notes as training memory.",
+            "FailureGalleryStep",
+            source_payload="/failure-gallery",
+        ),
+        _research_development_step(
+            7,
+            "readiness_evidence",
+            "Readiness evidence",
+            "blocked" if not readiness.get("promotion_ready") else "ready",
+            "Promotion Gatekeeper",
+            f"Readiness stage is {readiness.get('current_stage', {}).get('label', 'Observe-only')}.",
+            ["append_only_entries", "sample_thresholds", "missing_checks", "source_refs"],
+            _source_refs(readiness, "runs/example-run.json"),
+            first_missing.get("label") or first_missing.get("id") or "Human review and sample thresholds must be recorded.",
+            "Research: clear the first readiness blocker before changing product language.",
+            "ReadinessEvidenceStep",
+            source_payload="/readiness/ledger",
+        ),
+        _research_development_step(
+            8,
+            "hardened_response_schemas",
+            "Hardened response schemas",
+            "ready",
+            "Reproducibility Clerk",
+            "Release-rule, claim-journey, and R&D pass schemas are exposed in the response.",
+            ["product_release_rule", "claim_journey", "research_development_pass", "response_schema"],
+            _source_refs(product_rule, "packages/contracts/openapi/trading-lab.v0.yaml"),
+            "OpenAPI schema fields must remain required before a surface is treated as shippable.",
+            "Research: validate schema required fields before adding new release surfaces.",
+            "HardenedResponseSchemaStep",
+            source_payload="/platform/overview",
+            schema_refs=[
+                "ProductReleaseRule",
+                "ClaimJourney",
+                "ResearchDevelopmentPass",
+                "ResearchDevelopmentStep",
+            ],
+            claim_journey_step_count=len(claim_journey.get("steps", [])),
+        ),
+    ]
+    return {
+        "mode": "research_only",
+        "schema_version": "research_development_pass.v1",
+        "boundary": "offline R&D evidence only; not a trade instruction",
+        "steps": steps,
+        "forbidden_outputs": RESEARCH_DEVELOPMENT_FORBIDDEN_OUTPUTS,
+        "response_schema": {
+            "name": "ResearchDevelopmentPass",
+            "required_fields": [
+                "mode",
+                "schema_version",
+                "boundary",
+                "steps",
+                "forbidden_outputs",
+            ],
+            "openapi_refs": [
+                "ResearchDevelopmentPass",
+                "ResearchDevelopmentStep",
+            ],
+        },
+    }
+
+
 def terminal_payload() -> dict[str, Any]:
     """Return the compact terminal view assembled from existing evidence only."""
 
@@ -119,9 +530,27 @@ def terminal_payload() -> dict[str, Any]:
         evidence_rigor=evidence_rigor,
         ranked_attention_items=ranked_attention_items,
     )
+    product_rule = product_release_rule_payload(
+        run=run,
+        readiness=readiness,
+        blockers=blockers,
+        control_plane=control_plane,
+        ranked_attention_items=ranked_attention_items,
+    )
+    claim_journey = claim_journey_payload(
+        run=run,
+        snapshot=snapshot,
+        readiness=readiness,
+        blockers=blockers,
+        control_plane=control_plane,
+        ranked_attention_items=ranked_attention_items,
+        evidence_rigor=evidence_rigor,
+    )
 
     return {
         "mode": "research_only",
+        "product_release_rule": product_rule,
+        "claim_journey": claim_journey,
         "headline": _headline(run, event, freshness),
         "readiness_verdict": _readiness_verdict(run, snapshot, spread_bps, freshness, blockers),
         "market": {
@@ -210,6 +639,22 @@ def platform_payload() -> dict[str, Any]:
         agentic_review=agentic_review,
         control_plane=control_plane,
     )
+    payload["product_release_rule"] = product_release_rule_payload(
+        run=run,
+        readiness=readiness,
+        blockers=blockers,
+        control_plane=control_plane,
+        ranked_attention_items=ranked_attention_items,
+    )
+    payload["claim_journey"] = claim_journey_payload(
+        run=run,
+        snapshot=snapshot,
+        readiness=readiness,
+        blockers=blockers,
+        control_plane=control_plane,
+        ranked_attention_items=ranked_attention_items,
+        evidence_rigor=evidence_rigor,
+    )
     payload["strategy_import_preview"] = strategy_import_preview_payload(
         {
             "source_type": "plain_language_claim",
@@ -220,6 +665,10 @@ def platform_payload() -> dict[str, Any]:
             ),
             "source_ref": "manual:intake:example",
         }
+    )
+    payload["research_development_pass"] = research_development_pass_payload(
+        platform=payload,
+        agentic_review=agentic_review,
     )
     return payload
 
@@ -498,6 +947,71 @@ def _evidence_passport(run: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _research_development_step(
+    step_number: int,
+    step_id: str,
+    title: str,
+    status: str,
+    owner: str,
+    current_research_state: str,
+    visible_api_fields: list[str],
+    source_refs: list[str],
+    missing_proof: str,
+    next_safe_research_action: str,
+    schema_name: str,
+    **extra: Any,
+) -> dict[str, Any]:
+    payload = {
+        "step_number": step_number,
+        "id": step_id,
+        "title": title,
+        "status": status if status in {"ready", "open", "blocked", "needs_review"} else "open",
+        "owner": owner,
+        "current_research_state": current_research_state,
+        "visible_api_fields": visible_api_fields,
+        "source_refs": source_refs or ["runs/example-run.json"],
+        "missing_proof": missing_proof,
+        "next_safe_research_action": next_safe_research_action,
+        "response_schema": {
+            "name": schema_name,
+            "required_fields": RESEARCH_DEVELOPMENT_STEP_REQUIRED_FIELDS,
+            "forbidden_outputs": RESEARCH_DEVELOPMENT_FORBIDDEN_OUTPUTS,
+        },
+    }
+    payload.update(extra)
+    return payload
+
+
+def _pack_by_id(engine: dict[str, Any], pack_id: str) -> dict[str, Any]:
+    return next(
+        (pack for pack in engine.get("packs", []) if pack.get("pack_id") == pack_id),
+        {},
+    )
+
+
+def _source_refs(payload: dict[str, Any], fallback: str) -> list[str]:
+    values: list[Any] = []
+    source_refs = payload.get("source_refs")
+    if isinstance(source_refs, list):
+        values.extend(source_refs)
+    elif isinstance(source_refs, dict):
+        values.extend(source_refs.values())
+    for key in ("source_ref", "source", "path"):
+        if payload.get(key):
+            values.append(payload[key])
+    refs = [str(value) for value in values if str(value).strip()]
+    if fallback:
+        refs.append(fallback)
+    return list(dict.fromkeys(refs))
+
+
+def _join_or_default(values: Any, default: str) -> str:
+    if not isinstance(values, list):
+        return default
+    clean = [str(value) for value in values if str(value).strip()]
+    return ", ".join(clean) if clean else default
+
+
 class TradingLabHandler(BaseHTTPRequestHandler):
     server_version = "TradingLabAPI/0.1"
 
@@ -553,6 +1067,8 @@ class TradingLabHandler(BaseHTTPRequestHandler):
                 )
             elif route == "/failure-gallery":
                 self._send_json(platform_payload()["failure_gallery"])
+            elif route == "/research-development/pass":
+                self._send_json(research_development_pass_payload())
             elif route == "/confidence/readiness":
                 self._send_json(confidence_readiness_payload())
             elif route == "/readiness/artifacts":
@@ -584,6 +1100,7 @@ class TradingLabHandler(BaseHTTPRequestHandler):
                             "/strategy-import/preview",
                             "/strategy-import/example-preview",
                             "/failure-gallery",
+                            "/research-development/pass",
                             "/confidence/readiness",
                             "/readiness/artifacts",
                             "/agentic/review",
@@ -633,7 +1150,12 @@ class TradingLabHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def _send_common_headers(self, *, content_length: int) -> None:
-        self.send_header("Access-Control-Allow-Origin", "http://127.0.0.1:5199")
+        origin = self.headers.get("Origin")
+        self.send_header(
+            "Access-Control-Allow-Origin",
+            origin if origin in ALLOWED_WEB_ORIGINS else "http://127.0.0.1:5199",
+        )
+        self.send_header("Vary", "Origin")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.send_header("Cache-Control", "no-store")

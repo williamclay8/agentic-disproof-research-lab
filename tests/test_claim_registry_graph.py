@@ -39,20 +39,31 @@ def test_claim_run_registry_derives_records_from_existing_artifacts():
     assert payload["mode"] == "research_only"
     assert payload["boundary"] == "offline research falsification only"
     assert [claim["claim_id"] for claim in payload["claims"]] == [
+        "985monitor-fomo-wallet-falsification",
         "toy-moving-average-crossover"
     ]
-    assert payload["claims"][0]["source_ref"] == (
+    fomo_claim = payload["claims"][0]
+    toy_claim = payload["claims"][1]
+    assert fomo_claim["source_ref"] == (
+        "hypotheses/985monitor-fomo-wallet-falsification.json"
+    )
+    assert fomo_claim["run_ids"] == []
+    assert fomo_claim["latest_verdict"] is None
+    assert fomo_claim["open_gate_names"] == []
+    assert fomo_claim["research_only"] is True
+    assert toy_claim["source_ref"] == (
         "hypotheses/toy-moving-average-crossover.json"
     )
-    assert payload["claims"][0]["run_ids"] == [
+    assert toy_claim["run_ids"] == [
         "toy-moving-average-crossover-52635e40"
     ]
-    assert payload["claims"][0]["latest_verdict"] == "inconclusive"
-    assert payload["claims"][0]["open_gate_names"] == [
+    assert toy_claim["latest_verdict"] == "inconclusive"
+    assert toy_claim["open_gate_names"] == [
         "baseline comparison",
         "walk-forward robustness",
     ]
-    assert len(payload["claims"][0]["artifact_hash"]) == 64
+    assert len(fomo_claim["artifact_hash"]) == 64
+    assert len(toy_claim["artifact_hash"]) == 64
 
     assert [run["run_id"] for run in payload["runs"]] == [
         "toy-moving-average-crossover-52635e40"

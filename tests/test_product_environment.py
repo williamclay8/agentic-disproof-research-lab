@@ -5,12 +5,14 @@ import json
 from pathlib import Path
 
 from apps.api.server import (
+    ALLOWED_WEB_ORIGINS,
     claim_payload,
     claims_payload,
     control_plane_payload,
     health_payload,
     latest_snapshot_payload,
     platform_payload,
+    research_development_pass_payload,
     run_payload,
     strategy_import_preview_payload,
     terminal_payload,
@@ -20,6 +22,131 @@ from trading_lab.control_plane import build_active_mission
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+RELEASE_RULE_KEYS = {
+    "current_research_state",
+    "plain_english_meaning",
+    "missing_proof",
+    "next_safe_research_action",
+}
+CLAIM_JOURNEY_STEP_IDS = [
+    "what_are_we_testing",
+    "simple_baseline",
+    "fooling_risks",
+    "evidence_origin",
+    "research_readiness",
+    "next_research_test",
+]
+R_AND_D_STEP_IDS = [
+    "action_native_first_move",
+    "baseline_ledger",
+    "walk_forward_ledger",
+    "point_in_time_proof",
+    "agent_reviewer_artifacts",
+    "failure_gallery",
+    "readiness_evidence",
+    "hardened_response_schemas",
+]
+R_AND_D_STEP_REQUIRED_FIELDS = {
+    "id",
+    "title",
+    "status",
+    "owner",
+    "current_research_state",
+    "visible_api_fields",
+    "source_refs",
+    "missing_proof",
+    "next_safe_research_action",
+    "response_schema",
+}
+
+
+def assert_release_rule_answers(rule: dict) -> None:
+    assert RELEASE_RULE_KEYS <= set(rule)
+    for key in RELEASE_RULE_KEYS:
+        assert isinstance(rule[key], str)
+        assert rule[key].strip()
+    serialized = json.dumps(rule).lower()
+    assert "buy now" not in serialized
+    assert "sell now" not in serialized
+    assert "submit order" not in serialized
+    assert "position size" not in serialized
+
+
+def assert_claim_journey_steps(journey: dict) -> None:
+    assert journey["mode"] == "research_only"
+    assert [step["id"] for step in journey["steps"]] == CLAIM_JOURNEY_STEP_IDS
+    for index, step in enumerate(journey["steps"], start=1):
+        assert step["step_number"] == index
+        assert step["title"].strip()
+        assert step["question"].strip().endswith("?")
+        assert step["current_research_state"].strip()
+        assert step["plain_english_meaning"].strip()
+        assert step["missing_proof"].strip()
+        assert step["next_safe_research_action"].startswith("Research:")
+        assert step["source_ref"].strip()
+        serialized = json.dumps(step).lower()
+        assert "buy now" not in serialized
+        assert "sell now" not in serialized
+        assert "submit order" not in serialized
+        assert "broker api key" not in serialized
+
+
+def assert_research_development_pass(pass_payload: dict) -> None:
+    assert pass_payload["mode"] == "research_only"
+    assert pass_payload["schema_version"] == "research_development_pass.v1"
+    assert pass_payload["boundary"] == "offline R&D evidence only; not a trade instruction"
+    assert [step["id"] for step in pass_payload["steps"]] == R_AND_D_STEP_IDS
+    assert pass_payload["response_schema"]["required_fields"] == [
+        "mode",
+        "schema_version",
+        "boundary",
+        "steps",
+        "forbidden_outputs",
+    ]
+    assert "ResearchDevelopmentPass" in pass_payload["response_schema"]["openapi_refs"]
+    assert "ResearchDevelopmentStep" in pass_payload["response_schema"]["openapi_refs"]
+    assert "personalized recommendation" in pass_payload["forbidden_outputs"]
+    assert "broker/account/order route" in pass_payload["forbidden_outputs"]
+
+    for index, step in enumerate(pass_payload["steps"], start=1):
+        assert R_AND_D_STEP_REQUIRED_FIELDS <= set(step)
+        assert step["step_number"] == index
+        assert step["title"].strip()
+        assert step["status"] in {"ready", "open", "blocked", "needs_review"}
+        assert step["owner"].strip()
+        assert step["current_research_state"].strip()
+        assert isinstance(step["visible_api_fields"], list)
+        assert step["visible_api_fields"]
+        assert isinstance(step["source_refs"], list)
+        assert step["source_refs"]
+        assert step["missing_proof"].strip()
+        assert step["next_safe_research_action"].startswith("Research:")
+        assert step["response_schema"]["name"].strip()
+        assert step["response_schema"]["required_fields"]
+        assert "source_refs" in step["response_schema"]["required_fields"]
+        assert step["response_schema"]["forbidden_outputs"] == pass_payload["forbidden_outputs"]
+
+    by_id = {step["id"]: step for step in pass_payload["steps"]}
+    assert by_id["action_native_first_move"]["native_action"]["route"] == "/strategy-import/preview"
+    assert by_id["action_native_first_move"]["native_action"]["method"] == "POST"
+    assert by_id["action_native_first_move"]["native_action"]["default_state"] == "quarantine_until_evidence_exists"
+    assert "baseline_pack" in by_id["baseline_ledger"]["visible_api_fields"]
+    assert "baseline comparison" in by_id["baseline_ledger"]["current_research_state"]
+    assert "walk_forward_fold_ledger" in by_id["walk_forward_ledger"]["expected_artifacts"]
+    assert by_id["point_in_time_proof"]["source_payload"] == "/point-in-time-contract/current"
+    assert "point_in_time_contract.v1" in by_id["point_in_time_proof"]["contract_refs"]
+    assert "open_finding_count" in by_id["agent_reviewer_artifacts"]["measurement_fields"]
+    assert by_id["failure_gallery"]["source_payload"] == "/failure-gallery"
+    assert by_id["readiness_evidence"]["source_payload"] == "/readiness/ledger"
+    assert "append_only_entries" in by_id["readiness_evidence"]["visible_api_fields"]
+    assert "ProductReleaseRule" in by_id["hardened_response_schemas"]["schema_refs"]
+    assert "ClaimJourney" in by_id["hardened_response_schemas"]["schema_refs"]
+
+    serialized = json.dumps(pass_payload).lower()
+    assert "buy now" not in serialized
+    assert "sell now" not in serialized
+    assert "submit order" not in serialized
+    assert "broker api key" not in serialized
 
 
 def test_product_lane_files_exist_and_keep_trading_lab_standalone():
@@ -53,6 +180,11 @@ def test_api_health_payload_has_no_execution_or_advice_surface():
     assert payload["advice"] == "disabled"
 
 
+def test_api_cors_allows_localhost_and_loopback_web_shells():
+    assert "http://127.0.0.1:5199" in ALLOWED_WEB_ORIGINS
+    assert "http://localhost:5199" in ALLOWED_WEB_ORIGINS
+
+
 def test_api_payloads_read_existing_evidence_artifacts():
     run = run_payload()
     snapshot = latest_snapshot_payload()
@@ -81,6 +213,8 @@ def test_terminal_payload_ranks_attention_without_advice_or_execution():
     payload = terminal_payload()
 
     assert payload["mode"] == "research_only"
+    assert_release_rule_answers(payload["product_release_rule"])
+    assert_claim_journey_steps(payload["claim_journey"])
     assert payload["readiness_verdict"]["label"] == "Not live-signal ready"
     assert payload["readiness_verdict"]["action_ready"] is False
     assert payload["setup_visibility"]["visibility_stage"] in {
@@ -186,6 +320,31 @@ def test_control_plane_payload_turns_evidence_into_lab_workflows():
         "Comparator weakness",
         "Fold fragility",
     ]
+    json.dumps(payload)
+
+
+def test_platform_payload_exposes_same_product_release_rule():
+    payload = platform_payload()
+
+    assert_release_rule_answers(payload["product_release_rule"])
+    assert_claim_journey_steps(payload["claim_journey"])
+    assert payload["product_release_rule"]["current_research_state"]
+    assert "research" in payload["product_release_rule"]["next_safe_research_action"].lower()
+    json.dumps(payload)
+
+
+def test_research_development_pass_exposes_eight_hardened_steps():
+    payload = research_development_pass_payload()
+
+    assert_research_development_pass(payload)
+    json.dumps(payload)
+
+
+def test_platform_payload_exposes_research_development_pass():
+    payload = platform_payload()
+
+    assert_research_development_pass(payload["research_development_pass"])
+    assert payload["research_development_pass"]["steps"][0]["native_action"]["route"] == "/strategy-import/preview"
     json.dumps(payload)
 
 
@@ -348,6 +507,35 @@ def test_web_copy_blocks_recommendation_and_execution_language():
     ]
 
     assert "Decision Cockpit" in html
+    assert "Product Release Rule" in html
+    assert 'id="product-release-rule-grid"' in html
+    assert "renderProductReleaseRule" in html
+    assert "current_research_state" in html
+    assert "Claim Journey" in html
+    assert 'id="claim-journey-steps"' in html
+    assert "renderClaimJourney" in html
+    assert "What are we testing?" in html
+    assert "Can it beat a simple baseline?" in html
+    assert "What could be fooling us?" in html
+    assert "Where did this evidence come from?" in html
+    assert "Is this ready for more research?" in html
+    assert "What should we test next?" in html
+    assert "Guided Lab" in html
+    assert "Claim Card" in html
+    assert "Plain-English controls" in html
+    assert "Research Desk" in html
+    assert "Professional audit map" in html
+    assert "Agentic trading without the money-machine myth" in html
+    assert "R&D Pass" in html
+    assert 'id="research-development-pass"' in html
+    assert "renderResearchDevelopmentPass" in html
+    assert "Action-native first move" in html
+    assert "Baseline ledger" in html
+    assert "Walk-forward ledger" in html
+    assert "Point-in-time proof" in html
+    assert "Measurable agent reviewer artifacts" in html
+    assert "Readiness evidence" in html
+    assert "Hardened response schemas" in html
     assert "What matters now" in html
     assert "What this means" in html
     assert "Inspect next" in html
@@ -429,9 +617,39 @@ def test_openapi_contract_excludes_order_and_account_routes():
     assert "/strategy-import/contract" in contract
     assert "/strategy-import/preview" in contract
     assert "/failure-gallery" in contract
+    assert "/research-development/pass" in contract
+    assert "product_release_rule" in contract
+    assert "claim_journey" in contract
+    assert "research_development_pass" in contract
+    assert "ResearchDevelopmentPass" in contract
+    assert "ResearchDevelopmentStep" in contract
+    assert "action_native_first_move" in contract
+    assert "baseline_ledger" in contract
+    assert "walk_forward_ledger" in contract
+    assert "point_in_time_proof" in contract
+    assert "agent_reviewer_artifacts" in contract
+    assert "hardened_response_schemas" in contract
+    assert "what_are_we_testing" in contract
+    assert "current_research_state" in contract
+    assert "next_safe_research_action" in contract
     assert "/orders" not in contract
     assert "/accounts" not in contract
     assert "execution routes" in contract
+
+
+def test_product_environment_documents_release_rule_gate():
+    doc = (PROJECT_ROOT / "docs/architecture/product-environment.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "Product Release Rule" in doc
+    assert "current research state" in doc
+    assert "plain English" in doc
+    assert "missing proof" in doc
+    assert "next safe research action" in doc
+    assert "Claim Journey" in doc
+    assert "What are we testing?" in doc
+    assert "What should we test next?" in doc
 
 
 def test_compose_has_local_parity_services_without_secrets():

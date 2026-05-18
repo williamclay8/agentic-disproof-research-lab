@@ -30,7 +30,7 @@ paths:
       summary: Read the compact ranked falsification terminal overview
       responses:
         "200":
-          description: Research-only attention queue, evidence summary, and observation provenance
+          description: Research-only attention queue, evidence summary, observation provenance, claim_journey, and product_release_rule answers
   /control-plane/lab:
     get:
       summary: Read the research lab control plane
@@ -42,7 +42,7 @@ paths:
       summary: Read the full agentic claim-disproof platform overview
       responses:
         "200":
-          description: Research-only wedge payload spanning claim registry, evidence graph, falsification packs, readiness ledger, and trust packet
+          description: Research-only wedge payload spanning claim registry, evidence graph, falsification packs, readiness ledger, trust packet, claim_journey, product_release_rule answers, and research_development_pass
   /claims:
     get:
       summary: Read the claim registry
@@ -138,6 +138,12 @@ paths:
       responses:
         "200":
           description: Research-only archive of dead, blocked, and lesson-bearing claims
+  /research-development/pass:
+    get:
+      summary: Read the eight-step research and development pass
+      responses:
+        "200":
+          description: Research-only action-native first move, baseline_ledger, walk_forward_ledger, point_in_time_proof, agent_reviewer_artifacts, failure_gallery, readiness_evidence, and hardened_response_schemas
   /confidence/readiness:
     get:
       summary: Read evidence maturity gates for future setup visibility
@@ -162,3 +168,173 @@ paths:
       responses:
         "200":
           description: Research-only evidence rigor score, gaps, and baseline descriptors
+components:
+  schemas:
+    ProductReleaseRule:
+      type: object
+      description: Four answers every Trading Lab release surface must expose before it is shippable.
+      required:
+        - current_research_state
+        - plain_english_meaning
+        - missing_proof
+        - next_safe_research_action
+      properties:
+        current_research_state:
+          type: string
+        plain_english_meaning:
+          type: string
+        missing_proof:
+          type: string
+        next_safe_research_action:
+          type: string
+    ClaimJourney:
+      type: object
+      description: Six-step research-only journey from claim framing to next falsification test.
+      required:
+        - mode
+        - steps
+      properties:
+        mode:
+          type: string
+          const: research_only
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClaimJourneyStep"
+    ClaimJourneyStep:
+      type: object
+      required:
+        - step_number
+        - id
+        - title
+        - question
+        - current_research_state
+        - plain_english_meaning
+        - missing_proof
+        - next_safe_research_action
+        - source_ref
+      properties:
+        step_number:
+          type: integer
+        id:
+          type: string
+          enum:
+            - what_are_we_testing
+            - simple_baseline
+            - fooling_risks
+            - evidence_origin
+            - research_readiness
+            - next_research_test
+        title:
+          type: string
+        question:
+          type: string
+        current_research_state:
+          type: string
+        plain_english_meaning:
+          type: string
+        missing_proof:
+          type: string
+        next_safe_research_action:
+          type: string
+        source_ref:
+          type: string
+    ResearchDevelopmentPass:
+      type: object
+      description: Eight-step R&D pass for product, API, UI, and contract release surfaces.
+      required:
+        - mode
+        - schema_version
+        - boundary
+        - steps
+        - forbidden_outputs
+      properties:
+        mode:
+          type: string
+          const: research_only
+        schema_version:
+          type: string
+          const: research_development_pass.v1
+        boundary:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResearchDevelopmentStep"
+        forbidden_outputs:
+          type: array
+          items:
+            type: string
+        response_schema:
+          $ref: "#/components/schemas/HardenedResponseSchema"
+    ResearchDevelopmentStep:
+      type: object
+      required:
+        - step_number
+        - id
+        - title
+        - status
+        - owner
+        - current_research_state
+        - visible_api_fields
+        - source_refs
+        - missing_proof
+        - next_safe_research_action
+        - response_schema
+      properties:
+        step_number:
+          type: integer
+        id:
+          type: string
+          enum:
+            - action_native_first_move
+            - baseline_ledger
+            - walk_forward_ledger
+            - point_in_time_proof
+            - agent_reviewer_artifacts
+            - failure_gallery
+            - readiness_evidence
+            - hardened_response_schemas
+        title:
+          type: string
+        status:
+          type: string
+          enum:
+            - ready
+            - open
+            - blocked
+            - needs_review
+        owner:
+          type: string
+        current_research_state:
+          type: string
+        visible_api_fields:
+          type: array
+          items:
+            type: string
+        source_refs:
+          type: array
+          items:
+            type: string
+        missing_proof:
+          type: string
+        next_safe_research_action:
+          type: string
+        response_schema:
+          $ref: "#/components/schemas/HardenedResponseSchema"
+    HardenedResponseSchema:
+      type: object
+      required:
+        - name
+        - required_fields
+      properties:
+        name:
+          type: string
+        required_fields:
+          type: array
+          items:
+            type: string
+        forbidden_outputs:
+          type: array
+          items:
+            type: string

@@ -114,7 +114,26 @@ def test_readiness_ledger_summary_is_append_only_and_source_referenced():
     assert [entry["sequence"] for entry in ledger["entries"]] == [1, 2, 3, 4]
     assert {entry["artifact"] for entry in ledger["entries"]} == set(READINESS_PATHS)
     assert all(entry["source_ref"].startswith("runs/readiness/") for entry in ledger["entries"])
+    assert all(entry["source_refs"] == [entry["source_ref"]] for entry in ledger["entries"])
     assert all(len(entry["record_hash"]) == 64 for entry in ledger["entries"])
+    entries = {entry["artifact"]: entry for entry in ledger["entries"]}
+    assert entries["paper_ledger"]["artifact_type"] == "paper_observation_ledger"
+    assert entries["paper_ledger"]["owned_by"] == "Promotion Gatekeeper"
+    assert entries["paper_ledger"]["sample_count"] == 6
+    assert entries["live_shadow_drift"]["artifact_type"] == "live_shadow_drift_monitor"
+    assert entries["live_shadow_drift"]["measured_metrics"] == [
+        "expected_vs_observed_return_delta",
+        "max_allowed_delta",
+        "provider_mismatch_count",
+        "quote_freshness_failures",
+    ]
+    assert entries["calibration_history"]["measured_metrics"] == [
+        "brier_score",
+        "predicted_probability",
+        "realized_frequency",
+    ]
+    assert entries["risk_packet"]["risk_controls_present"] is True
+    assert entries["risk_packet"]["human_review_recorded"] is False
     assert "paper_ledger_sample_count" in {
         check["id"] for check in ledger["missing_failed_checks"]
     }

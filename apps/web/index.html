@@ -160,6 +160,26 @@
         min-width: 0;
       }
 
+      .persona-strip {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
+      .lens-button {
+        background: rgba(255, 255, 255, 0.035);
+        min-height: 38px;
+        padding: 8px 11px;
+      }
+
+      .lens-button.active {
+        background: rgba(97, 216, 234, 0.14);
+        border-color: rgba(97, 216, 234, 0.42);
+        color: var(--cyan);
+      }
+
       a.pill {
         text-decoration: none;
       }
@@ -524,6 +544,176 @@
         gap: 12px;
         grid-template-columns: 220px minmax(0, 1fr) 340px;
         margin-top: 12px;
+      }
+
+      .guided-lead {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.72fr);
+      }
+
+      .claim-card {
+        display: grid;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .claim-card strong {
+        font-size: 25px;
+        line-height: 1.12;
+        text-wrap: balance;
+      }
+
+      .safe-route-grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .route-button {
+        align-items: start;
+        border-color: rgba(218, 232, 250, 0.16);
+        display: grid;
+        gap: 5px;
+        justify-items: start;
+        min-height: 68px;
+        text-align: left;
+      }
+
+      .route-button strong {
+        color: var(--text);
+        font-size: 13px;
+      }
+
+      .route-button span {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .route-button.primary {
+        background: rgba(244, 201, 111, 0.1);
+        border-color: rgba(244, 201, 111, 0.34);
+      }
+
+      .decision-strip {
+        display: grid;
+        gap: 0;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .journey-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .journey-step {
+        background: rgba(255, 255, 255, 0.026);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 42px minmax(0, 0.86fr) minmax(220px, 0.58fr);
+        min-width: 0;
+        padding: 12px;
+      }
+
+      .journey-index {
+        align-items: center;
+        background: rgba(97, 216, 234, 0.12);
+        border: 1px solid rgba(97, 216, 234, 0.28);
+        border-radius: 999px;
+        color: var(--cyan);
+        display: inline-flex;
+        font-weight: 760;
+        height: 32px;
+        justify-content: center;
+        width: 32px;
+      }
+
+      .journey-main,
+      .journey-proof {
+        display: grid;
+        gap: 5px;
+        min-width: 0;
+      }
+
+      .journey-main strong {
+        font-size: 16px;
+        line-height: 1.25;
+      }
+
+      .journey-proof {
+        border-left: 1px solid var(--line);
+        padding-left: 12px;
+      }
+
+      .decision-cell {
+        border-top: 1px solid var(--line);
+        display: grid;
+        gap: 5px;
+        min-height: 92px;
+        padding: 12px 12px 0 0;
+      }
+
+      .decision-cell + .decision-cell {
+        border-left: 1px solid var(--line);
+        padding-left: 12px;
+      }
+
+      .decision-cell strong {
+        font-size: 18px;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.15;
+      }
+
+      .guided-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      }
+
+      .translation-grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .translation-row {
+        border-top: 1px solid var(--line);
+        display: grid;
+        gap: 5px;
+        padding-top: 10px;
+      }
+
+      .translation-row strong {
+        font-size: 13px;
+      }
+
+      .desk-intro {
+        background:
+          linear-gradient(135deg, rgba(126, 219, 146, 0.09), transparent 34%),
+          linear-gradient(180deg, rgba(244, 201, 111, 0.06), rgba(97, 216, 234, 0.035)),
+          rgba(22, 24, 21, 0.92);
+      }
+
+      .desk-map {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .desk-map button {
+        align-content: start;
+        display: grid;
+        gap: 4px;
+        justify-items: start;
+        text-align: left;
+      }
+
+      .desk-map span {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
       }
 
       .rail,
@@ -938,6 +1128,22 @@
         display: none !important;
       }
 
+      body[data-lens="plain"] .expert-lens,
+      body[data-lens="expert"] .plain-lens {
+        display: none !important;
+      }
+
+      body[data-lens="plain"] .command-surface,
+      body[data-lens="plain"] .basis,
+      body[data-lens="plain"] .rail-review {
+        display: none;
+      }
+
+      body[data-lens="plain"] .shell {
+        grid-template-columns: 220px minmax(0, 1fr);
+        margin-top: 0;
+      }
+
       @media (max-width: 1180px) {
         .hero,
         .shell,
@@ -977,10 +1183,16 @@
         .topbar,
         .verdict-line,
         .surface-head,
+        .guided-lead,
         .split,
         .two-up,
         .three-up,
         .meaning-grid,
+          .decision-strip,
+          .guided-grid,
+          .translation-grid,
+          .desk-map,
+          .journey-step,
           .gate-row,
           .gap-row,
           .task-row,
@@ -999,6 +1211,18 @@
         .brief-item + .brief-item {
           border-left: 0;
           padding-left: 0;
+        }
+
+        .decision-cell + .decision-cell {
+          border-left: 0;
+          padding-left: 0;
+        }
+
+        .journey-proof {
+          border-left: 0;
+          border-top: 1px solid var(--line);
+          padding-left: 0;
+          padding-top: 10px;
         }
 
         .nav-stack {
@@ -1082,23 +1306,29 @@
       }
     </style>
   </head>
-  <body data-view="overview">
+  <body data-view="overview" data-lens="plain">
     <main>
       <header class="topbar">
         <div class="brand">
           <p class="eyebrow">Agentic Trading Lab</p>
-          <h1>Research Ops Console</h1>
+          <h1>Trading Lab Decision Cockpit</h1>
           <p>
-            Local falsification for research claims, evidence gaps, agent
-            missions, bounded observations, and learning loops. Research only.
+            Bring a trading claim. The lab shows what evidence exists, what
+            breaks, and why the result stays research-only until the proof survives.
           </p>
         </div>
-        <div class="system-pills" aria-label="System status">
-          <span id="api-pill" class="pill ok">API-backed</span>
-          <span class="pill warn">Research only</span>
-          <span id="freshness-pill" class="pill">Quote unknown</span>
-          <span id="data-mode-pill" class="pill">Data mode unknown</span>
-          <a class="pill cyan" href="http://127.0.0.1:5199">Live local view</a>
+        <div class="persona-strip">
+          <div class="system-pills" aria-label="System status">
+            <span id="api-pill" class="pill ok">API-backed</span>
+            <span class="pill warn">Research only</span>
+            <span id="freshness-pill" class="pill">Quote unknown</span>
+            <span id="data-mode-pill" class="pill">Data mode unknown</span>
+            <a class="pill cyan" href="http://127.0.0.1:5199">Live local view</a>
+          </div>
+          <div class="tabs" aria-label="Interface lens">
+            <button class="lens-button active" type="button" data-lens-target="plain">Plain</button>
+            <button class="lens-button" type="button" data-lens-target="expert">Expert</button>
+          </div>
         </div>
       </header>
 
@@ -1198,16 +1428,17 @@
           <div>
             <p class="eyebrow">Views</p>
             <div class="nav-stack">
-              <button class="nav-button active" type="button" data-view-target="overview" aria-pressed="true">Now</button>
-              <button class="nav-button" type="button" data-view-target="platform" aria-pressed="false">Platform</button>
-              <button class="nav-button" type="button" data-view-target="tasks" aria-pressed="false">Tasks</button>
-              <button class="nav-button" type="button" data-view-target="agents" aria-pressed="false">Agent Ownership</button>
-              <button class="nav-button" type="button" data-view-target="evidence" aria-pressed="false">Evidence Gaps</button>
-              <button class="nav-button" type="button" data-view-target="provenance" aria-pressed="false">Provenance Trace</button>
-              <button class="nav-button" type="button" data-view-target="raw" aria-pressed="false">Evidence Ledger</button>
+              <button class="nav-button active" type="button" data-view-target="overview" aria-pressed="true">Guided Lab</button>
+              <button class="nav-button" type="button" data-view-target="learn" aria-pressed="false">Learn</button>
+              <button class="nav-button" type="button" data-view-target="platform" aria-pressed="false">Research Desk</button>
+              <button class="nav-button" type="button" data-view-target="tasks" aria-pressed="false">Disproof Queue</button>
+              <button class="nav-button" type="button" data-view-target="agents" aria-pressed="false">Agent Review</button>
+              <button class="nav-button" type="button" data-view-target="evidence" aria-pressed="false">Gate X-Ray</button>
+              <button class="nav-button" type="button" data-view-target="provenance" aria-pressed="false">Provenance</button>
+              <button class="nav-button" type="button" data-view-target="raw" aria-pressed="false">Ledger</button>
             </div>
           </div>
-          <div>
+          <div class="rail-review">
             <p class="eyebrow">Review queue</p>
             <div id="rail-queue" class="queue-list">
               <div class="queue-item">
@@ -1219,7 +1450,86 @@
         </nav>
 
         <section class="workbench" aria-live="polite">
+          <section class="surface product-release-rule" aria-labelledby="product-release-rule-title">
+            <div class="surface-head">
+              <div>
+                <p class="eyebrow">Product Release Rule</p>
+                <h2 id="product-release-rule-title">Every release must answer the four research questions</h2>
+              </div>
+              <span class="badge warn">release gate</span>
+            </div>
+            <div id="product-release-rule-grid" class="decision-strip"></div>
+          </section>
+
           <article class="view-panel active" data-view-panel="overview">
+            <section class="surface guided-lab">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Guided Lab</p>
+                  <h2>Start with a claim, not a trade</h2>
+                </div>
+                <span class="badge warn">not a trade signal</span>
+              </div>
+              <div class="guided-lead">
+                <div id="guided-claim-card" class="claim-card">
+                  <span class="eyebrow">Claim Card</span>
+                  <strong>Loading current research claim.</strong>
+                  <p class="body-copy">The lab is assembling the thesis, verdict, blockers, and next falsification step.</p>
+                </div>
+                <aside class="action-panel">
+                  <span class="eyebrow">Safe paths</span>
+                  <div class="safe-route-grid">
+                    <button class="route-button primary" type="button" data-jump-target="platform" data-focus-id="strategy-import-text">
+                      <strong>Quarantine a research claim</strong>
+                      <span>Turn a plain-language idea into a validate-only draft with first proof requirements.</span>
+                    </button>
+                    <button class="route-button" type="button" data-jump-target="evidence">
+                      <strong>Inspect what could fool us</strong>
+                      <span>Open leakage, baseline, fold, and missing-evidence checks before trusting the claim.</span>
+                    </button>
+                    <button class="route-button" type="button" data-jump-target="platform">
+                      <strong>Open the professional desk</strong>
+                      <span>Use the registry, evidence graph, readiness ledger, and trust packet.</span>
+                    </button>
+                  </div>
+                </aside>
+              </div>
+              <div id="guided-decision-strip" class="decision-strip"></div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Claim Journey</p>
+                  <h2>All six steps from idea to next research test</h2>
+                </div>
+                <span class="badge warn">six-step release path</span>
+              </div>
+              <div id="claim-journey-steps" class="journey-list"></div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">R&D Pass</p>
+                  <h2>Eight-step research pass before any release surface</h2>
+                </div>
+                <span class="badge warn">schema locked</span>
+              </div>
+              <div id="research-development-pass" class="journey-list"></div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Plain-English controls</p>
+                  <h2>What the lab is checking before trust grows</h2>
+                </div>
+                <span class="badge warn">research only</span>
+              </div>
+              <div id="guided-translation-grid" class="translation-grid"></div>
+            </section>
+
             <section class="surface">
               <div class="surface-head">
                 <div>
@@ -1276,7 +1586,65 @@
             </section>
           </article>
 
+          <article class="view-panel" data-view-panel="learn">
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Learn</p>
+                  <h2>Agentic trading without the money-machine myth</h2>
+                </div>
+                <span class="badge warn">research artifact</span>
+              </div>
+              <div class="guided-grid">
+                <div class="claim-card">
+                  <span class="eyebrow">What this lab does</span>
+                  <strong>It turns market hunches into falsifiable research claims.</strong>
+                  <p class="body-copy">Agents act as critics, clerks, and challengers. They look for leakage, weak baselines, fragile regimes, missing costs, and evidence gaps.</p>
+                </div>
+                <div class="claim-card">
+                  <span class="eyebrow">What this lab refuses</span>
+                  <strong>No broker, account, order, live call, or personalized guidance surface.</strong>
+                  <p class="body-copy">A result can become easier to understand, but it does not become an instruction. The default state is research-only hold.</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Glossary</p>
+                  <h2>Words that decide whether a claim deserves more work</h2>
+                </div>
+              </div>
+              <div class="translation-grid">
+                <div class="translation-row"><strong>Leakage</strong><p class="body-copy">The test may be using information that would not have been known at the time.</p></div>
+                <div class="translation-row"><strong>Baseline</strong><p class="body-copy">A simple comparison point the fancy idea must beat before complexity earns attention.</p></div>
+                <div class="translation-row"><strong>Slippage</strong><p class="body-copy">The gap between a clean backtest price and the messier price a market might actually show.</p></div>
+                <div class="translation-row"><strong>Regime</strong><p class="body-copy">The market environment tested, such as calm, volatile, trending, or choppy.</p></div>
+                <div class="translation-row"><strong>Calibration</strong><p class="body-copy">Whether model confidence matches how often similar claims are actually right.</p></div>
+                <div class="translation-row"><strong>Evidence lineage</strong><p class="body-copy">The trail from data and assumptions to code, run, review, and source artifact.</p></div>
+              </div>
+            </section>
+          </article>
+
           <article class="view-panel" data-view-panel="platform">
+            <section class="surface desk-intro">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow">Research Desk</p>
+                  <h2>Professional audit map</h2>
+                </div>
+                <span class="badge warn">evidence before performance</span>
+              </div>
+              <p class="body-copy">The desk keeps performance metrics behind proof quality: point-in-time lineage, baselines, costs, walk-forward evidence, readiness samples, agent findings, and human review.</p>
+              <div class="desk-map">
+                <button type="button" data-scroll-target="claim-registry"><strong>Claims</strong><span>Registry, run state, failure memory.</span></button>
+                <button type="button" data-scroll-target="point-in-time-contract"><strong>Lineage</strong><span>Known-at-time fields and missing proof.</span></button>
+                <button type="button" data-scroll-target="falsification-engine"><strong>Disproof</strong><span>Baseline, fold, and cost stress packs.</span></button>
+                <button type="button" data-scroll-target="trust-packet"><strong>Review</strong><span>Readiness ledger and trust packet.</span></button>
+              </div>
+            </section>
+
             <section class="surface">
               <div class="surface-head">
                 <div>
@@ -1555,6 +1923,96 @@
       function staticTerminal() {
         return {
           mode: "research_only",
+          product_release_rule: {
+            current_research_state: "Observe-only: inconclusive evidence with unresolved promotion blockers.",
+            plain_english_meaning: "The current claim remains a research artifact until stronger evidence exists.",
+            missing_proof: "Fresh market observation and no warning evidence gates.",
+            next_safe_research_action: "Research: refresh bounded observation and retest the weakest baseline evidence.",
+          },
+          claim_journey: {
+            mode: "research_only",
+            boundary: "claim journey is research-only and not a trade instruction",
+            steps: [
+              {
+                step_number: 1,
+                id: "what_are_we_testing",
+                title: "What are we testing?",
+                question: "What claim is under test?",
+                status: "ok",
+                owner: "Reproducibility Clerk",
+                current_research_state: "toy-moving-average-crossover is registered with verdict inconclusive.",
+                plain_english_meaning: "A toy moving-average crossover may beat an offline comparator on the bundled sample.",
+                missing_proof: "The claim must keep a thesis, null hypothesis, dataset, and source artifact attached.",
+                next_safe_research_action: "Research: keep the claim registered and inspect the baseline evidence before trust increases.",
+                source_ref: "runs/example-run.json",
+              },
+              {
+                step_number: 2,
+                id: "simple_baseline",
+                title: "Can it beat a simple baseline?",
+                question: "Did the idea beat a boring comparison?",
+                status: "warn",
+                owner: "Baseline Challenger",
+                current_research_state: "Baseline comparison is warn.",
+                plain_english_meaning: "Comparator evidence weakened the claim.",
+                missing_proof: "random-control, equal-weight, momentum, and reversion baselines remain required.",
+                next_safe_research_action: "Research: rerun or inspect the baseline pack with same-sample comparators.",
+                source_ref: "runs/example-run.json",
+              },
+              {
+                step_number: 3,
+                id: "fooling_risks",
+                title: "What could be fooling us?",
+                question: "Could leakage, costs, slippage, or regime fragility explain the result?",
+                status: "warn",
+                owner: "Regime Skeptic",
+                current_research_state: "Weakest exposed gate is baseline comparison.",
+                plain_english_meaning: "The strategy value did not clear the baseline value.",
+                missing_proof: "More walk-forward and regime evidence is required.",
+                next_safe_research_action: "Research: inspect leakage, cost stress, slippage, and walk-forward evidence before adding trust.",
+                source_ref: "runs/example-run.json",
+              },
+              {
+                step_number: 4,
+                id: "evidence_origin",
+                title: "Where did this evidence come from?",
+                question: "Can we trace the result to data, code, source refs, and hashes?",
+                status: "ok",
+                owner: "Reproducibility Clerk",
+                current_research_state: "Evidence is anchored to runs/example-run.json and runs/live/latest.json.",
+                plain_english_meaning: "Every result should be explainable from artifacts, not dashboard copy.",
+                missing_proof: "Run artifact, snapshot provenance, source timestamps, and hashes must remain available.",
+                next_safe_research_action: "Research: open the ledger or provenance view when any result feels unclear.",
+                source_ref: "runs/live/latest.json",
+              },
+              {
+                step_number: 5,
+                id: "research_readiness",
+                title: "Is this ready for more research?",
+                question: "Can the claim advance beyond the current research stage?",
+                status: "warn",
+                owner: "Promotion Gatekeeper",
+                current_research_state: "Current stage is Observe-only with 5 blockers.",
+                plain_english_meaning: "Promotion is blocked until evidence quality and human review requirements clear.",
+                missing_proof: "Fresh market observation.",
+                next_safe_research_action: "Research: clear the first missing readiness check before changing the claim state.",
+                source_ref: "runs/example-run.json",
+              },
+              {
+                step_number: 6,
+                id: "next_research_test",
+                title: "What should we test next?",
+                question: "What is the next safe research action?",
+                status: "open",
+                owner: "Baseline Challenger",
+                current_research_state: "Retest baseline comparison against stricter offline evidence.",
+                plain_english_meaning: "The next action must stay inside offline research.",
+                missing_proof: "baseline_pack_result",
+                next_safe_research_action: "Research: Retest baseline comparison against stricter offline evidence.",
+                source_ref: "runs/example-run.json",
+              },
+            ],
+          },
           headline: "BTC/USD: observe only; evidence verdict is inconclusive; quote is stale.",
           readiness_verdict: {
             label: "Not live-signal ready",
@@ -2040,6 +2498,7 @@
             ],
             learning_value: "Dead and blocked claims become training data for faster future falsification.",
           },
+          research_development_pass: staticResearchDevelopmentPass(),
         };
       }
 
@@ -2134,18 +2593,184 @@
         };
       }
 
+      function staticResearchDevelopmentPass() {
+        const forbidden = ["personalized recommendation", "directional live call", "broker/account/order route", "autonomous execution"];
+        const schema = (name) => ({
+          name,
+          required_fields: ["id", "title", "status", "owner", "current_research_state", "visible_api_fields", "source_refs", "missing_proof", "next_safe_research_action"],
+          forbidden_outputs: forbidden,
+        });
+        return {
+          mode: "research_only",
+          schema_version: "research_development_pass.v1",
+          boundary: "offline R&D evidence only; not a trade instruction",
+          forbidden_outputs: forbidden,
+          response_schema: {
+            name: "ResearchDevelopmentPass",
+            required_fields: ["mode", "schema_version", "boundary", "steps", "forbidden_outputs"],
+            openapi_refs: ["ResearchDevelopmentPass", "ResearchDevelopmentStep"],
+          },
+          steps: [
+            {
+              step_number: 1,
+              id: "action_native_first_move",
+              title: "Action-native first move",
+              status: "ready",
+              owner: "Promotion Gatekeeper",
+              current_research_state: "Validate-only intake is available as the first native action.",
+              visible_api_fields: ["strategy_import", "strategy_import_preview", "first_falsification_tasks"],
+              source_refs: ["manual:intake:preview"],
+              missing_proof: "A quarantined draft still needs point-in-time, baseline, fold, cost, and readiness proof.",
+              next_safe_research_action: "Research: preview a quarantined research draft before adding it to the claim surface.",
+              native_action: { method: "POST", route: "/strategy-import/preview", default_state: "quarantine_until_evidence_exists" },
+              response_schema: schema("ActionNativeFirstMove"),
+            },
+            {
+              step_number: 2,
+              id: "baseline_ledger",
+              title: "Baseline ledger",
+              status: "open",
+              owner: "Baseline Challenger",
+              current_research_state: "baseline comparison pack is open.",
+              visible_api_fields: ["baseline_pack", "packs", "queue", "missing_items"],
+              source_refs: ["runs/example-run.json"],
+              missing_proof: "random-control, momentum, reversion, and equal-weight baselines remain required.",
+              next_safe_research_action: "Research: rerun the baseline ledger with same-sample comparator artifacts.",
+              response_schema: schema("BaselineLedgerStep"),
+            },
+            {
+              step_number: 3,
+              id: "walk_forward_ledger",
+              title: "Walk-forward ledger",
+              status: "open",
+              owner: "Regime Skeptic",
+              current_research_state: "walk-forward robustness pack is open.",
+              visible_api_fields: ["packs", "queue", "open_gate_names", "required_artifacts"],
+              source_refs: ["runs/example-run.json"],
+              missing_proof: "walk_forward_fold_ledger needs additional chronological fold evidence.",
+              next_safe_research_action: "Research: record additional offline walk-forward folds and mark fold fragility.",
+              response_schema: schema("WalkForwardLedgerStep"),
+            },
+            {
+              step_number: 4,
+              id: "point_in_time_proof",
+              title: "Point-in-time proof",
+              status: "needs_review",
+              owner: "Leak Auditor",
+              current_research_state: "Point-in-time contract is needs_review.",
+              visible_api_fields: ["contract_schema", "allowed_fields", "fields", "gaps", "source_refs"],
+              source_refs: ["runs/example-run.json"],
+              missing_proof: "Known-at-time field lineage must stay source-referenced.",
+              next_safe_research_action: "Research: resolve open point-in-time gaps before trusting any field.",
+              response_schema: schema("PointInTimeProofStep"),
+            },
+            {
+              step_number: 5,
+              id: "agent_reviewer_artifacts",
+              title: "Measurable agent reviewer artifacts",
+              status: "open",
+              owner: "Reproducibility Clerk",
+              current_research_state: "Open reviewer findings are measurable by role.",
+              visible_api_fields: ["agent_contracts", "open_finding_count", "required_output_fields", "source_refs"],
+              source_refs: ["runs/example-run.json"],
+              missing_proof: "Agent findings must include status, severity, source refs, and next falsification step.",
+              next_safe_research_action: "Research: attach measurable reviewer findings to each owned evidence gap.",
+              response_schema: schema("AgentReviewerArtifactStep"),
+            },
+            {
+              step_number: 6,
+              id: "failure_gallery",
+              title: "Failure gallery",
+              status: "open",
+              owner: "Baseline Challenger",
+              current_research_state: "Blocked claims are visible as training memory.",
+              visible_api_fields: ["failed_or_blocked_claims", "learning_value", "next_archive_action"],
+              source_refs: ["runs/example-run.json"],
+              missing_proof: "Failure reasons need reviewer notes before they become durable training memory.",
+              next_safe_research_action: "Research: archive the failure reason and reviewer notes as training memory.",
+              response_schema: schema("FailureGalleryStep"),
+            },
+            {
+              step_number: 7,
+              id: "readiness_evidence",
+              title: "Readiness evidence",
+              status: "blocked",
+              owner: "Promotion Gatekeeper",
+              current_research_state: "Readiness stage is Observe-only.",
+              visible_api_fields: ["append_only_entries", "sample_thresholds", "missing_checks", "source_refs"],
+              source_refs: ["runs/readiness/paper-ledger.json"],
+              missing_proof: "Human review and sample thresholds must be recorded.",
+              next_safe_research_action: "Research: clear the first readiness blocker before changing product language.",
+              response_schema: schema("ReadinessEvidenceStep"),
+            },
+            {
+              step_number: 8,
+              id: "hardened_response_schemas",
+              title: "Hardened response schemas",
+              status: "ready",
+              owner: "Reproducibility Clerk",
+              current_research_state: "Release-rule, claim-journey, and R&D pass schemas are exposed in the response.",
+              visible_api_fields: ["product_release_rule", "claim_journey", "research_development_pass", "response_schema"],
+              source_refs: ["packages/contracts/openapi/trading-lab.v0.yaml"],
+              missing_proof: "OpenAPI schema fields must remain required before a surface is treated as shippable.",
+              next_safe_research_action: "Research: validate schema required fields before adding new release surfaces.",
+              response_schema: schema("HardenedResponseSchemaStep"),
+            },
+          ],
+        };
+      }
+
+      function activateView(target) {
+        document.body.dataset.view = target;
+        document.querySelectorAll("[data-view-target]").forEach((item) => {
+          item.classList.toggle("active", item.dataset.viewTarget === target);
+          item.setAttribute("aria-pressed", String(item.dataset.viewTarget === target));
+        });
+        document.querySelectorAll("[data-view-panel]").forEach((panel) => {
+          panel.classList.toggle("active", panel.dataset.viewPanel === target);
+        });
+      }
+
       function renderNavigation() {
         document.querySelectorAll("[data-view-target]").forEach((button) => {
           button.addEventListener("click", () => {
-            const target = button.dataset.viewTarget;
-            document.body.dataset.view = target;
-            document.querySelectorAll("[data-view-target]").forEach((item) => {
-              item.classList.toggle("active", item.dataset.viewTarget === target);
-              item.setAttribute("aria-pressed", String(item.dataset.viewTarget === target));
+            activateView(button.dataset.viewTarget);
+          });
+        });
+      }
+
+      function bindLensSwitch() {
+        document.querySelectorAll("[data-lens-target]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const target = button.dataset.lensTarget || "plain";
+            document.body.dataset.lens = target;
+            document.querySelectorAll("[data-lens-target]").forEach((item) => {
+              item.classList.toggle("active", item.dataset.lensTarget === target);
             });
-            document.querySelectorAll("[data-view-panel]").forEach((panel) => {
-              panel.classList.toggle("active", panel.dataset.viewPanel === target);
-            });
+          });
+        });
+      }
+
+      function bindRouteButtons() {
+        document.querySelectorAll("[data-jump-target]").forEach((button) => {
+          if (button.dataset.bound === "true") return;
+          button.dataset.bound = "true";
+          button.addEventListener("click", () => {
+            activateView(button.dataset.jumpTarget);
+            const focusId = button.dataset.focusId;
+            const target = focusId ? document.getElementById(focusId) : null;
+            if (target) {
+              target.scrollIntoView({ behavior: "smooth", block: "center" });
+              target.focus({ preventScroll: true });
+            }
+          });
+        });
+        document.querySelectorAll("[data-scroll-target]").forEach((button) => {
+          if (button.dataset.bound === "true") return;
+          button.dataset.bound = "true";
+          button.addEventListener("click", () => {
+            const target = document.getElementById(button.dataset.scrollTarget || "");
+            if (target) target.scrollIntoView({ behavior: "smooth", block: "center" });
           });
         });
       }
@@ -2331,6 +2956,153 @@
             <p class="body-copy">${escapeHtml(detail)}</p>
           </div>
         `;
+      }
+
+      function decisionCell(label, value, detail = "", tone = "") {
+        return `
+          <div class="decision-cell">
+            <span class="eyebrow">${escapeHtml(label)}</span>
+            <strong class="${tone}">${escapeHtml(value)}</strong>
+            <p class="body-copy">${escapeHtml(detail)}</p>
+          </div>
+        `;
+      }
+
+      function translationRow(term, plain, detail = "") {
+        return `
+          <div class="translation-row">
+            <strong>${escapeHtml(term)}</strong>
+            <p class="body-copy">${escapeHtml(plain)}</p>
+            ${detail ? `<p class="mono expert-lens">${escapeHtml(detail)}</p>` : ""}
+          </div>
+        `;
+      }
+
+      function deriveProductReleaseRule(terminal) {
+        const readiness = terminal.confidence_readiness || {};
+        const review = terminal.agentic_review?.promotion_decision || {};
+        const weakGate = currentWeakGate(terminal);
+        const firstMissing = (readiness.missing_checks || [])[0] || {};
+        const firstTask = (terminal.next_falsification_tasks || [])[0] || (terminal.ranked_attention_items || [])[0] || {};
+        const stage = readiness.current_stage?.label || terminal.claim_lifecycle?.stage || "research-only hold";
+        return {
+          current_research_state: `${text(stage)}: ${text(terminal.evidence?.verdict)} evidence, ${text((terminal.blockers || []).length)} blockers.`,
+          plain_english_meaning: text(review.reason || weakGate?.plain_english || weakGate?.detail || whyHeld(terminal)),
+          missing_proof: text(firstMissing.label || firstMissing.id || weakGate?.name || "No missing proof exposed."),
+          next_safe_research_action: `Research: ${text(firstTask.label || firstTask.why || "review the current evidence packet.")}`,
+        };
+      }
+
+      function renderProductReleaseRule(terminal) {
+        const rule = terminal.product_release_rule || deriveProductReleaseRule(terminal);
+        const labels = [
+          ["current_research_state", "Current research state"],
+          ["plain_english_meaning", "Plain English meaning"],
+          ["missing_proof", "Missing proof"],
+          ["next_safe_research_action", "Next safe research action"],
+        ];
+        document.querySelector("#product-release-rule-grid").innerHTML = labels
+          .map(([key, label], index) =>
+            decisionCell(label, text(rule[key]), key === "next_safe_research_action" ? "No advice, sizing, order, or broker step is available here." : "Required on every Trading Lab release surface.", index === 0 ? "warn" : key === "next_safe_research_action" ? "cyan" : ""),
+          )
+          .join("");
+      }
+
+      function renderClaimJourney(terminal) {
+        const journey = terminal.claim_journey || staticTerminal().claim_journey;
+        const steps = journey.steps || [];
+        document.querySelector("#claim-journey-steps").innerHTML = steps.length
+          ? steps.map((step) => `
+              <article class="journey-step">
+                <span class="journey-index">${escapeHtml(step.step_number)}</span>
+                <div class="journey-main">
+                  <span class="eyebrow">${escapeHtml(step.question)}</span>
+                  <strong>${escapeHtml(step.title)}</strong>
+                  ${badge(text(step.status), toneFor(step.status))}
+                  <p class="body-copy">${escapeHtml(step.plain_english_meaning)}</p>
+                </div>
+                <div class="journey-proof">
+                  <span class="eyebrow">Current research state</span>
+                  <p class="body-copy">${escapeHtml(step.current_research_state)}</p>
+                  <span class="eyebrow">Missing proof</span>
+                  <p class="body-copy">${escapeHtml(step.missing_proof)}</p>
+                  <span class="eyebrow">Next safe research action</span>
+                  <p class="body-copy">${escapeHtml(step.next_safe_research_action)}</p>
+                  <p class="mono">${escapeHtml(step.owner || "owner pending")} / ${escapeHtml(step.source_ref || "source pending")}</p>
+                </div>
+              </article>
+            `).join("")
+          : queueItem("No claim journey", "The current artifact exposes no six-step claim journey.", "warn");
+      }
+
+      function renderResearchDevelopmentPass(passPayload) {
+        const payload = passPayload || staticResearchDevelopmentPass();
+        const steps = payload.steps || [];
+        document.querySelector("#research-development-pass").innerHTML = steps.length
+          ? steps.map((step) => `
+              <article class="journey-step">
+                <span class="journey-index">${escapeHtml(step.step_number)}</span>
+                <div class="journey-main">
+                  <span class="eyebrow">${escapeHtml(step.owner || "owner pending")}</span>
+                  <strong>${escapeHtml(step.title)}</strong>
+                  ${badge(text(step.status), toneFor(step.status))}
+                  <p class="body-copy">${escapeHtml(step.current_research_state)}</p>
+                  <p class="mono">${escapeHtml((step.visible_api_fields || []).join(", "))}</p>
+                </div>
+                <div class="journey-proof">
+                  <span class="eyebrow">Missing proof</span>
+                  <p class="body-copy">${escapeHtml(step.missing_proof)}</p>
+                  <span class="eyebrow">Next safe research action</span>
+                  <p class="body-copy">${escapeHtml(step.next_safe_research_action)}</p>
+                  <p class="mono">${escapeHtml(step.source_payload || step.native_action?.route || "platform response")} / ${escapeHtml((step.source_refs || []).join(", ") || "source pending")}</p>
+                </div>
+              </article>
+            `).join("")
+          : queueItem("No R&D pass", "The current artifact exposes no research-development pass.", "warn");
+      }
+
+      function renderGuidedLab(terminal) {
+        const target = document.querySelector("#guided-claim-card");
+        if (!target) return;
+        const platform = terminal.platform || {};
+        const registry = platform.claim_registry || {};
+        const claim = (registry.claims || [])[0] || {};
+        const run = (registry.runs || [])[0] || {};
+        const evidence = terminal.evidence || {};
+        const lifecycle = terminal.claim_lifecycle || {};
+        const readiness = terminal.confidence_readiness || {};
+        const review = terminal.agentic_review?.promotion_decision || {};
+        const weakGate = currentWeakGate(terminal);
+        const firstTask = (terminal.next_falsification_tasks || [])[0] || (platform.falsification_engine?.queue || [])[0] || {};
+        const missing = readiness.missing_checks || [];
+        const thesis = claim.thesis || evidence.run_id || "No claim loaded yet.";
+        const verdict = evidence.verdict || claim.verdict || "unknown";
+        const stage = readiness.current_stage?.label || lifecycle.stage || "research-only hold";
+        target.innerHTML = `
+          <span class="eyebrow">Claim Card</span>
+          <strong>${escapeHtml(thesis)}</strong>
+          <p class="body-copy plain-lens">${escapeHtml(review.reason || whyHeld(terminal))}</p>
+          <p class="body-copy expert-lens">${escapeHtml(`Run ${text(run.run_id || evidence.run_id)} is anchored to ${text(run.source_ref || evidence.source || claim.source_ref)} with stage ${text(lifecycle.stage || stage)}.`)}</p>
+          <div class="metrics">
+            ${badge(pretty(verdict), verdict === "pass" ? "ok" : "warn")}
+            ${badge(pretty(stage), readiness.validation?.promotion_ready ? "ok" : "warn")}
+            ${badge("research only", "warn")}
+          </div>
+        `;
+        document.querySelector("#guided-decision-strip").innerHTML = `
+          ${decisionCell("Current state", pretty(stage), "The claim can be studied, not acted on.", "warn")}
+          ${decisionCell("Weakest proof", weakGate ? pretty(weakGate.name) : "No weak gate exposed", weakGate ? text(weakGate.detail) : "No warning gate is exposed in this packet.", weakGate ? toneFor(weakGate.status) : "ok")}
+          ${decisionCell("Would change our mind", text(missing[0]?.label || missing[0]?.id || "No missing check exposed"), text(missing[0]?.why || missing[0]?.detail || "The readiness packet has no first blocker."), missing.length ? "warn" : "ok")}
+          ${decisionCell("Next research task", text(firstTask.label || "Review evidence packet"), text(firstTask.owner || firstTask.why || "owner pending"), firstTask.label ? "cyan" : "warn")}
+        `;
+        document.querySelector("#guided-translation-grid").innerHTML = [
+          translationRow("Leakage", "Was the test accidentally allowed to know the future?", "Point-in-time contract, known-at-time fields, source timestamps."),
+          translationRow("Baseline", "Did the fancy idea beat a boring comparison?", "Same-sample buy-and-hold, random control, momentum, mean-reversion checks."),
+          translationRow("Slippage and costs", "Would market friction erase the result?", "Fees, spread, delay, fill assumptions, and cost-grid stress."),
+          translationRow("Regime", "Did it only work in one kind of market?", "Walk-forward folds, volatility slices, trend/chop splits."),
+          translationRow("Calibration", "Does confidence match reality over many samples?", "Paper ledger, shadow drift, confidence history, human review."),
+          translationRow("Evidence lineage", "Can we trace every result back to data, code, and review?", "Run artifact, hashes, snapshot refs, agent findings, trust packet."),
+        ].join("");
       }
 
       function renderMissionControl(terminal) {
@@ -2821,6 +3593,10 @@
       }
 
       function renderTerminal(terminal) {
+        renderProductReleaseRule(terminal);
+        renderClaimJourney(terminal);
+        renderResearchDevelopmentPass(terminal.platform?.research_development_pass || staticResearchDevelopmentPass());
+        renderGuidedLab(terminal);
         renderHero(terminal);
         renderMissionControl(terminal);
         renderLabScorecard(terminal);
@@ -2840,6 +3616,8 @@
       }
 
       renderNavigation();
+      bindLensSwitch();
+      bindRouteButtons();
       Promise.all([loadTerminal(), loadPlatform()])
         .then(([terminal, platform]) => {
           terminal.platform = platform;

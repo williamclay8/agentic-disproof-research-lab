@@ -88,6 +88,89 @@ def test_all_thresholds_and_human_review_allow_review_packet_verdict():
     }
 
 
+def test_append_only_readiness_ledgers_count_entries_and_review_controls():
+    result = validate_readiness(
+        paper_ledger={
+            "status": "pass",
+            "write_policy": "append_only",
+            "entries": [
+                {"sample_count": 12},
+                {"payload": {"sample_count": 18}},
+            ],
+            "limits": ["append-only research ledger"],
+        },
+        live_shadow_drift={
+            "status": "pass",
+            "write_policy": "append_only",
+            "entries": [
+                {
+                    "sample_count": 15,
+                    "metrics": {"expected_vs_observed_return_delta": 0.002},
+                },
+                {
+                    "payload": {
+                        "sample_count": 15,
+                        "drift": {"provider_mismatch_count": 0},
+                    }
+                },
+            ],
+        },
+        calibration_history={
+            "status": "pass",
+            "write_policy": "append_only",
+            "entries": [
+                {"sample_count": 20, "brier_score": 0.18},
+                {
+                    "payload": {
+                        "sample_count": 12,
+                        "buckets": [
+                            {
+                                "predicted_probability": 0.4,
+                                "realized_frequency": 0.37,
+                            }
+                        ],
+                    }
+                },
+            ],
+        },
+        risk_packet={
+            "status": "pass",
+            "write_policy": "append_only",
+            "entries": [
+                {
+                    "invalidation_evidence": ["baseline still blocks display"],
+                    "risk_controls": ["freshness expiry", "drift review"],
+                    "human_review": {
+                        "reviewed_by": "research-ops",
+                        "reviewed_at": "2026-05-02T19:10:00-05:00",
+                        "decision": "research_display_only",
+                    },
+                }
+            ],
+        },
+    )
+
+    assert result["promotion_ready"] is True
+    assert {
+        "paper_ledger_append_only",
+        "paper_ledger_sample_count",
+        "live_shadow_drift_append_only",
+        "live_shadow_drift_sample_count",
+        "live_shadow_drift_metric_present",
+        "calibration_history_append_only",
+        "calibration_history_sample_count",
+        "calibration_history_metric_present",
+        "risk_packet_append_only",
+        "risk_packet_controls_present",
+        "risk_packet_human_review",
+    }.issubset(result["completed_checks"])
+    assert result["missing_failed_checks"] == []
+    verdict_text = " ".join(str(value) for value in result["promotion_verdict"].values()).lower()
+    assert "research" in verdict_text
+    assert "order" not in verdict_text
+    assert "position" not in verdict_text
+
+
 def test_missing_payloads_are_reported_without_counting_artifacts_present():
     result = validate_readiness(
         paper_ledger={},

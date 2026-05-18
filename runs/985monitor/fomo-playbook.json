@@ -1,0 +1,479 @@
+{
+  "boundary": "Research-only, point-in-time falsification asset; not a trade instruction, not personalized investment advice, not a live signal, and not a broker or order-routing action. Not investment advice. Not a live signal. Not copy-trading guidance.",
+  "completed_plays_count": 5,
+  "dataset_summary": {
+    "concentration": {
+      "pnl_top10_share": {
+        "24h": 58.4,
+        "30d": 41.3,
+        "7d": 52.9,
+        "all_time": 71.6
+      },
+      "volume_top10_share": {
+        "24h": 84.7,
+        "30d": 77.4,
+        "7d": 79.4,
+        "all_time": 79.4
+      }
+    },
+    "csv_manifests": [
+      {
+        "content_length_bytes": 13800,
+        "field_label": "source-reported leaderboard context",
+        "filename": "fomo_24h_leaderboard_real_wallets.csv",
+        "provenance_status": "incomplete",
+        "row_count": 50,
+        "schema": [
+          "rank",
+          "handle",
+          "name",
+          "pnl_period_usd",
+          "total_volume_usd",
+          "trades",
+          "followers",
+          "real_solana",
+          "real_solana_usd",
+          "real_evm",
+          "real_evm_usd",
+          "sol_count",
+          "evm_count",
+          "fomo_old_solana",
+          "fomo_old_evm",
+          "twitter",
+          "fomo_id"
+        ],
+        "sha256": "51d076aae62f4f0906e068d544ba4a5207205cdc277b76e4bf60af70e0f777a0",
+        "source_timestamp_utc": "2026-05-03T12:06:00Z",
+        "url": "https://985monitor.xyz/fomo/fomo_24h_leaderboard_real_wallets.csv"
+      },
+      {
+        "content_length_bytes": 14026,
+        "field_label": "source-reported leaderboard context",
+        "filename": "fomo_7d_leaderboard_real_wallets.csv",
+        "provenance_status": "incomplete",
+        "row_count": 50,
+        "schema": [
+          "rank",
+          "handle",
+          "name",
+          "pnl_period_usd",
+          "total_volume_usd",
+          "trades",
+          "followers",
+          "real_solana",
+          "real_solana_usd",
+          "real_evm",
+          "real_evm_usd",
+          "sol_count",
+          "evm_count",
+          "fomo_old_solana",
+          "fomo_old_evm",
+          "twitter",
+          "fomo_id"
+        ],
+        "sha256": "f4631f4207025d00ebefe2d5ed9d760dd022a39b10a6142bfc9584a314b229e4",
+        "source_timestamp_utc": "2026-05-03T12:06:00Z",
+        "url": "https://985monitor.xyz/fomo/fomo_7d_leaderboard_real_wallets.csv"
+      },
+      {
+        "content_length_bytes": 13827,
+        "field_label": "source-reported leaderboard context",
+        "filename": "fomo_30d_leaderboard_real_wallets.csv",
+        "provenance_status": "incomplete",
+        "row_count": 50,
+        "schema": [
+          "rank",
+          "handle",
+          "name",
+          "pnl_period_usd",
+          "total_volume_usd",
+          "trades",
+          "followers",
+          "real_solana",
+          "real_solana_usd",
+          "real_evm",
+          "real_evm_usd",
+          "sol_count",
+          "evm_count",
+          "fomo_old_solana",
+          "fomo_old_evm",
+          "twitter",
+          "fomo_id"
+        ],
+        "sha256": "42f9c5b8ea67b7dc7f747853088016c4edd1c7ad07039af16bfa6668d13cf179",
+        "source_timestamp_utc": "2026-05-03T12:06:00Z",
+        "url": "https://985monitor.xyz/fomo/fomo_30d_leaderboard_real_wallets.csv"
+      },
+      {
+        "content_length_bytes": 7054,
+        "field_label": "source-reported leaderboard context",
+        "filename": "fomo_alltime_leaderboard_real_wallets.csv",
+        "provenance_status": "incomplete",
+        "row_count": 25,
+        "schema": [
+          "rank",
+          "handle",
+          "name",
+          "pnl_period_usd",
+          "total_volume_usd",
+          "trades",
+          "followers",
+          "real_solana",
+          "real_solana_usd",
+          "real_evm",
+          "real_evm_usd",
+          "sol_count",
+          "evm_count",
+          "fomo_old_solana",
+          "fomo_old_evm",
+          "twitter",
+          "fomo_id"
+        ],
+        "sha256": "cb4f42b92add4f0d12f026d348af072b578440a4340297a0ca369c4cf348519d",
+        "source_timestamp_utc": "2026-05-03T12:06:00Z",
+        "url": "https://985monitor.xyz/fomo/fomo_alltime_leaderboard_real_wallets.csv"
+      },
+      {
+        "content_length_bytes": 253608,
+        "field_label": "source-reported public/social context",
+        "filename": "fomo_smart_money_FULL_real_wallets.csv",
+        "provenance_status": "incomplete",
+        "row_count": 1065,
+        "schema": [
+          "rank",
+          "handle",
+          "name",
+          "real_solana",
+          "real_solana_usd",
+          "real_evm",
+          "real_evm_usd",
+          "total_volume_usd",
+          "followed_by_topN",
+          "leaderboard_windows",
+          "sol_wallet_count",
+          "evm_wallet_count",
+          "fomo_old_solana",
+          "fomo_old_evm",
+          "twitter",
+          "fomo_id"
+        ],
+        "sha256": "dfc442b58d2b7a36ef095fd72aa09c59a95e88d247da7ae0968b196c624b92da",
+        "source_timestamp_utc": "2026-05-03T12:06:00Z",
+        "url": "https://985monitor.xyz/fomo/fomo_smart_money_FULL_real_wallets.csv"
+      }
+    ],
+    "efficiency": {
+      "pnl_to_volume_median_pct": {
+        "24h": 4.4,
+        "30d": 8.2,
+        "7d": 9.7
+      },
+      "pnl_to_volume_p90_pct": {
+        "24h": 38.6,
+        "30d": 726.6,
+        "7d": 121.4
+      }
+    },
+    "freshness_status": "stale_snapshot",
+    "inspected_at_utc": "2026-05-13T15:51:00Z",
+    "pairwise_overlap": {
+      "24h_30d": 17,
+      "24h_7d": 21,
+      "24h_all_time": 5,
+      "30d_all_time": 8,
+      "7d_30d": 22,
+      "7d_all_time": 3
+    },
+    "pnl_membership_distribution": {
+      "four_windows": 2,
+      "one_window": 72,
+      "three_windows": 11,
+      "two_windows": 31
+    },
+    "pnl_union_unique_identities": 116,
+    "provenance_gaps": [
+      "No row-level collection timestamp was present.",
+      "No scrape code or source API contract was published with the snapshot.",
+      "The method for labeling wallets as real owner-controlled wallets is not independently verified.",
+      "USD valuation source and timestamp are unknown.",
+      "The page claims hourly updates, but fetched headers showed the same May 3, 2026 timestamp."
+    ],
+    "row_counts": {
+      "24h": 50,
+      "30d": 50,
+      "7d": 50,
+      "all_time": 25,
+      "social": 1065,
+      "total_rows": 1240
+    },
+    "safe_claim": "985monitor published five FOMO-derived CSV snapshots with aggregate leaderboard and common-follow structure as of the May 3, 2026 snapshot.",
+    "schema_notes": [
+      "PnL leaderboards expose rank, handle/name, source PnL, volume, trades, followers, real SOL/EVM wallet coverage, old FOMO wallets, and fomo_id.",
+      "Social/common-follow rows expose followed_by_topN, leaderboard_windows, wallet coverage, total volume, and fomo_id.",
+      "The twitter field was blank in the inspected CSVs."
+    ],
+    "snapshot_timestamp_utc": "2026-05-03T12:06:00Z",
+    "social_segments": {
+      "followed_by_topN_at_least_10": 44,
+      "followed_by_topN_at_least_5": 134,
+      "social_rows_with_leaderboard_windows": 52,
+      "social_rows_without_real_wallet": 121
+    },
+    "source_url": "https://985monitor.xyz/fomo/",
+    "wallet_coverage": {
+      "pnl_union": {
+        "both_chains": 74,
+        "real_evm": 75,
+        "real_solana": 115,
+        "unique_identities": 116
+      },
+      "social": {
+        "both_chains": 368,
+        "neither_chain": 121,
+        "real_evm": 391,
+        "real_solana": 921,
+        "unique_rows": 1065
+      }
+    }
+  },
+  "global_blocked_outputs": [
+    "personalized investment advice",
+    "copy-trading instruction",
+    "broker or order-routing action",
+    "live signal",
+    "raw wallet resale without rights review",
+    "current-balance or ownership claims without source proof"
+  ],
+  "mode": "research_only",
+  "plays": [
+    {
+      "blocked_outputs": [
+        "personalized investment advice",
+        "copy-trading instruction",
+        "broker or order-routing action",
+        "live signal",
+        "raw wallet resale without rights review",
+        "current-balance or ownership claims without source proof"
+      ],
+      "blocker": "Cannot market as alpha until forward tests, baselines, and friction controls exist.",
+      "buyer": "Research desks, founders, funds, and crypto operators who need a skeptical read on KOL wallet claims.",
+      "completion_artifact": "reports/985monitor-paid-kol-wallet-falsification-report.md",
+      "completion_status": "complete_as_research_artifact",
+      "deliverable": [
+        "A recurring report template that asks what survived and what failed.",
+        "A baseline section comparing persistent winners against one-window winners.",
+        "A limitations section that leads with timestamp and provenance gaps."
+      ],
+      "id": "paid_falsification_report",
+      "proof_gates": [
+        "Keep all outputs delayed or point-in-time.",
+        "Use aggregate or pseudonymous cohorts by default.",
+        "State provenance gaps before any monetization claim.",
+        "Block promotion if users could reasonably treat the output as current trade guidance.",
+        "Require forward-only rank persistence tests before saying a cohort has predictive value.",
+        "Require baseline and concentration controls before selling any edge narrative."
+      ],
+      "research_only": true,
+      "revenue_mechanism": "Paid monthly report, bespoke diligence memo, or sponsor-free research subscription.",
+      "source_fields_or_aggregates": [
+        "PnL leaderboard rank by window",
+        "multi-window identity persistence",
+        "top-10 PnL and volume concentration",
+        "wallet coverage by chain",
+        "source provenance gaps"
+      ],
+      "title": "Paid KOL Wallet Falsification Report"
+    },
+    {
+      "blocked_outputs": [
+        "personalized investment advice",
+        "copy-trading instruction",
+        "broker or order-routing action",
+        "live signal",
+        "raw wallet resale without rights review",
+        "current-balance or ownership claims without source proof"
+      ],
+      "blocker": "Defamation, privacy, and provenance risk if labels are attached to people rather than evidence cohorts.",
+      "buyer": "Wallet-tool builders, Telegram bot teams, trading communities, and diligence teams.",
+      "completion_artifact": "docs/985monitor-fomo-research-playbook.md#2-anti-copy-wallet-quality-score",
+      "completion_status": "complete_as_research_artifact",
+      "deliverable": [
+        "A component scorecard: persistence, concentration risk, wallet coverage, social crowding, and provenance risk.",
+        "Risk labels such as evidence thin, concentration heavy, stale snapshot, and provenance blocked.",
+        "An appeal/removal and rights-review note for public packaging."
+      ],
+      "id": "anti_copy_wallet_quality_score",
+      "proof_gates": [
+        "Keep all outputs delayed or point-in-time.",
+        "Use aggregate or pseudonymous cohorts by default.",
+        "State provenance gaps before any monetization claim.",
+        "Block promotion if users could reasonably treat the output as current trade guidance.",
+        "Do not score a named person; score dataset rows or pseudonymous cohorts.",
+        "Require an explanation for every score component."
+      ],
+      "research_only": true,
+      "revenue_mechanism": "B2B score API spec, CSV score export, or diligence pack.",
+      "source_fields_or_aggregates": [
+        "window_count per identity",
+        "PnL-to-volume ratio",
+        "PnL-per-trade ratio where trades exist",
+        "balance-to-volume ratio",
+        "SOL-only, EVM-only, both-chain, and no-real-wallet coverage flags",
+        "social followed_by_topN buckets"
+      ],
+      "title": "Anti-Copy Wallet Quality Score"
+    },
+    {
+      "blocked_outputs": [
+        "personalized investment advice",
+        "copy-trading instruction",
+        "broker or order-routing action",
+        "live signal",
+        "raw wallet resale without rights review",
+        "current-balance or ownership claims without source proof"
+      ],
+      "blocker": "Legal and reputational sensitivity if the output implies misconduct without evidence.",
+      "buyer": "Token teams, exchanges, communities, compliance-minded sponsors, and investor relations teams.",
+      "completion_artifact": "docs/985monitor-fomo-research-playbook.md#3-kol-campaign-forensics-template",
+      "completion_status": "complete_as_research_artifact",
+      "deliverable": [
+        "A campaign intake checklist that requests token, campaign window, disclosed relationships, and public source links.",
+        "A forensics memo layout: evidence observed, what cannot be proven, disclosure questions, and dump-risk indicators.",
+        "A no-harassment and no-deanonymization handling policy."
+      ],
+      "id": "kol_campaign_forensics_template",
+      "proof_gates": [
+        "Keep all outputs delayed or point-in-time.",
+        "Use aggregate or pseudonymous cohorts by default.",
+        "State provenance gaps before any monetization claim.",
+        "Block promotion if users could reasonably treat the output as current trade guidance.",
+        "Require campaign date windows and public source citations before making any campaign finding.",
+        "Separate disclosure questions from misconduct conclusions."
+      ],
+      "research_only": true,
+      "revenue_mechanism": "Fixed-scope forensic review, pre-campaign diligence, or post-campaign audit retainer.",
+      "source_fields_or_aggregates": [
+        "public handle/identity count as aggregate",
+        "wallet coverage availability",
+        "social common-follow clusters",
+        "leaderboard window metadata",
+        "volume concentration by cohort"
+      ],
+      "title": "KOL Campaign Forensics Template"
+    },
+    {
+      "blocked_outputs": [
+        "personalized investment advice",
+        "copy-trading instruction",
+        "broker or order-routing action",
+        "live signal",
+        "raw wallet resale without rights review",
+        "current-balance or ownership claims without source proof"
+      ],
+      "blocker": "Redistribution rights and wallet-label provenance remain unresolved.",
+      "buyer": "Dashboard builders, data startups, research desks, and market-intelligence vendors.",
+      "completion_artifact": "docs/985monitor-fomo-research-playbook.md#4-derived-aggregate-dataset-licensing-packet",
+      "completion_status": "complete_as_research_artifact",
+      "deliverable": [
+        "A license packet for aggregate metrics only.",
+        "A data dictionary that excludes raw wallet-handle mappings unless rights review approves them.",
+        "A buyer-safe redaction policy and refresh cadence note."
+      ],
+      "id": "derived_aggregate_dataset_licensing_packet",
+      "proof_gates": [
+        "Keep all outputs delayed or point-in-time.",
+        "Use aggregate or pseudonymous cohorts by default.",
+        "State provenance gaps before any monetization claim.",
+        "Block promotion if users could reasonably treat the output as current trade guidance.",
+        "Complete source rights review before redistribution.",
+        "Ship aggregates first; keep raw wallet maps out of commercial packages by default."
+      ],
+      "research_only": true,
+      "revenue_mechanism": "Monthly derived dataset license, aggregate feed, or private research data room.",
+      "source_fields_or_aggregates": [
+        "row counts by source file",
+        "identity overlap counts",
+        "wallet coverage counts",
+        "top-N concentration",
+        "followed_by_topN distribution buckets",
+        "provenance and rights-review status"
+      ],
+      "title": "Derived Aggregate Dataset Licensing Packet"
+    },
+    {
+      "blocked_outputs": [
+        "personalized investment advice",
+        "copy-trading instruction",
+        "broker or order-routing action",
+        "live signal",
+        "raw wallet resale without rights review",
+        "current-balance or ownership claims without source proof"
+      ],
+      "blocker": "Historical snapshots and executable friction data are missing.",
+      "buyer": "Internal Trading Lab research, workshops, and founder-facing falsification demos.",
+      "completion_artifact": "hypotheses/985monitor-fomo-wallet-falsification.json",
+      "completion_status": "complete_as_research_artifact",
+      "deliverable": [
+        "A pre-registered hypothesis registry entry.",
+        "A ranked backlog of falsification tests.",
+        "A promotion gate that keeps the result not live-signal ready until forward tests pass."
+      ],
+      "id": "trading_lab_hypothesis_factory",
+      "proof_gates": [
+        "Keep all outputs delayed or point-in-time.",
+        "Use aggregate or pseudonymous cohorts by default.",
+        "State provenance gaps before any monetization claim.",
+        "Block promotion if users could reasonably treat the output as current trade guidance.",
+        "Require row-level timestamps before event-impact claims.",
+        "Require fees, slippage, delay, and capacity checks before monetization claims.",
+        "Reject any hypothesis whose value disappears after baseline or leakage controls."
+      ],
+      "research_only": true,
+      "revenue_mechanism": "Paid workshop, implementation kit, or research operating-system demo.",
+      "source_fields_or_aggregates": [
+        "point-in-time event timing",
+        "leaderboard persistence",
+        "cluster convergence",
+        "crowding or fade behavior",
+        "category-specific skill",
+        "monetization after fees, slippage, delay, and capacity limits"
+      ],
+      "title": "Trading Lab Hypothesis Factory"
+    }
+  ],
+  "promotion_status": {
+    "promotion_ready": false,
+    "reason": "Point-in-time snapshot lacks row-level timing, independent wallet verification, live execution evidence, legal rights review, and forward-tested monetization proof.",
+    "status": "blocked_by_incomplete_provenance"
+  },
+  "research_only": true,
+  "schema": "fomo_985monitor_playbook.v1",
+  "source": {
+    "freshness_status": "stale_snapshot",
+    "inspected_at_utc": "2026-05-13T15:51:00Z",
+    "provenance_status": "incomplete",
+    "safe_claim": "985monitor published five FOMO-derived CSV snapshots with aggregate leaderboard and common-follow structure as of the May 3, 2026 snapshot.",
+    "snapshot_timestamp_utc": "2026-05-03T12:06:00Z",
+    "url": "https://985monitor.xyz/fomo/"
+  },
+  "source_snapshot_contract": {
+    "derived_fields": [
+      "freshness",
+      "source_timestamp",
+      "license_note",
+      "provenance_status",
+      "content_hash"
+    ],
+    "normalized_fields": [
+      "topic",
+      "payload",
+      "metadata",
+      "provenance",
+      "producer",
+      "sequence",
+      "hash"
+    ],
+    "privacy": "aggregate_or_pseudonymous",
+    "schema": "trading_lab_product_playbook.v0"
+  }
+}

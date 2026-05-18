@@ -2,16 +2,25 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 from trading_lab.agents import AGENT_ROLES
 from trading_lab.artifacts import ResearchRunArtifact
 from trading_lab.control_plane import gate_evidence_summary, owner_for_gate, role_id, slug
+from trading_lab.data import load_price_csv
 from trading_lab.falsification import build_falsification_engine as build_core_falsification_engine
 from trading_lab.point_in_time import (
     build_point_in_time_contract as build_core_point_in_time_contract,
 )
 from trading_lab.readiness_ledger import summarize_readiness_ledger
+from trading_lab.research_ledgers import (
+    build_action_guidance,
+    build_baseline_pack_ledger,
+    build_failure_gallery,
+    build_point_in_time_proof,
+    build_walk_forward_ledger,
+)
 from trading_lab.trust_packet import build_trust_packet as build_core_trust_packet
 
 
@@ -27,6 +36,7 @@ SUPPORTED_STRATEGY_SOURCES = [
     "lean_algorithm",
     "notebook_summary",
 ]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 def build_platform_overview(
@@ -81,6 +91,13 @@ def build_platform_overview(
         ),
         "agent_contracts": _agent_contracts(agentic_review, source_ref),
         "readiness_ledger": readiness_ledger,
+        "research_ledgers": _research_ledgers(
+            artifact,
+            snapshot=snapshot,
+            readiness=readiness,
+            evidence_rigor=evidence_rigor,
+            source_ref=source_ref,
+        ),
         "trust_packet": _trust_packet(
             artifact,
             run=run,
@@ -91,6 +108,51 @@ def build_platform_overview(
         ),
         "strategy_import": _strategy_import(),
         "failure_gallery": _failure_gallery(artifact, run, lifecycle, gaps, source_ref),
+    }
+
+
+def _research_ledgers(
+    artifact: ResearchRunArtifact,
+    *,
+    snapshot: dict[str, Any],
+    readiness: dict[str, Any],
+    evidence_rigor: dict[str, Any],
+    source_ref: str,
+) -> dict[str, Any]:
+    rows = load_price_csv(_dataset_path(artifact.manifest.source))
+    baseline_ledger = build_baseline_pack_ledger(
+        artifact,
+        rows=rows,
+        source_ref=source_ref,
+    )
+    walk_forward_ledger = build_walk_forward_ledger(
+        artifact,
+        source_ref=source_ref,
+    )
+    point_in_time_proof = build_point_in_time_proof(
+        artifact,
+        evidence_summary=evidence_rigor.get("summary", evidence_rigor),
+        snapshot=_latest_snapshot_event(snapshot),
+        source_ref=source_ref,
+    )
+    failure_gallery = build_failure_gallery(
+        artifact,
+        baseline_ledger=baseline_ledger,
+        walk_forward_ledger=walk_forward_ledger,
+        source_ref=source_ref,
+    )
+    return {
+        "baseline_pack_ledger": baseline_ledger,
+        "walk_forward_ledger": walk_forward_ledger,
+        "point_in_time_proof": point_in_time_proof,
+        "failure_gallery": failure_gallery,
+        "action_guidance": build_action_guidance(
+            artifact,
+            readiness=readiness,
+            baseline_ledger=baseline_ledger,
+            walk_forward_ledger=walk_forward_ledger,
+            source_ref=source_ref,
+        ),
     }
 
 
@@ -633,3 +695,19 @@ def _primary_failure_reason(
     if gaps:
         return gaps[0].get("detail", "Evidence gap remains open.")
     return "No failure reason recorded."
+
+
+def _dataset_path(source: str) -> Path:
+    path = Path(source)
+    if path.is_absolute():
+        return path
+    return PROJECT_ROOT / path
+
+
+def _latest_snapshot_event(snapshot: dict[str, Any]) -> dict[str, Any]:
+    events = snapshot.get("events")
+    if isinstance(events, list) and events:
+        event = events[0]
+        if isinstance(event, dict):
+            return event
+    return {}

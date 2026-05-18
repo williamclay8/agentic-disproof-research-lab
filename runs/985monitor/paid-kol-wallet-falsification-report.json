@@ -1,0 +1,150 @@
+{
+  "schema": "paid_kol_wallet_falsification_report.v1",
+  "mode": "research_only",
+  "research_only": true,
+  "report_id": "985monitor-fomo-paid-kol-wallet-falsification-2026-05-13",
+  "title": "Paid KOL Wallet Falsification Report",
+  "source_packet": "runs/985monitor/fomo-playbook.json",
+  "human_report": "reports/985monitor-paid-kol-wallet-falsification-report.md",
+  "source": {
+    "url": "https://985monitor.xyz/fomo/",
+    "snapshot_timestamp_utc": "2026-05-03T12:06:00Z",
+    "inspected_at_utc": "2026-05-13T15:51:00Z",
+    "freshness_status": "stale_snapshot",
+    "provenance_status": "incomplete",
+    "safe_claim": "985monitor published five FOMO-derived CSV snapshots with aggregate leaderboard and common-follow structure as of the May 3, 2026 snapshot."
+  },
+  "boundary": "Research-only, point-in-time falsification report. Not investment advice. Not a live signal. Not copy-trading guidance. No broker, account, credential, order, fill, execution, position sizing, entry, exit, target, or stop-loss surface is provided.",
+  "client_use": {
+    "intended_buyer": "Research desk, fund, founder, market-intelligence team, or crypto operator evaluating source-reported KOL wallet claims.",
+    "usable_for": [
+      "deciding whether a KOL-wallet dataset deserves deeper due diligence",
+      "screening claims for provenance, concentration, and baseline gaps",
+      "scoping a paid diligence engagement or recurring research report",
+      "building an internal falsification backlog"
+    ],
+    "not_usable_for": [
+      "selecting trades",
+      "copying wallets",
+      "ranking people for targeting",
+      "claiming wallet ownership",
+      "publishing current performance claims",
+      "redistributing raw wallet-handle mappings without rights review"
+    ]
+  },
+  "evidence_inventory": {
+    "csv_count": 5,
+    "total_rows": 1240,
+    "pnl_leaderboard_rows": 175,
+    "pnl_union_unique_identities": 116,
+    "social_rows": 1065,
+    "csv_manifests": [
+      {
+        "filename": "fomo_24h_leaderboard_real_wallets.csv",
+        "row_count": 50,
+        "sha256": "51d076aae62f4f0906e068d544ba4a5207205cdc277b76e4bf60af70e0f777a0",
+        "field_label": "source-reported leaderboard context"
+      },
+      {
+        "filename": "fomo_7d_leaderboard_real_wallets.csv",
+        "row_count": 50,
+        "sha256": "f4631f4207025d00ebefe2d5ed9d760dd022a39b10a6142bfc9584a314b229e4",
+        "field_label": "source-reported leaderboard context"
+      },
+      {
+        "filename": "fomo_30d_leaderboard_real_wallets.csv",
+        "row_count": 50,
+        "sha256": "42f9c5b8ea67b7dc7f747853088016c4edd1c7ad07039af16bfa6668d13cf179",
+        "field_label": "source-reported leaderboard context"
+      },
+      {
+        "filename": "fomo_alltime_leaderboard_real_wallets.csv",
+        "row_count": 25,
+        "sha256": "cb4f42b92add4f0d12f026d348af072b578440a4340297a0ca369c4cf348519d",
+        "field_label": "source-reported leaderboard context"
+      },
+      {
+        "filename": "fomo_smart_money_FULL_real_wallets.csv",
+        "row_count": 1065,
+        "sha256": "dfc442b58d2b7a36ef095fd72aa09c59a95e88d247da7ae0968b196c624b92da",
+        "field_label": "source-reported public/social context"
+      }
+    ]
+  },
+  "findings": [
+    {
+      "id": "freshness_blocker",
+      "status": "blocks_promotion",
+      "finding": "The page claimed hourly updates, but the inspected page and all five CSV files showed the same May 3, 2026 source timestamp.",
+      "business_meaning": "This can be sold only as a historical falsification packet until a refresh and archive process exists.",
+      "next_safe_action": "Set up point-in-time snapshot capture with source timestamp, ingest timestamp, schema hash, and content hash."
+    },
+    {
+      "id": "provenance_gap",
+      "status": "blocks_promotion",
+      "finding": "No scrape code, source API contract, row-level collection timestamp, wallet-linkage method, or USD valuation source was included.",
+      "business_meaning": "The report can evaluate source-reported claims but cannot certify wallet ownership, current balances, or future edge.",
+      "next_safe_action": "Require provenance review before any external paid distribution beyond aggregate research."
+    },
+    {
+      "id": "pnl_persistence_inconclusive",
+      "status": "needs_forward_test",
+      "finding": "The four PnL leaderboards contain 116 unique identities; 72 appear in one window, 31 in two, 11 in three, and only 2 in all four.",
+      "business_meaning": "Persistence is the first paid-research hook, but the current snapshot cannot prove repeatable skill.",
+      "next_safe_action": "Test forward-only rank persistence against random active-wallet and volume-weighted baselines."
+    },
+    {
+      "id": "concentration_risk",
+      "status": "needs_stress_test",
+      "finding": "Top-10 concentration is high: PnL top-10 share ranges from 41.3% to 71.6%, and volume top-10 share ranges from 77.4% to 84.7% across PnL windows.",
+      "business_meaning": "A small head cohort may dominate apparent results, making the dataset useful for concentration-risk reporting.",
+      "next_safe_action": "Run leave-top-10-out and identity-cluster stress tests before claiming cohort robustness."
+    },
+    {
+      "id": "social_context_not_identity_proof",
+      "status": "context_only",
+      "finding": "The social/common-follow sheet has 1,065 rows, 44 rows followed by at least 10 top accounts, and 121 rows without a real wallet populated.",
+      "business_meaning": "The common-follow sheet can support aggregate social-context research, not targeting, contact lists, or coordination claims.",
+      "next_safe_action": "Keep social fields aggregate or pseudonymous and separate them from any misconduct conclusion."
+    }
+  ],
+  "falsification_verdict": {
+    "status": "inconclusive_blocked",
+    "summary": "The dataset is commercially useful as a paid falsification and diligence report seed, but it fails promotion gates for live signal, copy-trading, or predictive-performance claims.",
+    "promotion_ready": false,
+    "blocked_by": [
+      "stale snapshot",
+      "incomplete provenance",
+      "no row-level point-in-time lineage",
+      "no forward-only persistence test",
+      "no baseline comparison",
+      "no fees/slippage/latency/capacity model",
+      "no rights review for redistribution"
+    ]
+  },
+  "proof_gates": [
+    "Source timestamp and ingest timestamp recorded for every future snapshot.",
+    "Every CSV manifest includes filename, row count, schema, byte size, hash, source URL, and provenance status.",
+    "Leaderboard fields remain labeled source-reported context, not performance proof.",
+    "Common-follow fields remain labeled social context, not identity or coordination proof.",
+    "Forward-only outcomes beat random active-wallet and volume-weighted baselines before any edge language is allowed.",
+    "Fees, slippage, latency, spread, and capacity stress tests are recorded before monetization claims are increased.",
+    "Human and rights review happens before any external sale of derived data."
+  ],
+  "blocked_outputs": [
+    "personalized investment advice",
+    "copy-trading instruction",
+    "broker or order-routing action",
+    "live signal",
+    "raw wallet resale without rights review",
+    "current-balance or ownership claims without source proof",
+    "identity targeting or contact list",
+    "coordination or insider claim without independent evidence"
+  ],
+  "deliverable_status": {
+    "complete_as_research_deliverable": true,
+    "committed": false,
+    "pushed": false,
+    "deployed_live": false
+  }
+}

@@ -54,6 +54,13 @@ Local URLs:
 
 - The kernel remains deterministic, local-first, and artifact-backed.
 - API routes expose evidence and snapshots, not investment recommendations.
+- Product Release Rule: every Trading Lab UI, API view, report, export, or
+  release surface must answer four questions before it is treated as shippable:
+  current research state, plain English meaning, missing proof, and next safe research action.
+- Claim Journey: every claim-facing release must walk the user through these
+  six research-only steps in order: What are we testing? Can it beat a simple
+  baseline? What could be fooling us? Where did this evidence come from? Is this
+  ready for more research? What should we test next?
 - The first screen operates as a ranked falsification terminal: attention queue,
   agent review, evidence rigor, weakest gates, bounded observation, provenance,
   confidence readiness, and raw evidence drawer.

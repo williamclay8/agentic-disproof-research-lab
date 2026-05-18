@@ -49,6 +49,64 @@ def test_agentic_review_prioritizes_fails_then_warnings_deterministically() -> N
     ]
 
 
+def test_agentic_review_emits_measurable_reviewer_artifacts() -> None:
+    review = build_agentic_review(
+        gate_results=[
+            _gate(
+                "baseline comparison",
+                "warn",
+                "warning",
+                evidence={"source_refs": ["runs/run-a.json#gate:baseline-comparison"]},
+            ),
+            _gate(
+                "baseline comparison",
+                "fail",
+                "critical",
+                evidence={"source_ref": "runs/run-b.json#gate:baseline-comparison"},
+            ),
+            _gate(
+                "cost grid robustness",
+                "warn",
+                "warning",
+                evidence={"source_refs": ["runs/run-b.json#gate:cost-grid-robustness"]},
+            ),
+        ],
+        next_tests=[],
+        limitations=[],
+        source_ref="runs/review-source.json",
+    )
+
+    baseline_findings = [
+        finding
+        for finding in review["findings"]
+        if finding["gate_name"] == "baseline comparison"
+    ]
+    assert baseline_findings[0]["reviewer_artifact_id"] == (
+        "review-artifact-baseline-challenger-baseline-comparison-1"
+    )
+    assert baseline_findings[0]["reviewer_id"] == "baseline_challenger"
+    assert baseline_findings[0]["owned_artifact_type"] == "baseline_pack_result"
+    assert baseline_findings[0]["score"] == 100
+    assert baseline_findings[0]["repeated_finding_count"] == 2
+    assert baseline_findings[0]["source_refs"] == [
+        "runs/run-b.json#gate:baseline-comparison",
+        "runs/review-source.json#gate:baseline-comparison",
+    ]
+
+    scorecard = {
+        item["reviewer_id"]: item for item in review["reviewer_scorecard"]
+    }
+    assert scorecard["baseline_challenger"]["owned_artifact_types"] == [
+        "baseline_pack_result"
+    ]
+    assert scorecard["baseline_challenger"]["open_finding_count"] == 2
+    assert scorecard["baseline_challenger"]["repeated_finding_count"] == 2
+    assert scorecard["baseline_challenger"]["max_score"] == 100
+    assert review["repeated_findings"] == [
+        {"gate_name": "baseline comparison", "count": 2}
+    ]
+
+
 def test_agentic_review_language_stays_research_only_and_non_actionable() -> None:
     review = build_agentic_review(
         gate_results=[_gate("baseline comparison", "warn", "warning")],
@@ -92,11 +150,16 @@ def test_agentic_review_promotes_only_as_preliminary_research_when_all_gates_pas
     assert "harder falsification" in review["ranked_next_actions"][0]
 
 
-def _gate(name: str, status: str, severity: str) -> GateResult:
+def _gate(
+    name: str,
+    status: str,
+    severity: str,
+    evidence: dict[str, object] | None = None,
+) -> GateResult:
     return GateResult(
         gate_name=name,
         status=status,
-        evidence={"recorded": True},
+        evidence=evidence or {"recorded": True},
         threshold="evidence recorded",
         remediation_hint=f"Resolve {name} evidence gap.",
         severity=severity,
